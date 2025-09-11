@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+const routes = require('./routes');
+router.use('/', routes);
+
 router.get('/health', (req, res) => {
     res.status(200).json({
         success: true,
