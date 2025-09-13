@@ -1,8 +1,6 @@
 const nodemailer = require("nodemailer");
 const config = require("../config/environment");
 
-console.log(config.EMAIL_USER, config.EMAIL_PASS, config.SMTP_SERVICE);
-
 const transporter = nodemailer.createTransport({
     service: config.SMTP_SERVICE,
     auth: {
