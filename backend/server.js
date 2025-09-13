@@ -4,6 +4,8 @@ const configureServer = require('./src/config/server');
 const config = require('./src/config/environment');
 const errorHandler = require('./src/middleware/errorHandler');
 const notFound = require('./src/middleware/notFound');
+const cookieParser = require('cookie-parser');
+
 
 // Import routes
 const indexRoutes = require('./src/routes/index');
@@ -14,13 +16,17 @@ const app = express();
 // Configure server middleware
 configureServer(app);
 
+// Parse cookies before routes (needed for auth middleware)
+app.use(cookieParser());
+
 // Connect to MongoDB
 connectDB();
 
 // Routes
-app.use(`${config.API_PREFIX}`, indexRoutes);
+app.use(`${config.API_PREFIX}`, indexRoutes);                 
 
 // Error handling middleware (must be last)
+
 app.use(notFound);
 app.use(errorHandler);
 
@@ -32,3 +38,4 @@ app.listen(PORT, () => {
     console.log(`🌍 Entorno: ${config.NODE_ENV}`);
     console.log(`📚 API Base: http://localhost:${PORT}${config.API_PREFIX}`);
 });
+

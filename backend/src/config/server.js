@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 
+
 // Import custom middleware
 const logger = require('../middleware/logger');
 
@@ -12,6 +13,7 @@ const configureServer = (app) => {
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         allowedHeaders: ['Content-Type', 'Authorization']
     }));
+
 
     // Logging middleware
     app.use(logger);
