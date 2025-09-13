@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
+const taskController = require("../controllers/taskController");
 const { loginLimiter } = require("../middleware/auth");
+const { authenticateToken } = require("../middleware/auth");
 
 
 
@@ -20,6 +22,7 @@ router.post("/forgot-password", authController.forgotPassword);
 // Reestablecer contraseña
 router.post("/reset-password" ,authController.resetPassword);
 
-
+// Crear tarea
+router.post("/tasks", authenticateToken, taskController.createTask);
 
 module.exports = router;

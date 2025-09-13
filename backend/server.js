@@ -16,13 +16,14 @@ const app = express();
 // Configure server middleware
 configureServer(app);
 
+// Parse cookies before routes (needed for auth middleware)
+app.use(cookieParser());
+
 // Connect to MongoDB
 connectDB();
 
 // Routes
 app.use(`${config.API_PREFIX}`, indexRoutes);                 
-
-app.use(cookieParser());
 
 // Error handling middleware (must be last)
 
