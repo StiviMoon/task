@@ -9,4 +9,6 @@ router.use("/auth", userRoutes);
 
 // Implementar luego las rutas protegidas aquí. ( por el Auth.js )
 
+
 module.exports = router;
+
