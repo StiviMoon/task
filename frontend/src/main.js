@@ -1,24 +1,21 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+import page from "page";
+import {
+  renderLogin, addLoginLogic,
+  renderForgotPassword, addForgotPasswordLogic
+} from "./pages/LoginPage.js";
+import { renderRegister, addRegisterLogic } from "./pages/RegisterPage.js";
+import { DashboardPage } from "./pages/DashboardPage.js";
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Task Manager
-    </p>
-  </div>
-`
+function mount(renderFn, logicFn) {
+  const app = document.getElementById("app");
+  app.innerHTML = renderFn ? renderFn() : "";
+  if (logicFn) logicFn();
+}
 
-setupCounter(document.querySelector('#counter'))
+// ================== routes ==================
+page("/", () => mount(renderLogin, addLoginLogic));
+page("/signup", () => mount(renderRegister, addRegisterLogic));
+page("/forgot-password", () => mount(renderForgotPassword, addForgotPasswordLogic));
+page("/tasks", () => DashboardPage());
+
+page.start();
