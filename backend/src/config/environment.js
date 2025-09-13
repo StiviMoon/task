@@ -16,7 +16,18 @@ const config = {
 
     // API configuration
     API_VERSION: process.env.API_VERSION || 'v1',
-    API_PREFIX: process.env.API_PREFIX || '/api'
+    API_PREFIX: process.env.API_PREFIX || '/api',
+
+    // JWT configuration
+    JWT_SECRET: process.env.JWT_SECRET || 'your_jwt_secret',
+    JWT_RESET_PASSWORD_SECRET: process.env.JWT_RESET_PASSWORD_SECRET || 'your_jwt_reset_secret',
+
+    
+    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+    // Email configuration
+    EMAIL_USER: process.env.EMAIL_USER || '',
+    EMAIL_PASS: process.env.EMAIL_PASS || '',
+    SMTP_SERVICE: process.env.SMTP_SERVICE || 'gmail'
 };
 
 module.exports = config;
