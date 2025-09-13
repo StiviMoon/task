@@ -5,6 +5,8 @@ const { loginLimiter } = require("../middleware/auth");
 
 
 
+// Crear un nuevo usuario
+router.post("/register", authController.register);
 
 // Iniciar sesión
 router.post("/login", loginLimiter ,authController.login);
@@ -12,9 +14,11 @@ router.post("/login", loginLimiter ,authController.login);
 // Cerrar sesión
 router.post("/logout" ,authController.logout);
 
+// Olvidé mi contraseña
+router.post("/forgot-password", authController.forgotPassword);
 
-// Crear un nuevo usuario
-router.post("/register", authController.register);
+// Reestablecer contraseña
+router.post("/reset-password" ,authController.resetPassword);
 
 
 

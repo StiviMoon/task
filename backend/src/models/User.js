@@ -53,7 +53,8 @@ const userSchema = new mongoose.Schema(
                 /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
                 "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial"
                 ]
-    }
+    },
+    resetPasswordJti:{ type: String  , default: null }
   },
   { timestamps: true ,
    versionKey: false }

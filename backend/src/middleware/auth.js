@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const rateLimit = require("express-rate-limit");
 
+
 /**
  * Middleware para autenticar solicitudes usando JWT.
  * @param {Request} req  objeto de solicitud HTTP.
@@ -22,8 +23,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-
-
+// Limitador de tasa para la ruta de inicio de sesión
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, 
   max: 5, 
