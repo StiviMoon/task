@@ -1,9 +1,22 @@
+/**
+ * Middleware de manejo de errores global para Express.
+ * Envía un mensaje genérico para errores 5XX y muestra detalles solo en desarrollo.
+ *
+ * @param {Error} err - Objeto de error lanzado.
+ * @param {Request} req - Objeto de solicitud de Express.
+ * @param {Response} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función next de Express.
+ * @returns {void}
+ */
+
+const config = require('../config/environment');
+
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message;
 
-    // Log error with more details
-    console.error('❌ Error Details:', {
+    if (config.NODE_ENV === 'development') {
+        console.error('❌ Error Details:', {
         message: err.message,
         stack: err.stack,
         url: req.originalUrl,
@@ -11,7 +24,8 @@ const errorHandler = (err, req, res, next) => {
         ip: req.ip,
         userAgent: req.get('User-Agent'),
         timestamp: new Date().toISOString()
-    });
+        });
+    }
 
     // Mongoose bad ObjectId
     if (err.name === 'CastError') {
@@ -61,7 +75,7 @@ const errorHandler = (err, req, res, next) => {
 
     res.status(statusCode).json({
         success: false,
-        error: message,
+        error: statusCode >= 500 ? 'Intenta de nuevo más tarde' : message,
         ...(process.env.NODE_ENV === 'development' && {
             stack: err.stack,
             details: {

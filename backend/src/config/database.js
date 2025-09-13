@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
+const config = require('./environment');
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI);
+        const conn = await mongoose.connect(config.MONGODB_URI);
 
         console.log(`MongoDB conectado: ${conn.connection.host}`);
         console.log(`Base de datos: ${conn.connection.name}`);
@@ -10,7 +11,7 @@ const connectDB = async () => {
         console.error('Error conectando a MongoDB:', error.message);
         console.log('Asegúrate de configurar MONGODB_URI en tu archivo .env');
 
-        if (process.env.NODE_ENV === 'production') {
+        if (config.NODE_ENV === 'production') {
             process.exit(1);
         }
     }
