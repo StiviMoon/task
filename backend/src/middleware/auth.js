@@ -13,8 +13,6 @@ const authenticateToken = (req, res, next) => {
   const token =
     req.cookies?.access_token ||
     (authHeader && authHeader.split(" ")[1]);
-
-  console.log(req.cookies)
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
