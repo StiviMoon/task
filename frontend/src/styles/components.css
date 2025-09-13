@@ -1,0 +1,270 @@
+/* ===========================
+   Form Inputs
+=========================== */
+input, select, textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+/* ===========================
+   Buttons
+=========================== */
+button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #6a1b9a;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+button:hover:enabled {
+  background: #4a148c;
+}
+
+/* Variants */
+.btn-danger {
+  background: #d32f2f;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #b71c1c;
+}
+
+.btn-secondary {
+  background: #ccc;
+  color: #333;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #aaa;
+}
+
+/* ===========================
+   Toast
+=========================== */
+.toast {
+  background: #4caf50;
+  color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* ===========================
+   Task Item
+=========================== */
+.task-item {
+  cursor: pointer;
+  background: #fff;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 0.5rem;
+  border: 1px solid #eee;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* ===========================
+   Modals
+=========================== */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  position: relative;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Close modal button */
+.close-btn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: #6a1b9a;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #4a148c;
+}
+
+/* Actions within the modal*/
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+/* ===========================
+   Dashboard & Kanban
+=========================== */
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+}
+
+.kanban-board {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+  padding: 1rem;
+}
+
+.kanban-column {
+  flex: 1;
+  background: #f5f5f5;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+/* ===========================
+   Sidebar & Menu
+=========================== */
+.sidebar {
+  background: #6a1b9a;
+  color: #fff;
+  padding: 0.5rem;
+  position: relative;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.sidebar-menu.hidden {
+  display: none;
+}
+
+.menu-item {
+  background: #fff;
+  color: #6a1b9a;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: left;
+}
+
+.menu-item:hover {
+  background: #eee;
+}
+
+/* ===========================
+   Floating Action Button (FAB)
+=========================== */
+.fab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  background: #6a1b9a;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: bold;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.fab:hover {
+  background: #4a148c;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .kanban-board {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .kanban-column {
+    width: 100%;
+  }
+
+  .task-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+}
