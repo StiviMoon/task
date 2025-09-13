@@ -1,7 +1,7 @@
 import page from "page";
-import {
+import { 
   renderLogin, addLoginLogic,
-  renderForgotPassword, addForgotPasswordLogic
+  renderForgotPassword, addForgotPasswordLogic 
 } from "./pages/LoginPage.js";
 import { renderRegister, addRegisterLogic } from "./pages/RegisterPage.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
