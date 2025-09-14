@@ -1,6 +1,30 @@
 // src/components/TaskForm.js
 import { createTask } from "../services/taskService.js";
 
+/*
+ Creates and returns a task form with real-time validation.
+
+This form includes fields for title, detail, date, time, and status.
+Upon submission, attempts to create a new task using `createTask` and executes
+the `onTaskCreated` callback if provided.
+
+@function TaskForm
+@param {function(Object):void} [onTaskCreated] - Callback opcional que se ejecuta
+After the task has been successfully created,
+it receives the created task as an argument.
+ 
+@returns {HTMLFormElement}The task creation form is ready to be 
+inserted into the DOM.
+ 
+ @example
+ import { TaskForm } from "./components/TaskForm.js";
+ 
+ const container = document.getElementById("app");
+ const form = TaskForm((task) => {
+  console.log("Tarea creada:", task);
+});
+container.appendChild(form);
+ */
 export function TaskForm(onTaskCreated) {
   const form = document.createElement("form");
   form.id = "task-form";
@@ -44,7 +68,12 @@ export function TaskForm(onTaskCreated) {
   const saveBtn = form.querySelector("#save-task");
   const spinner = form.querySelector("#spinner");
 
-  // Real-time validation
+/*
+Input event to validate required fields in real time.
+Enables or disables the save button based on the state of the fields.
+@event input
+*/
+
   form.addEventListener("input", () => {
     const title = form.querySelector("#title").value.trim();
     const date = form.querySelector("#date").value;
@@ -53,8 +82,17 @@ export function TaskForm(onTaskCreated) {
 
     saveBtn.disabled = !(title && date && time && status);
   });
+/*
+`submit` event that creates a new task when the form is submitted.
 
-  // Submit new task
+@event submit
+@property {Object} newTask - Details of the new task.
+@property {string} newTask.title -Title of the task.
+@property {string} newTask.detail - Details of the task.
+@property {string} newTask.date - Date in ISO format (yyyy-mm-dd).
+@property {string} newTask.time - Time in HH:mm format.
+@property {"todo"|"doing"|"done"} newTask.status - Status of the task.
+*/
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
