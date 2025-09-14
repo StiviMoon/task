@@ -1,19 +1,19 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-/**    
- *  
- * Esquema de Mongoose para el modelo User.
- * Define la estructura y validaciones para los documentos de usuario en la base de datos.
- * Campos:
- * - name: Nombre del usuario (String, requerido).
- * - lastName: Apellido del usuario (String, requerido).
- * - age: Edad del usuario (Number, requerido, mínimo 13).
- *  - email: Correo electrónico del usuario (String, requerido, único, formato válido).
- * - password: Contraseña del usuario (String, requerido, mínimo 6 caracteres, debe incluir una mayúscula, un número y un carácter especial).
- * - createdAt: Fecha de creación del usuario (Date, por defecto la fecha actual). -> Con el timestamp
- * - updatedAt: Fecha de última actualización del usuario (Date, por defecto la fecha actual). -> Con el timestamp
- * 
+/**
+*
+* Mongoose schema for the User model.
+* Defines the structure and validations for user documents in the database.
+* Fields:
+* - name: User's first name (String, required).
+* - lastName: User's last name (String, required).
+* - age: User's age (Number, required, minimum 13).
+* - email: User's email address (String, required, unique, valid format).
+* - password: User's password (String, required, minimum 6 characters, must include one capital letter, one number, and one special character).
+* - createdAt: User creation date (Date, defaults to the current date). -> With the timestamp
+* - updatedAt: User last update date (Date, defaults to the current date). -> With the timestamp
+* 
 */
 
 const userSchema = new mongoose.Schema(
@@ -62,19 +62,18 @@ const userSchema = new mongoose.Schema(
 
 
 /**
- * Middleware de Mongoose que se ejecuta antes de guardar un documento User.
- *
- * - Verifica si el campo `password` fue modificado.
- * - Si fue modificado (o es nuevo), genera una sal y hashea la contraseña con bcrypt.
- * - Reemplaza la contraseña en texto plano por el hash antes de guardar en la base de datos.
- *
- * @function
- * @name preSavePasswordHash
- * @memberof UserSchema
- * @param {Function} next - Callback que indica a Mongoose que continúe con la operación de guardado.
- *
- */
-
+* Mongoose middleware that runs before saving a User document.
+*
+* - Checks if the `password` field has been modified.
+* - If it has been modified (or is new), generates a salt and hashes the password with bcrypt.
+* - Replaces the plaintext password with the hash before saving to the database.
+*
+* @function
+* @name preSavePasswordHash
+* @memberof UserSchema
+* @param {Function} next - Callback that tells Mongoose to continue with the save operation.
+*
+*/
 userSchema.pre("save", async function (next){
    if (!this.isModified("password")) return next();
     try {

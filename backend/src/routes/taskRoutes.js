@@ -2,16 +2,16 @@ const express = require("express");
 const router = express.Router();
 const taskController = require("../controllers/taskController");
 
-// Crear tarea
+// Create a task
 router.post("/", taskController.createTask);
 
-// Obtener todas las tareas del usuario autenticado
+// Get all tasks for the authenticated user
 router.get("/", taskController.getTasks);
 
-// Actualizar una tarea
+// Update a task
 router.put("/:id", taskController.updateTask);
 
-// Eliminar una tarea
+// Delete a task
 router.delete("/:id", taskController.deleteTask);
 
 module.exports = router;
