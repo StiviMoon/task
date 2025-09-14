@@ -1,0 +1,308 @@
+/* === LOGIN & REGISTER === */
+/* Container for login and register pages (centers content vertically & horizontally) */
+.register-container, .login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+
+/* Card for login and register forms */
+.register-card, .login-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 350px;
+}
+
+/* Spinner inside forms */
+#spinner {
+  margin-top: 1rem;
+}
+
+/* Links inside login/register cards */
+.login-card a, .register-card a {
+  color: #6a1b9a;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.login-card a:hover, .register-card a:hover {
+  text-decoration: underline;
+}
+
+/* === DASHBOARD === */
+/* General dashboard layout (sidebar + main content) */
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  background: #f8f9fa;
+}
+
+/* Sidebar with navigation buttons */
+.sidebar {
+  width: 60px;
+  background: #f2e3f6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+  gap: 1rem;
+}
+
+/* Main content area (top bar + kanban board) */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+/* === TOP BAR === */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Search input inside top bar */
+.search-input {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Search button */
+.search-btn {
+  background: #6a1b9a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+/* === KANBAN BOARD === */
+.kanban-board {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+/* Kanban column (To Do, In Progress, etc.) */
+.kanban-column {
+  background: #e9f2fb;
+  padding: 1rem;
+  border-radius: 10px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-column h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+/* Task card inside kanban columns */
+.task-card {
+  background: white;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Floating action button (FAB) for adding tasks */
+.fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #6c63ff;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+/* === SIDEBAR MENU === */
+.sidebar-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Dropdown menu from sidebar */
+.sidebar-menu {
+  position: absolute;
+  top: 50px;
+  left: 60px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.sidebar-menu.hidden {
+  display: none;
+}
+
+/* Items inside sidebar menu */
+.menu-item {
+  background: none;
+  color: #333;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  width: 100%;
+}
+
+.menu-item:hover {
+  background: #f2e3f6;
+}
+
+/* === MODAL === */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+.modal-content h2 {
+  margin-bottom: 1rem;
+}
+
+/* Modal action buttons (Confirm / Cancel) */
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Danger button (e.g. delete) */
+.modal-actions .danger {
+  background: #d32f2f;
+  color: white;
+}
+
+.modal-actions .danger:hover {
+  background: #b71c1c;
+}
+
+.modal-actions button:hover {
+  opacity: 0.9;
+}
+
+/* Hidden utility class */
+.hidden {
+  display: none;
+}
+
+/* Toast notification */
+.toast {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #4caf50;
+  color: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* === RESPONSIVE (MOBILE) === */
+/* Sidebar menu becomes a panel on mobile */
+@media (max-width: 768px) {
+  .sidebar-menu {
+    position: absolute;
+    top: 3rem;
+    left: 0;
+    background: #6a1b9a;
+    width: 200px;
+    padding: 1rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+
+  /* Dashboard switches to vertical layout */
+  .kanban-board {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .kanban-column {
+    width: 100%;
+    min-height: auto;
+    padding: 0.5rem;
+  }
+
+  .task-card {
+    width: 100%;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  /* Compact top bar */
+  .topbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* FAB closer to the corner */
+  .fab {
+    right: 1rem;
+    bottom: 1rem;
+  }
+}

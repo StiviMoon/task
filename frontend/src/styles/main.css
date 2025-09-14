@@ -1,0 +1,27 @@
+/* Reset global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f9fafb;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* Utilidades */
+.hidden { display: none; }
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.logo {
+  width: 100px;
+  margin-bottom: 1rem;
+}
