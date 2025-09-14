@@ -6,6 +6,7 @@ import {
 import { renderRegister, addRegisterLogic } from "./pages/RegisterPage.js";
 import { renderResetPassword, addResetPasswordLogic } from "./pages/ResetPasswordPage.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
+import { requireAuth, requireGuest } from "./utils/authGuard.js";
 import "./styles/main.css";
 import "./styles/components.css";
 import "./styles/pages.css";
@@ -39,29 +40,40 @@ const showLoading = () => {
 
 // Ruta de login - solo accesible si NO estás autenticado
 page("/", () => {
-  mount(renderLogin, addLoginLogic);
+  requireGuest(
+    () => mount(renderLogin, addLoginLogic),
+    () => window.location.href = '/tasks'
+  );
 });
 
 // Ruta de registro - solo accesible si NO estás autenticado
 page("/signup", () => {
-  mount(renderRegister, addRegisterLogic);
+  requireGuest(
+    () => mount(renderRegister, addRegisterLogic),
+    () => window.location.href = '/tasks'
+  );
 });
 
-// Ruta de forgot password - solo accesible si NO estás autenticado
+// Ruta de forgot password - accesible sin autenticación (para recuperar contraseña)
 page("/forgot-password", () => {
   mount(renderForgotPassword, addForgotPasswordLogic);
 });
 
-// Ruta de reset password - accesible sin autenticación
+// Ruta de reset password - accesible sin autenticación (para restablecer contraseña)
 page("/reset-password", () => {
   mount(renderResetPassword, addResetPasswordLogic);
 });
 
 // Ruta de dashboard - solo accesible si estás autenticado
-page("/tasks", async () => {
-  const app = document.getElementById("app");
-  app.innerHTML = ""; // Limpiar contenido anterior
-  await DashboardPage();
+page("/tasks", () => {
+  requireAuth(
+    async () => {
+      const app = document.getElementById("app");
+      app.innerHTML = ""; // Limpiar contenido anterior
+      await DashboardPage();
+    },
+    () => window.location.href = '/'
+  );
 });
 
 // Redirigir cualquier ruta desconocida
