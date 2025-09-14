@@ -16,6 +16,10 @@ function mount(renderFn, logicFn) {
 page("/", () => mount(renderLogin, addLoginLogic));
 page("/signup", () => mount(renderRegister, addRegisterLogic));
 page("/forgot-password", () => mount(renderForgotPassword, addForgotPasswordLogic));
-page("/tasks", () => DashboardPage());
+page("/tasks", async () => {
+  const app = document.getElementById("app");
+  app.innerHTML = ""; // Limpiar contenido anterior
+  await DashboardPage();
+});
 
 page.start();
