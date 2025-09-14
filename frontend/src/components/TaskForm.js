@@ -11,7 +11,7 @@ export function TaskForm(onTaskCreated) {
     </label>
     <label>
       Detalles
-      <textarea id="details" maxlength="500" rows="2" cols="50" placeholder="Describe los detalles de tu tarea..."></textarea>
+      <textarea id="details" maxlength="500" rows="2" cols="50" placeholder="Describe los detalles de tu tarea.. ( Opcional )"></textarea>
     </label>
     <label>
       Fecha *

@@ -52,6 +52,27 @@ button:hover:enabled {
   background: #4a148c;
 }
 
+/* Spinner inside buttons */
+.loader {
+    width: 1rem;
+    height: 1rem;
+    border: 5px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+    } 
+
 /* Variants */
 .btn-danger {
   background: #d32f2f;
@@ -133,6 +154,9 @@ button:hover:enabled {
   background: #fff;
   padding: 2rem;
   border-radius: 1rem;
+  word-wrap: break-word;      /* para cortar palabras largas */
+  overflow-wrap: break-word;  
+  white-space: normal;        /* permite que el texto haga saltos de línea */
   width: 90%;
   max-width: 400px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);

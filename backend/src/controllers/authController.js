@@ -80,7 +80,7 @@ exports.login = async (req, res) => {
   }
 
   catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: "Inténtalo de nuevo más tarde." });
   }
 };
 
@@ -220,7 +220,7 @@ exports.resetPassword = async (req, res) => {
         return res.status(400).json({ success: false, message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial" });
     }
 
-
+    user.resetPasswordJti = null; // Invalida el token después de usarlo
     user.password = newPassword;
 
     await user.save();
