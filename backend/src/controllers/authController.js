@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { sendMail } = require("../service/mailService");
+const { sendMail } = require("../service/resendService");
 const config = require("../config/environment");
 
 /**
@@ -181,7 +181,8 @@ exports.forgotPassword = async (req, res) => {
 
     res.status(200).json({ success: true });
   } catch (err) {
-    res.status(500).json({ success: false, err: err.message });
+    console.error('Error en forgotPassword:', err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 

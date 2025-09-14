@@ -4,6 +4,7 @@ import {
   renderForgotPassword, addForgotPasswordLogic
 } from "./pages/LoginPage.js";
 import { renderRegister, addRegisterLogic } from "./pages/RegisterPage.js";
+import { renderResetPassword, addResetPasswordLogic } from "./pages/ResetPasswordPage.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
 import "./styles/main.css";
 import "./styles/components.css";
@@ -49,6 +50,11 @@ page("/signup", () => {
 // Ruta de forgot password - solo accesible si NO estás autenticado
 page("/forgot-password", () => {
   mount(renderForgotPassword, addForgotPasswordLogic);
+});
+
+// Ruta de reset password - accesible sin autenticación
+page("/reset-password", () => {
+  mount(renderResetPassword, addResetPasswordLogic);
 });
 
 // Ruta de dashboard - solo accesible si estás autenticado

@@ -57,6 +57,7 @@
     "picomatch": "^2.3.1",
     "pstree.remy": "^1.1.8",
     "readdirp": "^3.6.0",
+    "resend": "^6.0.3",
     "semver": "^7.7.2",
     "simple-update-notifier": "^2.0.0",
     "supports-color": "^5.5.0",

@@ -1,6 +1,7 @@
 import page from "page";
-import { renderLogin, addLoginLogic } from "./pages/LoginPage.js";
+import { renderLogin, addLoginLogic, renderForgotPassword, addForgotPasswordLogic } from "./pages/LoginPage.js";
 import { renderRegister, addRegisterLogic } from "./pages/RegisterPage.js";
+import { renderResetPassword, addResetPasswordLogic } from "./pages/ResetPasswordPage.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
 import { requireAuth, requireGuest } from "./utils/authGuard.js";
 
@@ -38,6 +39,8 @@ const showLoading = () => {
 /**
  * "/" → Login page (solo accesible si NO estás autenticado)
  * "/signup" → Register page (solo accesible si NO estás autenticado)
+ * "/forgot-password" → Forgot password page (solo accesible si NO estás autenticado)
+ * "/reset-password" → Reset password page (accesible sin autenticación)
  * "/tasks" → Dashboard page (solo accesible si estás autenticado)
  */
 
@@ -55,6 +58,19 @@ page("/signup", () => {
     () => mount(renderRegister, addRegisterLogic),
     () => window.location.href = '/tasks'
   );
+});
+
+// Ruta de recuperación de contraseña - solo accesible si NO estás autenticado
+page("/forgot-password", () => {
+  requireGuest(
+    () => mount(renderForgotPassword, addForgotPasswordLogic),
+    () => window.location.href = '/tasks'
+  );
+});
+
+// Ruta de restablecimiento de contraseña - accesible sin autenticación
+page("/reset-password", () => {
+  mount(renderResetPassword, addResetPasswordLogic);
 });
 
 // Ruta de dashboard - solo accesible si estás autenticado
