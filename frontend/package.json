@@ -5,9 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:local": "vite --mode development",
     "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "build:prod": "vite build --mode production",
     "preview": "vite preview",
-    "start": "npm run build && npm run preview"
+    "preview:dev": "vite preview --mode development",
+    "preview:prod": "vite preview --mode production",
+    "start": "npm run build && npm run preview",
+    "start:dev": "npm run build:dev && npm run preview:dev",
+    "start:prod": "npm run build:prod && npm run preview:prod"
   },
   "dependencies": {
     "page": "^1.11.6"

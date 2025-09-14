@@ -13,10 +13,21 @@ const authenticateToken = (req, res, next) => {
   const token =
     req.cookies?.access_token ||
     (authHeader && authHeader.split(" ")[1]);
-  if (!token) return res.sendStatus(401);
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Token de acceso requerido"
+    });
+  }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
+    if (err) {
+      return res.status(403).json({
+        success: false,
+        message: "Token inválido o expirado"
+      });
+    }
     req.user = user;
     next();
   });
@@ -24,14 +35,14 @@ const authenticateToken = (req, res, next) => {
 
 // Limitador de tasa para la ruta de inicio de sesión
 const loginLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, 
-  max: 5, 
+  windowMs: 10 * 60 * 1000,
+  max: 5,
     message: {
     success: false,
     message: "Cuenta temporalmente bloqueada."
     },
-    standardHeaders: true, 
-    legacyHeaders: false, 
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
 module.exports = { authenticateToken, loginLimiter };

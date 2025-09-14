@@ -1,20 +1,19 @@
 import page from "page";
-import {
-  renderLogin, addLoginLogic,
-  renderForgotPassword, addForgotPasswordLogic
-} from "./pages/LoginPage.js";
+import { renderLogin, addLoginLogic, renderForgotPassword, addForgotPasswordLogic } from "./pages/LoginPage.js";
 import { renderRegister, addRegisterLogic } from "./pages/RegisterPage.js";
 import { renderResetPassword, addResetPasswordLogic } from "./pages/ResetPasswordPage.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
 import { requireAuth, requireGuest } from "./utils/authGuard.js";
-import "./styles/main.css";
-import "./styles/components.css";
-import "./styles/pages.css";
 
-function mount(renderFn, logicFn) {
+/**
+ * Mounts a view inside the #app element
+ * @param {Function} view - Function that returns HTML string
+ * @param {Function} logic - Function that adds event listeners / page logic
+ */
+function mount(view, logic) {
   const app = document.getElementById("app");
-  app.innerHTML = renderFn ? renderFn() : "";
-  if (logicFn) logicFn();
+  app.innerHTML = view(); // render the HTML of the page
+  logic(); // attach the page-specific logic
 }
 
 // Función para mostrar loading mientras se verifica autenticación
@@ -36,7 +35,14 @@ const showLoading = () => {
   `;
 };
 
-// ================== routes ==================
+// ================== ROUTES ==================
+/**
+ * "/" → Login page (solo accesible si NO estás autenticado)
+ * "/signup" → Register page (solo accesible si NO estás autenticado)
+ * "/forgot-password" → Forgot password page (solo accesible si NO estás autenticado)
+ * "/reset-password" → Reset password page (accesible sin autenticación)
+ * "/tasks" → Dashboard page (solo accesible si estás autenticado)
+ */
 
 // Ruta de login - solo accesible si NO estás autenticado
 page("/", () => {
@@ -54,12 +60,15 @@ page("/signup", () => {
   );
 });
 
-// Ruta de forgot password - accesible sin autenticación (para recuperar contraseña)
+// Ruta de recuperación de contraseña - solo accesible si NO estás autenticado
 page("/forgot-password", () => {
-  mount(renderForgotPassword, addForgotPasswordLogic);
+  requireGuest(
+    () => mount(renderForgotPassword, addForgotPasswordLogic),
+    () => window.location.href = '/tasks'
+  );
 });
 
-// Ruta de reset password - accesible sin autenticación (para restablecer contraseña)
+// Ruta de restablecimiento de contraseña - accesible sin autenticación
 page("/reset-password", () => {
   mount(renderResetPassword, addResetPasswordLogic);
 });
@@ -78,7 +87,14 @@ page("/tasks", () => {
 
 // Redirigir cualquier ruta desconocida
 page("*", () => {
-  window.location.href = '/';
+  // Verificar si está autenticado para decidir a dónde redirigir
+  requireAuth(
+    () => window.location.href = '/tasks',
+    () => window.location.href = '/'
+  );
 });
 
-page.start();
+// Starts the Page.js router
+export function initRouter() {
+  page.start();
+}

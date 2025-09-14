@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { sendMail } = require("../service/mailService");
+const { sendMail } = require("../service/resendService");
 const config = require("../config/environment");
 
 /**
@@ -10,8 +10,8 @@ const config = require("../config/environment");
  *
  * @async
  * @function register
- * @param {Request} req 
- * @param {Response} res 
+ * @param {Request} req
+ * @param {Response} res
  * @returns {Promise<void>} Devuelve un objeto JSON con:
  *  - 201: `{ message: user._id }` si el registro es exitoso.
  *  - 409: `{ message: "Este correo ya está registrado." }` si el email está duplicado.
@@ -42,8 +42,8 @@ exports.register = async (req, res) => {
  *
  * @async
  * @function login
- * @param {Request} req 
- * @param {Response} res 
+ * @param {Request} req
+ * @param {Response} res
  * @returns { Promise<void>} Devuelve un objeto JSON con:
  *  - 200: `{ success: true, ,message: "Inicio de sesión exitoso."" ,token }` si las credenciales son correctas. y también manda el cookie.
  *  - 401: `{ success: false, message: "Correo o contraseña inválidos." }` si no coinciden email/contraseña.
@@ -67,26 +67,28 @@ exports.login = async (req, res) => {
     );
 
     // Enviar el token en una cookie segura
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("access_token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",            // Si es cross-site cookie colocar: None
-        maxAge: 2 * 60 * 60 * 1000, 
+        secure: isProduction, // true para HTTPS en producción
+        sameSite: isProduction ? "none" : "lax", // none para cross-origin en producción
+        maxAge: 2 * 60 * 60 * 1000, // 2 horas
         path: "/",
     });
 
     res.status(200).json({ success: true, message: "Inicio de sesión exitoso." });
-  } 
+  }
 
   catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: "Inténtalo de nuevo más tarde." });
   }
 };
 
-/** 
+/**
  * Cierra la sesión del usuario eliminando la cookie del token.
  * @function logout
  * @param {Request} req
+ *
  * @param {Response}  res
  * @returns {void} Devuelve un objeto JSON con:
  *  - 200: `{ message: "Sesión cerrada exitosamente." }` si la cookie se elimina correctamente.
@@ -95,19 +97,44 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
     try{
+        const isProduction = process.env.NODE_ENV === 'production';
         res.clearCookie("access_token", {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax", 
-            path: "/", 
+            secure: isProduction, // true para HTTPS en producción
+            sameSite: isProduction ? "none" : "lax", // none para cross-origin en producción
+            path: "/",
         });
-        
+
         res.status(200).json({ success: true, message: "Sesión cerrada exitosamente." });
     }
     catch(error){
         res.status(400).json({ success: false, message: error.message });
     }
 
+};
+
+/**
+ * Verifica si el usuario está autenticado.
+ * @function verifyAuth
+ * @param {Request} req - Request object (debe tener req.user del middleware authenticateToken)
+ * @param {Response} res
+ * @returns {void} Devuelve un objeto JSON con:
+ *  - 200: `{ success: true, user: { id, email, name } }` si está autenticado.
+ *  - 401: Si no está autenticado (manejado por el middleware authenticateToken).
+ */
+exports.verifyAuth = (req, res) => {
+    try {
+        // Si llegamos aquí, el middleware authenticateToken ya verificó que el token es válido
+        res.status(200).json({
+            success: true,
+            user: {
+                id: req.user.userId,
+                email: req.user.email
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };
 
 
@@ -139,23 +166,33 @@ exports.forgotPassword = async (req, res) => {
       config.JWT_RESET_PASSWORD_SECRET,
       { expiresIn: '1h' , jwtid }
     );
-    
+
     user.resetPasswordJti = jwtid;
     await user.save();
 
     const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    
+
+    // En desarrollo, enviar a email verificado de Resend
+    const emailToSend = process.env.NODE_ENV === 'production'
+        ? 'johan.steven.rodriguez@correounivalle.edu.co'
+        : email;
+
     await sendMail({
-        to: email,
+        to: emailToSend,
         subject: "Restablecimiento de contraseña",
-        text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
-        html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetLink}">${resetLink}</a>`,
+        text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}\n\nSolicitado para: ${email}`,
+        html: `
+            <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+            <a href="${resetLink}">${resetLink}</a>
+            <p><strong>Solicitado para:</strong> ${email}</p>
+        `,
     });
 
     res.status(200).json({ success: true });
   } catch (err) {
-    res.status(500).json({ success: false, err: err.message });
-  } 
+    console.error('Error en forgotPassword:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 /**
@@ -168,7 +205,7 @@ exports.forgotPassword = async (req, res) => {
  *  - 200: `{ success: true, message: "Contraseña actualizada." }` si la contraseña se actualiza correctamente.
  * - 400: `{ success: false, message: "Enlace inválido o ya utilizado." }` si el token es inválido o ya fue usado.
  * - 500: `{ success: false, message: err.message }` si ocurre un error interno.
- * 
+ *
  */
 exports.resetPassword = async (req, res) => {
   try {
@@ -183,9 +220,9 @@ exports.resetPassword = async (req, res) => {
         return res.status(400).json({ success: false, message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial" });
     }
 
-
+    user.resetPasswordJti = null; // Invalida el token después de usarlo
     user.password = newPassword;
-    
+
     await user.save();
     console.log(user.password)
     res.status(200).json({ success: true, message: "Contraseña actualizada." });
@@ -193,4 +230,3 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: "Inténtalo de nuevo más tarde." , err: err.message});
   }
 };
-
