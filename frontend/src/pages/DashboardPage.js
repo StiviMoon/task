@@ -1,4 +1,6 @@
-import { getTasks } from "../services/taskService.js";
+import { getTasks, createTask } from "../services/taskService.js";
+import { logout } from "../services/authService.js";
+import { handleLogout } from "../utils/authGuard.js";
 import { TaskForm } from "../components/TaskForm.js";
 
 export async function DashboardPage() {
@@ -78,24 +80,48 @@ export async function DashboardPage() {
   }
 
   function renderTask(task) {
-    const column = document.querySelector(`[data-status="${task.status}"] .task-list`);
+    // Mapear estados del backend a los del frontend
+    const statusMap = {
+      "Por hacer": "todo",
+      "Haciendo": "doing",
+      "Hecho": "done"
+    };
+
+    const frontendStatus = statusMap[task.status] || "todo";
+    const column = document.querySelector(`[data-status="${frontendStatus}"] .task-list`);
+
+    if (!column) {
+      console.warn(`No se encontró columna para estado: ${frontendStatus}`);
+      return;
+    }
+
     const taskEl = document.createElement("div");
     taskEl.className = "task-item";
     taskEl.innerHTML = `
       <h4>${task.title}</h4>
-      <small>${task.date} ${task.time}</small>
+      <small>${formatDate(task.date)} ${task.hour || ''}</small>
     `;
 
     taskEl.addEventListener("click", () => {
       document.getElementById("detail-title").textContent = task.title;
-      document.getElementById("detail-description").textContent = task.detail || "Sin descripción";
-      document.getElementById("detail-status").textContent = mapStatus(task.status);
-      document.getElementById("detail-date").textContent = task.date;
-      document.getElementById("detail-time").textContent = task.time;
+      document.getElementById("detail-description").textContent = task.details || "Sin descripción";
+      document.getElementById("detail-status").textContent = task.status;
+      document.getElementById("detail-date").textContent = formatDate(task.date);
+      document.getElementById("detail-time").textContent = task.hour || "Sin hora";
       detailModal.classList.remove("hidden");
     });
 
     column.appendChild(taskEl);
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return "Sin fecha";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   }
 
   // === Task modals ===
@@ -108,16 +134,33 @@ export async function DashboardPage() {
 
   // Load and render tasks
   try {
-    const tasks = await getTasks();
-    tasks.forEach(renderTask);
+    const result = await getTasks();
+    if (result.success && result.data) {
+      result.data.forEach(renderTask);
+    } else {
+      console.error("Error cargando tareas:", result.error);
+      showError("Error al cargar las tareas");
+    }
   } catch (err) {
     console.error("Error cargando tareas:", err);
+    showError("Error de conexión al cargar tareas");
   }
 
   // Assemble form
-  const taskForm = TaskForm((createdTask) => {
-    taskModal.classList.add("hidden");
-    renderTask(createdTask);
+  const taskForm = TaskForm(async (taskData) => {
+    try {
+      const result = await createTask(taskData);
+      if (result.success) {
+        taskModal.classList.add("hidden");
+        // Recargar todas las tareas para mostrar la nueva
+        location.reload();
+      } else {
+        showError(result.error || "Error al crear la tarea");
+      }
+    } catch (error) {
+      console.error("Error creando tarea:", error);
+      showError("Error de conexión al crear tarea");
+    }
   });
   formContainer.appendChild(taskForm);
 
@@ -143,9 +186,42 @@ export async function DashboardPage() {
   logoutBtn.addEventListener("click", () => logoutModal.classList.remove("hidden"));
   cancelLogout.addEventListener("click", () => logoutModal.classList.add("hidden"));
 
-  confirmLogout.addEventListener("click", () => {
-    localStorage.removeItem("user");
-    history.pushState({}, "", "/");
-    window.dispatchEvent(new PopStateEvent("popstate"));
+  confirmLogout.addEventListener("click", async () => {
+    // Usar la función handleLogout que maneja todo el proceso
+    await handleLogout(logout);
   });
+
+  // Helper function to show errors
+  function showError(message) {
+    // Crear o actualizar elemento de error
+    let errorEl = document.getElementById("dashboard-error");
+    if (!errorEl) {
+      errorEl = document.createElement("div");
+      errorEl.id = "dashboard-error";
+      errorEl.className = "error-message";
+      errorEl.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #fee;
+        color: #c33;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        max-width: 300px;
+      `;
+      document.body.appendChild(errorEl);
+    }
+
+    errorEl.textContent = message;
+    errorEl.style.display = "block";
+
+    // Auto-hide después de 5 segundos
+    setTimeout(() => {
+      if (errorEl) {
+        errorEl.style.display = "none";
+      }
+    }, 5000);
+  }
 }

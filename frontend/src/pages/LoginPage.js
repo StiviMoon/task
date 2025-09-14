@@ -1,4 +1,5 @@
 import page from "page";
+import { login, forgotPassword } from "../services/authService.js";
 import "../styles/main.css";
 import "../styles/components.css";
 import "../styles/pages.css";
@@ -18,7 +19,7 @@ export function renderLogin() {
         <p>
           <a href="#" id="forgotPassword">¿Olvidaste tu contraseña?</a>
         </p>
-        <p>¿No tienes cuenta? 
+        <p>¿No tienes cuenta?
           <a href="#" id="goToRegister">Regístrate aquí</a>
         </p>
       </div>
@@ -28,17 +29,37 @@ export function renderLogin() {
 
 export function addLoginLogic() {
   const form = document.getElementById("loginForm");
+  const submitBtn = form.querySelector("button[type='submit']");
+  const originalBtnText = submitBtn.textContent;
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = form.email.value.trim();
     const password = form.password.value.trim();
 
-    console.log("Intento de login:", { email, password });
-    
+    // Mostrar loading
+    submitBtn.disabled = true;
+    submitBtn.textContent = "⏳ Iniciando sesión...";
 
-    // Redirigir al dashboard con Page.js
-    page("/tasks");
+    try {
+      const result = await login({ email, password });
+
+      if (result.success) {
+        console.log("Login exitoso:", result);
+        // Redirigir al dashboard
+        page("/tasks");
+      } else {
+        console.error("Error en login:", result.error);
+        showError("Credenciales inválidas. Intenta de nuevo.");
+      }
+    } catch (error) {
+      console.error("Error en login:", error);
+      showError("Error de conexión. Intenta de nuevo.");
+    } finally {
+      // Restaurar botón
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
   });
 
   document.getElementById("goToRegister").addEventListener("click", (e) => {
@@ -78,19 +99,41 @@ export function addForgotPasswordLogic() {
   const form = document.getElementById("forgotForm");
   const spinner = document.getElementById("spinner");
   const toast = document.getElementById("toast");
+  const submitBtn = form.querySelector("button[type='submit']");
+  const originalBtnText = submitBtn.textContent;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const email = document.getElementById("forgotEmail").value.trim();
+
+    if (!email) {
+      showToast("❌ Por favor ingresa tu correo", toast);
+      return;
+    }
+
+    // Mostrar loading
     spinner.classList.remove("hidden");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "⏳ Enviando...";
 
-    const email = document.getElementById("forgotEmail").value;
+    try {
+      const result = await forgotPassword(email);
 
-    // Simula llamada al backend (≤ 3s)
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    spinner.classList.add("hidden");
-    showToast("✅ Revisa tu correo para continuar", toast);
-    console.log("Recuperación enviada a:", email);
+      if (result.success) {
+        showToast("✅ Revisa tu correo para continuar", toast);
+        console.log("Recuperación enviada a:", email);
+      } else {
+        showToast(`❌ ${result.error}`, toast);
+      }
+    } catch (error) {
+      console.error("Error en forgot password:", error);
+      showToast("❌ Error de conexión. Intenta de nuevo.", toast);
+    } finally {
+      // Restaurar UI
+      spinner.classList.add("hidden");
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
   });
 
   document.getElementById("backToLogin").addEventListener("click", (e) => {
@@ -99,9 +142,39 @@ export function addForgotPasswordLogic() {
   });
 }
 
-// ====================== HELPER TOAST ======================
+// ====================== HELPER FUNCTIONS ======================
 function showToast(message, toastEl) {
   toastEl.textContent = message;
   toastEl.classList.remove("hidden");
   setTimeout(() => toastEl.classList.add("hidden"), 3000);
+}
+
+function showError(message) {
+  // Crear o actualizar elemento de error
+  let errorEl = document.getElementById("login-error");
+  if (!errorEl) {
+    errorEl = document.createElement("div");
+    errorEl.id = "login-error";
+    errorEl.className = "error-message";
+    errorEl.style.cssText = `
+      background: #fee;
+      color: #c33;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      text-align: center;
+    `;
+    const form = document.getElementById("loginForm");
+    form.insertBefore(errorEl, form.firstChild);
+  }
+
+  errorEl.textContent = message;
+  errorEl.style.display = "block";
+
+  // Auto-hide después de 5 segundos
+  setTimeout(() => {
+    if (errorEl) {
+      errorEl.style.display = "none";
+    }
+  }, 5000);
 }

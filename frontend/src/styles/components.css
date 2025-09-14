@@ -11,6 +11,25 @@ input, select, textarea {
 }
 
 /* ===========================
+   Textarea específico
+=========================== */
+textarea {
+  min-height: 80px;
+  max-height: 150px;
+  resize: vertical; /* Permite redimensionar solo verticalmente */
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+/* Textarea para detalles de tareas */
+#details {
+  min-height: 100px;
+  max-height: 150px;
+  width: 100%;
+  resize: vertical;
+}
+
+/* ===========================
    Buttons
 =========================== */
 button {
@@ -119,6 +138,8 @@ button:hover:enabled {
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
   text-align: center;
   animation: fadeIn 0.3s ease;
+  word-wrap: break-word; /*Avoid text overflows in modals with word-wrap*/
+
 }
 
 /* Animation */

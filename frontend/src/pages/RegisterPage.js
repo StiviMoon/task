@@ -1,4 +1,5 @@
 import page from "page";
+import { register } from "../services/authService.js";
 import { renderLogin, addLoginLogic } from "./LoginPage.js";
 import "../styles/main.css";
 import "../styles/components.css";
@@ -32,7 +33,7 @@ export function renderRegister() {
           <button type="submit" id="registerBtn" disabled>Registrarse</button>
           <div id="spinner" class="hidden">⏳ Procesando...</div>
         </form>
-        <p>¿Ya tienes cuenta? 
+        <p>¿Ya tienes cuenta?
           <a href="#" id="goToLogin">Inicia sesión</a>
         </p>
       </div>
@@ -129,29 +130,54 @@ export function addRegisterLogic() {
   });
 
   // Submit form
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    // Validar formulario antes de enviar
+    if (!isFormValid()) {
+      showError("Por favor completa todos los campos correctamente");
+      return;
+    }
 
     spinner.classList.remove("hidden");
     btn.disabled = true;
+    btn.textContent = "⏳ Creando cuenta...";
 
-    setTimeout(() => {
+    try {
+      // Preparar datos para el backend
+      const userData = {
+        name: inputs.names.value.trim(),
+        lastName: inputs.surnames.value.trim(),
+        age: parseInt(inputs.age.value, 10),
+        email: inputs.email.value.trim(),
+        password: inputs.password.value
+      };
+
+      const result = await register(userData);
+
+      if (result.success) {
+        console.log("Usuario creado exitosamente:", result.data);
+        toast.textContent = "✅ Cuenta creada exitosamente";
+        toast.classList.remove("hidden");
+
+        // Redirigir al login después de 2 segundos
+        setTimeout(() => {
+          toast.classList.add("hidden");
+          page("/");
+        }, 2000);
+      } else {
+        console.error("Error al crear usuario:", result.error);
+        showError(result.error || "Error al crear la cuenta");
+      }
+    } catch (error) {
+      console.error("Error en registro:", error);
+      showError("Error de conexión. Intenta de nuevo.");
+    } finally {
+      // Restaurar UI
       spinner.classList.add("hidden");
-      toast.classList.remove("hidden");
-
-      console.log("Usuario creado:", {
-        id: Date.now(),
-        names: inputs.names.value,
-        surnames: inputs.surnames.value,
-        age: inputs.age.value,
-        email: inputs.email.value,
-      });
-
-      setTimeout(() => {
-        toast.classList.add("hidden");
-        page("/");
-      }, 500);
-    }, 2000);
+      btn.disabled = false;
+      btn.textContent = "Registrarse";
+    }
   });
 
   // Button to go to login
@@ -159,4 +185,35 @@ export function addRegisterLogic() {
     e.preventDefault();
     page("/");
   });
+
+  // Helper function to show errors
+  function showError(message) {
+    // Crear o actualizar elemento de error
+    let errorEl = document.getElementById("register-error");
+    if (!errorEl) {
+      errorEl = document.createElement("div");
+      errorEl.id = "register-error";
+      errorEl.className = "error-message";
+      errorEl.style.cssText = `
+        background: #fee;
+        color: #c33;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        text-align: center;
+      `;
+      const form = document.getElementById("registerForm");
+      form.insertBefore(errorEl, form.firstChild);
+    }
+
+    errorEl.textContent = message;
+    errorEl.style.display = "block";
+
+    // Auto-hide después de 5 segundos
+    setTimeout(() => {
+      if (errorEl) {
+        errorEl.style.display = "none";
+      }
+    }, 5000);
+  }
 }
