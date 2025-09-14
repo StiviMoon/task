@@ -28,7 +28,7 @@ async function sendMail({ to, subject, text, html }) {
 
     if (error) {
       console.error('❌ Error de Resend:', error);
-      throw new Error(`Error enviando email: ${error.message}`);
+      throw new Error(`Error enviando email: ${error.message || 'Error desconocido'}`);
     }
 
     console.log('✅ Email enviado exitosamente con Resend');

@@ -172,11 +172,20 @@ exports.forgotPassword = async (req, res) => {
 
     const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
+    // En desarrollo, enviar a email verificado de Resend
+    const emailToSend = process.env.NODE_ENV === 'production'
+        ? 'johan.steven.rodriguez@correounivalle.edu.co'
+        : email;
+
     await sendMail({
-        to: email,
+        to: emailToSend,
         subject: "Restablecimiento de contraseña",
-        text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
-        html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetLink}">${resetLink}</a>`,
+        text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}\n\nSolicitado para: ${email}`,
+        html: `
+            <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+            <a href="${resetLink}">${resetLink}</a>
+            <p><strong>Solicitado para:</strong> ${email}</p>
+        `,
     });
 
     res.status(200).json({ success: true });
