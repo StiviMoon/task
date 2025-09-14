@@ -19,7 +19,11 @@ const configureServer = (app) => {
             // Allow requests with no origin (like mobile apps or curl requests)
             if (!origin) return callback(null, true);
 
+            console.log('CORS checking origin:', origin);
+            console.log('Allowed origins:', allowedOrigins);
+
             if (allowedOrigins.indexOf(origin) !== -1) {
+                console.log('CORS allowed origin:', origin);
                 callback(null, true);
             } else {
                 console.log('CORS blocked origin:', origin);
