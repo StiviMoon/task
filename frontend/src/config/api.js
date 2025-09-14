@@ -1,7 +1,11 @@
 // API Configuration
 const API_CONFIG = {
-  // Base URL del backend local (cambiar a producción cuando sea necesario)
-  BASE_URL: process.env.VITE_API_BASE_URL_PROD || process.env.VITE_API_BASE_URL,
+  // Base URL del backend (configurado por variables de entorno)
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+
+  // App configuration
+  APP_NAME: import.meta.env.VITE_APP_NAME || 'Task Manager',
+  NODE_ENV: import.meta.env.VITE_NODE_ENV || 'development',
 
   // Endpoints
   ENDPOINTS: {
@@ -41,6 +45,27 @@ export const getAuthHeaders = () => {
   }
 
   return headers;
+};
+
+// Helper function to check if we're in development mode
+export const isDevelopment = () => {
+  return API_CONFIG.NODE_ENV === 'development';
+};
+
+// Helper function to check if we're in production mode
+export const isProduction = () => {
+  return API_CONFIG.NODE_ENV === 'production';
+};
+
+// Helper function to get current environment info
+export const getEnvironmentInfo = () => {
+  return {
+    baseUrl: API_CONFIG.BASE_URL,
+    appName: API_CONFIG.APP_NAME,
+    nodeEnv: API_CONFIG.NODE_ENV,
+    isDevelopment: isDevelopment(),
+    isProduction: isProduction()
+  };
 };
 
 export default API_CONFIG;

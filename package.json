@@ -1,5 +1,45 @@
 {
+  "name": "task-manager",
+  "version": "1.0.0",
+  "description": "Full-stack Task Manager application with React frontend and Node.js backend",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev:local",
+    "dev:frontend": "cd frontend && npm run dev:local",
+    "dev:prod": "concurrently \"npm run dev:backend:prod\" \"npm run dev:frontend:prod\"",
+    "dev:backend:prod": "cd backend && npm run dev:prod",
+    "dev:frontend:prod": "cd frontend && npm run dev:prod",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build:prod",
+    "build:frontend:dev": "cd frontend && npm run build:dev",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm run start:prod",
+    "start:frontend": "cd frontend && npm run start:prod",
+    "start:dev": "concurrently \"npm run start:backend:dev\" \"npm run start:frontend:dev\"",
+    "start:backend:dev": "cd backend && npm run start:dev",
+    "start:frontend:dev": "cd frontend && npm run start:dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "setup:dev": "npm run install:all && npm run switch:dev",
+    "setup:prod": "npm run install:all && npm run switch:prod",
+    "switch:dev": "echo 'Usando configuración de desarrollo (.env)'",
+    "switch:prod": "echo 'Usando configuración de producción (.env.production)'",
+    "verify:env": "node verify-env.js",
+    "verify:env:dev": "node verify-env.js dev",
+    "verify:env:prod": "node verify-env.js prod"
+  },
   "dependencies": {
     "axios": "^1.12.1"
-  }
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "task-manager",
+    "react",
+    "nodejs",
+    "mongodb",
+    "fullstack"
+  ],
+  "author": "StiviMoon",
+  "license": "ISC"
 }

@@ -15,6 +15,12 @@ const configureServer = (app) => {
         process.env.FRONTEND_URL
     ].filter(Boolean); // Remove undefined values
 
+    // Add additional origins from environment variable (comma-separated)
+    if (process.env.ADDITIONAL_ORIGINS) {
+        const additionalOrigins = process.env.ADDITIONAL_ORIGINS.split(',').map(origin => origin.trim());
+        allowedOrigins.push(...additionalOrigins);
+    }
+
     app.use(cors({
         origin: function (origin, callback) {
             // Allow requests with no origin (like mobile apps or curl requests)
