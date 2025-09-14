@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-
+// Import main routes
 const routes = require('./routes');
-router.use('/', routes);
 
-
-
+// Health check route
 router.get('/health', (req, res) => {
     res.status(200).json({
         success: true,
@@ -16,6 +14,7 @@ router.get('/health', (req, res) => {
     });
 });
 
+// Welcome route
 router.get('/', (req, res) => {
     res.status(200).json({
         success: true,
@@ -24,5 +23,8 @@ router.get('/', (req, res) => {
         status: 'Servidor listo para desarrollo'
     });
 });
+
+// Use main routes
+router.use('/', routes);
 
 module.exports = router;

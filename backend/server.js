@@ -23,10 +23,9 @@ app.use(cookieParser());
 connectDB();
 
 // Routes
-app.use(`${config.API_PREFIX}`, indexRoutes);                 
+app.use(`${config.API_PREFIX}`, indexRoutes);
 
 // Error handling middleware (must be last)
-
 app.use(notFound);
 app.use(errorHandler);
 
@@ -38,4 +37,3 @@ app.listen(PORT, () => {
     console.log(`🌍 Entorno: ${config.NODE_ENV}`);
     console.log(`📚 API Base: http://localhost:${PORT}${config.API_PREFIX}`);
 });
-
