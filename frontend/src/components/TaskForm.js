@@ -1,5 +1,4 @@
 // src/components/TaskForm.js
-import { createTask } from "../services/taskService.js";
 
 export function TaskForm(onTaskCreated) {
   const form = document.createElement("form");
@@ -11,8 +10,8 @@ export function TaskForm(onTaskCreated) {
       <span id="title-error" class="error" aria-live="polite"></span>
     </label>
     <label>
-      Detalle
-      <textarea id="detail" maxlength="500"></textarea>
+      Detalles
+      <textarea id="details" maxlength="500"></textarea>
     </label>
     <label>
       Fecha *
@@ -20,17 +19,17 @@ export function TaskForm(onTaskCreated) {
       <span id="date-error" class="error" aria-live="polite"></span>
     </label>
     <label>
-      Hora *
-      <input type="time" id="time" required aria-describedby="time-error">
-      <span id="time-error" class="error" aria-live="polite"></span>
+      Hora
+      <input type="time" id="hour" aria-describedby="hour-error">
+      <span id="hour-error" class="error" aria-live="polite"></span>
     </label>
     <label>
       Estado *
       <select id="status" required aria-describedby="status-error">
         <option value="">Seleccione</option>
-        <option value="todo">Por hacer</option>
-        <option value="doing">Haciendo</option>
-        <option value="done">Hecho</option>
+        <option value="Por hacer">Por hacer</option>
+        <option value="Haciendo">Haciendo</option>
+        <option value="Hecho">Hecho</option>
       </select>
       <span id="status-error" class="error" aria-live="polite"></span>
     </label>
@@ -48,10 +47,9 @@ export function TaskForm(onTaskCreated) {
   form.addEventListener("input", () => {
     const title = form.querySelector("#title").value.trim();
     const date = form.querySelector("#date").value;
-    const time = form.querySelector("#time").value;
     const status = form.querySelector("#status").value;
 
-    saveBtn.disabled = !(title && date && time && status);
+    saveBtn.disabled = !(title && date && status);
   });
 
   // Submit new task
@@ -60,9 +58,9 @@ export function TaskForm(onTaskCreated) {
 
     const newTask = {
       title: form.querySelector("#title").value.trim(),
-      detail: form.querySelector("#detail").value.trim(),
+      details: form.querySelector("#details").value.trim(),
       date: form.querySelector("#date").value,
-      time: form.querySelector("#time").value,
+      hour: form.querySelector("#hour").value,
       status: form.querySelector("#status").value,
     };
 
@@ -70,12 +68,12 @@ export function TaskForm(onTaskCreated) {
     spinner.classList.remove("hidden");
 
     try {
-      const createdTask = await createTask(newTask);
+      if (onTaskCreated) {
+        await onTaskCreated(newTask);
+      }
       spinner.classList.add("hidden");
       form.reset();
       saveBtn.disabled = true;
-
-      if (onTaskCreated) onTaskCreated(createdTask);
     } catch (err) {
       spinner.classList.add("hidden");
       alert("No pudimos guardar tu tarea, inténtalo de nuevo");
