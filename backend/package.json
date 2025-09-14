@@ -65,5 +65,8 @@
     "touch": "^3.1.1",
     "undefsafe": "^2.0.5"
   },
-  "description": "Backend API para Task Manager - Sistema de gestión de tareas con autenticación JWT y MongoDB"
+  "description": "Backend API para Task Manager - Sistema de gestión de tareas con autenticación JWT y MongoDB",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
 }

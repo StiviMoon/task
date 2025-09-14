@@ -39,7 +39,7 @@ export function addLoginLogic() {
 
     // Mostrar loading
     submitBtn.disabled = true;
-    submitBtn.textContent = "⏳ Iniciando sesión...";
+    submitBtn.innerHTML= '<span class="loader"></span> Iniciando sesión...';
 
     try {
       const result = await login({ email, password });
@@ -49,8 +49,7 @@ export function addLoginLogic() {
         // Redirigir al dashboard
         page("/tasks");
       } else {
-        console.error("Error en login:", result.error);
-        showError("Credenciales inválidas. Intenta de nuevo.");
+        showError(result.error);
       }
     } catch (error) {
       console.error("Error en login:", error);
