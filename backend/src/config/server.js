@@ -10,6 +10,7 @@ const configureServer = (app) => {
     const allowedOrigins = [
         'http://localhost:3000',
         'http://localhost:5173',
+        'https://task-three-blue.vercel.app',
         process.env.FRONTEND_URL
     ].filter(Boolean); // Remove undefined values
 

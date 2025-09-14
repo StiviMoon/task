@@ -87,6 +87,7 @@ exports.login = async (req, res) => {
  * Cierra la sesión del usuario eliminando la cookie del token.
  * @function logout
  * @param {Request} req
+ *
  * @param {Response}  res
  * @returns {void} Devuelve un objeto JSON con:
  *  - 200: `{ message: "Sesión cerrada exitosamente." }` si la cookie se elimina correctamente.
