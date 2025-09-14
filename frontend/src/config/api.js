@@ -1,7 +1,7 @@
 // API Configuration
 const API_CONFIG = {
-  // Base URL del backend desplegado en Render
-  BASE_URL: 'https://task-bc6l.onrender.com/api',
+  // Base URL del backend local (cambiar a producción cuando sea necesario)
+  BASE_URL: 'http://localhost:5000/api',
 
   // Endpoints
   ENDPOINTS: {
@@ -12,10 +12,10 @@ const API_CONFIG = {
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
 
-    // Task endpoints
+    // Task endpoints (usando RESTful conventions)
     TASKS: '/tasks',
-    CREATE_TASK: '/tasks/createTask',
-    GET_TASKS: '/tasks/getTasks',
+    CREATE_TASK: '/tasks',
+    GET_TASKS: '/tasks',
 
     // Health check
     HEALTH: '/health'

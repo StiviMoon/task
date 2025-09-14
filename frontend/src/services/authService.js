@@ -1,8 +1,5 @@
 import { getApiUrl, getAuthHeaders } from '../config/api.js';
 
-// API Base URL
-const API_BASE_URL = 'https://task-bc6l.onrender.com/api';
-
 /**
  * Registra un nuevo usuario en el sistema
  * @param {Object} userData - Datos del usuario
@@ -15,7 +12,7 @@ const API_BASE_URL = 'https://task-bc6l.onrender.com/api';
  */
 export const register = async (userData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetch(getApiUrl('/auth/register'), {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(userData),
@@ -51,7 +48,7 @@ export const register = async (userData) => {
  */
 export const login = async (credentials) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(getApiUrl('/auth/login'), {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(credentials),
@@ -84,7 +81,7 @@ export const login = async (credentials) => {
  */
 export const logout = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+    const response = await fetch(getApiUrl('/auth/logout'), {
       method: 'POST',
       headers: getAuthHeaders(),
       credentials: 'include'
@@ -117,7 +114,7 @@ export const logout = async () => {
  */
 export const forgotPassword = async (email) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+    const response = await fetch(getApiUrl('/auth/forgot-password'), {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ email }),
@@ -153,7 +150,7 @@ export const forgotPassword = async (email) => {
  */
 export const resetPassword = async (resetData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+    const response = await fetch(getApiUrl('/auth/reset-password'), {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(resetData),
@@ -186,7 +183,7 @@ export const resetPassword = async (resetData) => {
  */
 export const isAuthenticated = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`, {
+    const response = await fetch(getApiUrl('/health'), {
       method: 'GET',
       credentials: 'include'
     });

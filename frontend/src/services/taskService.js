@@ -1,15 +1,12 @@
 import { getApiUrl, getAuthHeaders } from '../config/api.js';
 
-// API Base URL
-const API_BASE_URL = 'https://task-bc6l.onrender.com/api';
-
 /**
  * Obtiene todas las tareas del usuario autenticado
  * @returns {Promise<Object>} Lista de tareas
  */
 export const getTasks = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/tasks/getTasks`, {
+    const response = await fetch(getApiUrl('/tasks'), {
       method: 'GET',
       headers: getAuthHeaders(),
       credentials: 'include' // Importante para las cookies de autenticación
@@ -48,7 +45,7 @@ export const getTasks = async () => {
  */
 export const createTask = async (taskData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/tasks/createTask`, {
+    const response = await fetch(getApiUrl('/tasks'), {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(taskData),
@@ -83,7 +80,7 @@ export const createTask = async (taskData) => {
  */
 export const updateTask = async (taskId, taskData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+    const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(taskData),
@@ -117,7 +114,7 @@ export const updateTask = async (taskId, taskData) => {
  */
 export const deleteTask = async (taskId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+    const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
       method: 'DELETE',
       headers: getAuthHeaders(),
       credentials: 'include'
@@ -150,7 +147,7 @@ export const deleteTask = async (taskId) => {
  */
 export const getTaskById = async (taskId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+    const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
       method: 'GET',
       headers: getAuthHeaders(),
       credentials: 'include'

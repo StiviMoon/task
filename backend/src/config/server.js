@@ -9,6 +9,7 @@ const configureServer = (app) => {
     // CORS configuration
     const allowedOrigins = [
         'http://localhost:3000',
+        'http://localhost:3001', // Puerto alternativo del frontend
         'http://localhost:5173',
         'https://task-three-blue.vercel.app',
         process.env.FRONTEND_URL
@@ -31,8 +32,9 @@ const configureServer = (app) => {
             }
         },
         credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+        exposedHeaders: ['Set-Cookie'],
         optionsSuccessStatus: 200 // Para compatibilidad con navegadores antiguos
     }));
 

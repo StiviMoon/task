@@ -67,11 +67,12 @@ exports.login = async (req, res) => {
     );
 
     // Enviar el token en una cookie segura
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("access_token", token, {
         httpOnly: true,
-        secure: true, // Siempre true para HTTPS
-        sameSite: "none", // Siempre none para cross-origin
-        maxAge: 2 * 60 * 60 * 1000,
+        secure: isProduction, // true para HTTPS en producción
+        sameSite: isProduction ? "none" : "lax", // none para cross-origin en producción
+        maxAge: 2 * 60 * 60 * 1000, // 2 horas
         path: "/",
     });
 
@@ -96,10 +97,11 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
     try{
+        const isProduction = process.env.NODE_ENV === 'production';
         res.clearCookie("access_token", {
             httpOnly: true,
-            secure: true, // Siempre true para HTTPS
-            sameSite: "none", // Siempre none para cross-origin
+            secure: isProduction, // true para HTTPS en producción
+            sameSite: isProduction ? "none" : "lax", // none para cross-origin en producción
             path: "/",
         });
 
