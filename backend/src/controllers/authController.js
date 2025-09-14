@@ -10,8 +10,8 @@ const config = require("../config/environment");
  *
  * @async
  * @function register
- * @param {Request} req 
- * @param {Response} res 
+ * @param {Request} req
+ * @param {Response} res
  * @returns {Promise<void>} Devuelve un objeto JSON con:
  *  - 201: `{ message: user._id }` si el registro es exitoso.
  *  - 409: `{ message: "Este correo ya está registrado." }` si el email está duplicado.
@@ -42,8 +42,8 @@ exports.register = async (req, res) => {
  *
  * @async
  * @function login
- * @param {Request} req 
- * @param {Response} res 
+ * @param {Request} req
+ * @param {Response} res
  * @returns { Promise<void>} Devuelve un objeto JSON con:
  *  - 200: `{ success: true, ,message: "Inicio de sesión exitoso."" ,token }` si las credenciales son correctas. y también manda el cookie.
  *  - 401: `{ success: false, message: "Correo o contraseña inválidos." }` si no coinciden email/contraseña.
@@ -71,19 +71,19 @@ exports.login = async (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",            // Si es cross-site cookie colocar: None
-        maxAge: 2 * 60 * 60 * 1000, 
+        maxAge: 2 * 60 * 60 * 1000,
         path: "/",
     });
 
     res.status(200).json({ success: true, message: "Inicio de sesión exitoso." });
-  } 
+  }
 
   catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-/** 
+/**
  * Cierra la sesión del usuario eliminando la cookie del token.
  * @function logout
  * @param {Request} req
@@ -98,10 +98,10 @@ exports.logout = (req, res) => {
         res.clearCookie("access_token", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax", 
-            path: "/", 
+            sameSite: "lax",
+            path: "/",
         });
-        
+
         res.status(200).json({ success: true, message: "Sesión cerrada exitosamente." });
     }
     catch(error){
@@ -139,12 +139,12 @@ exports.forgotPassword = async (req, res) => {
       config.JWT_RESET_PASSWORD_SECRET,
       { expiresIn: '1h' , jwtid }
     );
-    
+
     user.resetPasswordJti = jwtid;
     await user.save();
 
     const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    
+
     await sendMail({
         to: email,
         subject: "Restablecimiento de contraseña",
@@ -155,7 +155,7 @@ exports.forgotPassword = async (req, res) => {
     res.status(200).json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, err: err.message });
-  } 
+  }
 };
 
 /**
@@ -168,7 +168,7 @@ exports.forgotPassword = async (req, res) => {
  *  - 200: `{ success: true, message: "Contraseña actualizada." }` si la contraseña se actualiza correctamente.
  * - 400: `{ success: false, message: "Enlace inválido o ya utilizado." }` si el token es inválido o ya fue usado.
  * - 500: `{ success: false, message: err.message }` si ocurre un error interno.
- * 
+ *
  */
 exports.resetPassword = async (req, res) => {
   try {
@@ -185,7 +185,7 @@ exports.resetPassword = async (req, res) => {
 
 
     user.password = newPassword;
-    
+
     await user.save();
     console.log(user.password)
     res.status(200).json({ success: true, message: "Contraseña actualizada." });
@@ -193,4 +193,3 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: "Inténtalo de nuevo más tarde." , err: err.message});
   }
 };
-
