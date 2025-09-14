@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
-const { loginLimiter } = require("../middleware/auth");
+const { loginLimiter, authenticateToken } = require("../middleware/auth");
 
 // Crear un nuevo usuario
 router.post("/register", authController.register);
@@ -11,6 +11,9 @@ router.post("/login", loginLimiter, authController.login);
 
 // Cerrar sesión
 router.post("/logout", authController.logout);
+
+// Verificar autenticación
+router.get("/verify", authenticateToken, authController.verifyAuth);
 
 // Olvidé mi contraseña
 router.post("/forgot-password", authController.forgotPassword);

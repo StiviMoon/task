@@ -183,12 +183,17 @@ export const resetPassword = async (resetData) => {
  */
 export const isAuthenticated = async () => {
   try {
-    const response = await fetch(getApiUrl('/health'), {
+    const response = await fetch(getApiUrl('/auth/verify'), {
       method: 'GET',
       credentials: 'include'
     });
 
-    return response.ok;
+    if (response.ok) {
+      const data = await response.json();
+      return data.success === true;
+    }
+
+    return false;
   } catch (error) {
     console.error('Error verificando autenticación:', error);
     return false;

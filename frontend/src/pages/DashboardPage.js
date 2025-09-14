@@ -1,5 +1,6 @@
 import { getTasks, createTask } from "../services/taskService.js";
 import { logout } from "../services/authService.js";
+import { handleLogout } from "../utils/authGuard.js";
 import { TaskForm } from "../components/TaskForm.js";
 
 export async function DashboardPage() {
@@ -186,23 +187,8 @@ export async function DashboardPage() {
   cancelLogout.addEventListener("click", () => logoutModal.classList.add("hidden"));
 
   confirmLogout.addEventListener("click", async () => {
-    try {
-      const result = await logout();
-      if (result.success) {
-        console.log("Logout exitoso");
-        // Limpiar localStorage si existe
-        localStorage.removeItem("user");
-        // Redirigir al login
-        history.pushState({}, "", "/");
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      } else {
-        console.error("Error en logout:", result.error);
-        showError("Error al cerrar sesión");
-      }
-    } catch (error) {
-      console.error("Error en logout:", error);
-      showError("Error de conexión al cerrar sesión");
-    }
+    // Usar la función handleLogout que maneja todo el proceso
+    await handleLogout(logout);
   });
 
   // Helper function to show errors

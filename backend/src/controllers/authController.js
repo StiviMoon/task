@@ -113,6 +113,30 @@ exports.logout = (req, res) => {
 
 };
 
+/**
+ * Verifica si el usuario está autenticado.
+ * @function verifyAuth
+ * @param {Request} req - Request object (debe tener req.user del middleware authenticateToken)
+ * @param {Response} res
+ * @returns {void} Devuelve un objeto JSON con:
+ *  - 200: `{ success: true, user: { id, email, name } }` si está autenticado.
+ *  - 401: Si no está autenticado (manejado por el middleware authenticateToken).
+ */
+exports.verifyAuth = (req, res) => {
+    try {
+        // Si llegamos aquí, el middleware authenticateToken ya verificó que el token es válido
+        res.status(200).json({
+            success: true,
+            user: {
+                id: req.user.userId,
+                email: req.user.email
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 
 
 /** * Envía un correo electrónico con un enlace para restablecer la contraseña.
