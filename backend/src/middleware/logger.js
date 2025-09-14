@@ -1,3 +1,14 @@
+/**
+* HTTP request logging middleware.
+* 
+* This middleware logs information about each request that reaches the server to the console,
+* including the HTTP method, the requested URL, the client IP address, the date and time of the request,
+* the response status code, and the time it took to process.
+* 
+* @param {import('express').Request} req - HTTP request object.
+* @param {import('express').Response} res - HTTP response object.
+* @param {Function} next - Function that calls the next middleware in the chain.
+*/
 const logger = (req, res, next) => {
     const start = Date.now();
 
