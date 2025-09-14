@@ -18,6 +18,44 @@
   width: 350px;
 }
 
+/* Tooltip for register form */
+.input-group {
+  position: relative; /* necesario para que el tooltip se ubique relativo al input */
+  margin-bottom: 0.1rem;
+}
+.error {
+  display: none;
+  position: absolute;
+  background: #f44336;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 0.8em;
+  white-space: nowrap;
+  z-index: 10;
+  transform: translateY(-50%);
+  left: 105%; /* a la derecha del input */
+  top: 49%;   /* centrado verticalmente */
+}
+
+/* flechita del tooltip */
+.error::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent #f44336 transparent transparent;
+}
+
+/* mostrar tooltip */
+.show-tooltip {
+  display: block;
+}
+
+
 /* Spinner inside forms */
 #spinner {
   margin-top: 1rem;

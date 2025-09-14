@@ -22,8 +22,6 @@ const config = {
     JWT_SECRET: process.env.JWT_SECRET || 'your_jwt_secret',
     JWT_RESET_PASSWORD_SECRET: process.env.JWT_RESET_PASSWORD_SECRET || 'your_jwt_reset_secret',
 
-
-    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
     // Email configuration (Resend)
     RESEND_API_KEY: process.env.RESEND_API_KEY || ''
 };
