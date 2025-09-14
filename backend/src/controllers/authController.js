@@ -70,7 +70,7 @@ exports.login = async (req, res) => {
     res.cookie("access_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",            // Si es cross-site cookie colocar: None
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 2 * 60 * 60 * 1000,
         path: "/",
     });
@@ -98,7 +98,7 @@ exports.logout = (req, res) => {
         res.clearCookie("access_token", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             path: "/",
         });
 

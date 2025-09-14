@@ -27,7 +27,8 @@ const configureServer = (app) => {
         },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-        allowedHeaders: ['Content-Type', 'Authorization']
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        optionsSuccessStatus: 200 // Para compatibilidad con navegadores antiguos
     }));
 
 
