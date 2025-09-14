@@ -19,8 +19,10 @@ configureServer(app);
 // Parse cookies before routes (needed for auth middleware)
 app.use(cookieParser());
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB (only if not in test mode)
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 // Routes
 app.use(`${config.API_PREFIX}`, indexRoutes);
@@ -29,11 +31,16 @@ app.use(`${config.API_PREFIX}`, indexRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
-const PORT = config.PORT;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
-    console.log(`📱 API disponible en: http://localhost:${PORT}`);
-    console.log(`🌍 Entorno: ${config.NODE_ENV}`);
-    console.log(`📚 API Base: http://localhost:${PORT}${config.API_PREFIX}`);
-});
+// Start server (only if not in test mode)
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = config.PORT;
+  app.listen(PORT, () => {
+      console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
+      console.log(`📱 API disponible en: http://localhost:${PORT}`);
+      console.log(`🌍 Entorno: ${config.NODE_ENV}`);
+      console.log(`📚 API Base: http://localhost:${PORT}${config.API_PREFIX}`);
+  });
+}
+
+// Export app for testing
+module.exports = app;
