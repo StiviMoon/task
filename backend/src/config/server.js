@@ -9,8 +9,6 @@ const configureServer = (app) => {
     // CORS configuration
     const allowedOrigins = [
         'http://localhost:3000',
-        'http://localhost:3001', // Puerto alternativo del frontend
-        'http://localhost:5173',
         'https://task-three-blue.vercel.app',
         process.env.FRONTEND_URL
     ].filter(Boolean); // Remove undefined values
@@ -22,28 +20,31 @@ const configureServer = (app) => {
     }
 
     app.use(cors({
-        origin: function (origin, callback) {
-            // Allow requests with no origin (like mobile apps or curl requests)
-            if (!origin) return callback(null, true);
-
-            console.log('CORS checking origin:', origin);
-            console.log('Allowed origins:', allowedOrigins);
-
-            if (allowedOrigins.indexOf(origin) !== -1) {
-                console.log('CORS allowed origin:', origin);
-                callback(null, true);
-            } else {
-                console.log('CORS blocked origin:', origin);
-                callback(new Error('Not allowed by CORS'));
-            }
-        },
+        origin: true, // Permite TODOS los orígenes
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'User-Agent', 'X-Requested-With', 'Access-Control-Allow-Origin'],
         exposedHeaders: ['Set-Cookie'],
-        optionsSuccessStatus: 200 // Para compatibilidad con navegadores antiguos
+        optionsSuccessStatus: 200, // Para compatibilidad con navegadores antiguos
+        preflightContinue: false
     }));
 
+
+    // Headers adicionales para máxima compatibilidad
+    app.use((req, res, next) => {
+        // Permitir acceso desde cualquier origen
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Credentials', 'true');
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma');
+
+        // Para solicitudes OPTIONS (preflight)
+        if (req.method === 'OPTIONS') {
+            res.sendStatus(200);
+        } else {
+            next();
+        }
+    });
 
     // Logging middleware
     app.use(logger);

@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const UserDAO = require("../dao/UserDAO");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -21,12 +21,11 @@ exports.register = async (req, res) => {
     try{
         const { name, lastName, age, email, password } = req.body;
 
-        const user = new User({ name, lastName, age, email, password });
-        await user.save();
+        const user = await UserDAO.createUser({ name, lastName, age, email, password });
         res.status(201).json({ userId: user._id });
     }
     catch(error){
-        if (error.code === 11000 && error.keyPattern?.email) {
+        if (error.message === "Este correo ya está registrado") {
             return res.status(409).json({
                 message: "Este correo ya está registrado."
             });
@@ -54,7 +53,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await UserDAO.findByEmail(email);
     if(!user) return res.status(401).json({ success: false, message: 'Correo o contraseña inválidos' });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -63,20 +62,26 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: '2h' }
+      { expiresIn: '24h' } // Coincide con la duración de la cookie
     );
 
-    // Enviar el token en una cookie segura
+    // Configuración de cookie adaptativa según entorno
     const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("access_token", token, {
-        httpOnly: true,
-        secure: isProduction, // true para HTTPS en producción
-        sameSite: isProduction ? "none" : "lax", // none para cross-origin en producción
-        maxAge: 2 * 60 * 60 * 1000, // 2 horas
+        httpOnly: false, // Accesible desde JavaScript para máxima compatibilidad
+        secure: false, // HTTP y HTTPS en todos los entornos para testing universal
+        sameSite: "lax", // Máxima compatibilidad cross-browser
+        maxAge: 24 * 60 * 60 * 1000, // 24 horas
         path: "/",
+        domain: undefined // Sin restricción de dominio
     });
 
-    res.status(200).json({ success: true, message: "Inicio de sesión exitoso." });
+    res.status(200).json({
+        success: true,
+        message: "Inicio de sesión exitoso.",
+        // Enviar token también en respuesta para máxima compatibilidad
+        token: token
+    });
   }
 
   catch (err) {
@@ -97,11 +102,10 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
     try{
-        const isProduction = process.env.NODE_ENV === 'production';
         res.clearCookie("access_token", {
-            httpOnly: true,
-            secure: isProduction, // true para HTTPS en producción
-            sameSite: isProduction ? "none" : "lax", // none para cross-origin en producción
+            httpOnly: false,
+            secure: false,
+            sameSite: "lax",
             path: "/",
         });
 
@@ -156,7 +160,7 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     console.log(email);
-    const user = await User.findOne({ email });
+    const user = await UserDAO.findByEmail(email);
     if (!user) {
       return res.status(202).json({ success: false, message: "Correo no registrado." });
     }
@@ -167,8 +171,7 @@ exports.forgotPassword = async (req, res) => {
       { expiresIn: '1h' , jwtid }
     );
 
-    user.resetPasswordJti = jwtid;
-    await user.save();
+    await UserDAO.updateResetPasswordJti(user._id, jwtid);
 
     const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
@@ -211,7 +214,7 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
     const decoded = jwt.verify(token, config.JWT_RESET_PASSWORD_SECRET);
-    const user = await User.findById(decoded.userId);
+    const user = await UserDAO.findById(decoded.userId);
     if(user.resetPasswordJti !== decoded.jti){
         return res.status(400).json({ success: false, message: "Enlace inválido o ya utilizado." });
     }
@@ -220,10 +223,9 @@ exports.resetPassword = async (req, res) => {
         return res.status(400).json({ success: false, message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial" });
     }
 
-    user.resetPasswordJti = null; // Invalida el token después de usarlo
-    user.password = newPassword;
-
-    await user.save();
+    // Invalida el token y actualiza la contraseña
+    await UserDAO.updateResetPasswordJti(user._id, null);
+    await UserDAO.updatePassword(user._id, newPassword);
     console.log(user.password)
     res.status(200).json({ success: true, message: "Contraseña actualizada." });
   } catch (err) {

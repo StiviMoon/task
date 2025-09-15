@@ -16,7 +16,7 @@ const config = {
 
     // API configuration
     API_VERSION: process.env.API_VERSION || 'v1',
-    API_PREFIX: process.env.API_PREFIX || '/api',
+    API_PREFIX: (process.env.API_PREFIX || '/api').replace(/\/$/, ''), // Elimina slash final si existe
 
     // JWT configuration
     JWT_SECRET: process.env.JWT_SECRET || 'your_jwt_secret',
