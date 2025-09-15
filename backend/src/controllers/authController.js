@@ -67,10 +67,17 @@ exports.login = async (req, res) => {
     // Adaptive cookie configuration according to environment
     const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("access_token", token, {
+
         httpOnly: false, // Accessible from JavaScript for maximum compatibility
         secure: false, // HTTP and HTTPS in all environments for universal testing
         sameSite: "lax", // Maximum cross-browser compatibility
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
+
+        httpOnly: false, // Accesible desde JavaScript para máxima compatibilidad
+        secure: isProduction, // HTTPS en producción, HTTP en desarrollo
+        sameSite: isProduction ? "none" : "lax", // "none" para cross-domain en producción
+        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+
         path: "/",
         domain: undefined // No domain restriction
     });
@@ -101,10 +108,11 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
     try{
+        const isProduction = process.env.NODE_ENV === 'production';
         res.clearCookie("access_token", {
             httpOnly: false,
-            secure: false,
-            sameSite: "lax",
+            secure: isProduction, // HTTPS en producción
+            sameSite: isProduction ? "none" : "lax", // "none" para cross-domain en producción
             path: "/",
         });
 
