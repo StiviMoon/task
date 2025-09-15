@@ -65,22 +65,15 @@ exports.login = async (req, res) => {
     );
 
     // Adaptive cookie configuration according to environment
-    const isProduction = process.env.NODE_ENV === 'production';
+     const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("access_token", token, {
-
         httpOnly: false, // Accessible from JavaScript for maximum compatibility
-        secure: false, // HTTP and HTTPS in all environments for universal testing
-        sameSite: "lax", // Maximum cross-browser compatibility
+        secure: isProduction, // HTTPS in production, HTTP in development
+        sameSite: isProduction ? "none" : "lax", // "none" for cross-domain in production
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-
-        httpOnly: false, // Accesible desde JavaScript para máxima compatibilidad
-        secure: isProduction, // HTTPS en producción, HTTP en desarrollo
-        sameSite: isProduction ? "none" : "lax", // "none" para cross-domain en producción
-        maxAge: 24 * 60 * 60 * 1000, // 24 horas
-
         path: "/",
         domain: undefined // No domain restriction
-    });
+});
 
     res.status(200).json({
         success: true,
