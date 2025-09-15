@@ -466,8 +466,7 @@ curl -X GET http://localhost:5000/api/tasks \
 
 ## 🔧 Variables de Entorno
 
-Crea un archivo `.env` con:
-
+### Desarrollo (archivo `.env`)
 ```env
 # Servidor
 NODE_ENV=development
@@ -488,7 +487,61 @@ RESEND_API_KEY=tu_api_key_de_resend
 
 # API
 API_PREFIX=/api
+
+# Rate limiting (opcional)
+SKIP_RATE_LIMIT=true
 ```
+
+### Producción (Render)
+Configura estas variables en el dashboard de Render:
+
+```env
+NODE_ENV=production
+MONGODB_URI=mongodb+srv://terminal:12345@todolisttest.miey5kl.mongodb.net/?retryWrites=true&w=majority&appName=todolistTest
+FRONTEND_URL=https://task-three-blue.vercel.app
+JWT_SECRET=tu-clave-secreta
+JWT_RESET_PASSWORD_SECRET=tu-clave-secreta-para-reset
+API_PREFIX=/api
+RESEND_API_KEY=re_FjB9n9me_LkBmuLNcRyukZoZtqR62aLs6
+```
+
+---
+
+## 🚀 Despliegue en Render
+
+### Pasos para desplegar:
+
+1. **Conecta tu repositorio** en [render.com](https://render.com)
+
+2. **Configuración del servicio:**
+   ```
+   Build Command: cd backend && npm install
+   Start Command: cd backend && npm start
+   ```
+
+3. **Variables de entorno** (en Render Dashboard):
+   ```
+   NODE_ENV=production
+   MONGODB_URI=tu_mongodb_atlas_uri
+   FRONTEND_URL=tu_frontend_url
+   JWT_SECRET=tu_jwt_secret
+   JWT_RESET_PASSWORD_SECRET=tu_reset_secret
+   API_PREFIX=/api
+   RESEND_API_KEY=tu_resend_key
+   ```
+
+4. **Auto-deploy:** ✅ Habilitado (se actualiza automáticamente con cada push)
+
+### URL de producción:
+```
+https://tu-app-name.onrender.com/api
+```
+
+### Troubleshooting común:
+- ✅ **IPv6 Error:** Solucionado con rate limiting compatible
+- ✅ **MongoDB:** Usa MongoDB Atlas (no local)
+- ✅ **CORS:** Configurado para acceso universal
+- ✅ **Variables:** Configuradas en Render Dashboard
 
 ---
 
