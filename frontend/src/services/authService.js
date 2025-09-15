@@ -48,6 +48,8 @@ export const register = async (userData) => {
  */
 export const login = async (credentials) => {
   try {
+    console.log('🔄 Intentando login con URL:', getApiUrl("/auth/login"));
+
     const response = await fetch(getApiUrl("/auth/login"), {
       method: "POST",
       headers: getAuthHeaders(),
@@ -55,10 +57,25 @@ export const login = async (credentials) => {
       credentials: "include", // Importante para las cookies
     });
 
-    const data = await response.json();
+    console.log('📡 Respuesta recibida:', response.status, response.statusText);
 
     if (!response.ok) {
-      throw new Error(data.message || "Error al iniciar sesión");
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (parseError) {
+        console.error('Error parsing error response:', parseError);
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    console.log('✅ Login exitoso:', data);
+
+    // Guardar token en localStorage como backup
+    if (data.token) {
+      localStorage.setItem('access_token', data.token);
     }
 
     return {
@@ -67,10 +84,12 @@ export const login = async (credentials) => {
       message: "Inicio de sesión exitoso",
     };
   } catch (error) {
-    console.error("Error en login:", error);
+    console.error("❌ Error en login:", error);
+    console.error("URL utilizada:", getApiUrl("/auth/login"));
+
     return {
       success: false,
-      error: error.message,
+      error: error.message || "Error de conexión con el servidor",
     };
   }
 };
