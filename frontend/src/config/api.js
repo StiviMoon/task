@@ -1,11 +1,14 @@
 // API Configuration
 const API_CONFIG = {
   // Base URL del backend (configurado por variables de entorno)
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL ||
+    (import.meta.env.MODE === 'production'
+      ? 'https://backend-task-6ub4.onrender.com/api'
+      : 'http://localhost:5000/api'),
 
   // App configuration
   APP_NAME: import.meta.env.VITE_APP_NAME || 'Task Manager',
-  NODE_ENV: import.meta.env.VITE_NODE_ENV || 'development',
+  NODE_ENV: import.meta.env.VITE_NODE_ENV || import.meta.env.MODE || 'development',
 
   // Endpoints
   ENDPOINTS: {

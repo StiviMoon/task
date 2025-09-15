@@ -9,15 +9,19 @@ import { isAuthenticated } from '../services/authService.js';
  */
 export const requireAuth = async (callback, redirectCallback = null) => {
   try {
+    console.log('🔒 Verificando autenticación...');
     const authenticated = await isAuthenticated();
+    console.log('🔑 Estado de autenticación:', authenticated);
 
     if (authenticated) {
       // Usuario autenticado, ejecutar callback
+      console.log('✅ Usuario autenticado, acceso permitido');
       if (callback) {
         callback();
       }
     } else {
       // Usuario no autenticado, redirigir o ejecutar callback de redirección
+      console.log('❌ Usuario no autenticado, redirigiendo...');
       if (redirectCallback) {
         redirectCallback();
       } else {
@@ -26,7 +30,7 @@ export const requireAuth = async (callback, redirectCallback = null) => {
       }
     }
   } catch (error) {
-    console.error('Error verificando autenticación:', error);
+    console.error('❌ Error verificando autenticación:', error);
     // En caso de error, redirigir a login
     if (redirectCallback) {
       redirectCallback();
