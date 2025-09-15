@@ -203,19 +203,49 @@ export const resetPassword = async (resetData) => {
  */
 export const isAuthenticated = async () => {
   try {
-    const response = await fetch(getApiUrl("/auth/verify"), {
+    console.log('🔄 Verificando autenticación...');
+
+    // Primero intentar con cookies
+    let response = await fetch(getApiUrl("/auth/verify"), {
       method: "GET",
       credentials: "include",
     });
 
+    console.log('📡 Respuesta verificación (cookies):', response.status);
+
     if (response.ok) {
       const data = await response.json();
+      console.log('✅ Autenticado con cookies');
       return data.success === true;
     }
 
+    // Si falla con cookies, intentar con token de localStorage
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      console.log('🔄 Intentando con token localStorage...');
+
+      response = await fetch(getApiUrl("/auth/verify"), {
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: "include",
+      });
+
+      console.log('📡 Respuesta verificación (localStorage):', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Autenticado con localStorage token');
+        return data.success === true;
+      }
+    }
+
+    console.log('❌ No autenticado');
     return false;
   } catch (error) {
-    console.error("Error verificando autenticación:", error);
+    console.error("❌ Error verificando autenticación:", error);
     return false;
   }
 };
