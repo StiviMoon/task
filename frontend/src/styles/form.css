@@ -1,0 +1,259 @@
+/* ===========================
+   FORM COMPONENT STYLES
+=========================== */
+
+/* Form Groups */
+.form-group {
+  margin-bottom: var(--spacing-xl);
+}
+
+.form-group label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Input Fields */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  transition: var(--transition-base);
+  margin: var(--spacing-sm) 0;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--bg-muted);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Input States */
+input.error,
+select.error,
+textarea.error {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+input.success,
+select.success,
+textarea.success {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+/* Textarea Specific */
+textarea {
+  min-height: 80px;
+  max-height: 150px;
+  resize: vertical;
+  line-height: var(--line-height-base);
+}
+
+#details {
+  min-height: 100px;
+  max-height: 150px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-2xl);
+}
+
+/* Input Groups for Validation */
+.input-group {
+  position: relative;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Error Tooltip */
+.error-tooltip {
+  display: none;
+  position: absolute;
+  background: var(--color-danger);
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  z-index: 10;
+  transform: translateY(-50%);
+  left: 105%;
+  top: 50%;
+  box-shadow: var(--shadow-md);
+}
+
+.error-tooltip::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent var(--color-danger) transparent transparent;
+}
+
+.error-tooltip.show {
+  display: block;
+}
+
+/* Legacy Support */
+.error {
+  display: none;
+  position: absolute;
+  background: var(--color-danger);
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  z-index: 10;
+  transform: translateY(-50%);
+  left: 105%;
+  top: 50%;
+}
+
+.error::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent var(--color-danger) transparent transparent;
+}
+
+.show-tooltip {
+  display: block;
+}
+
+/* Select Styling */
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right var(--spacing-sm) center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: var(--spacing-2xl);
+  appearance: none;
+}
+
+/* Checkbox and Radio */
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  margin-right: var(--spacing-sm);
+  accent-color: var(--color-primary);
+}
+
+/* File Input */
+input[type="file"] {
+  padding: var(--spacing-sm);
+  border-style: dashed;
+  cursor: pointer;
+}
+
+input[type="file"]:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-muted);
+}
+
+/* ===========================
+   FORM RESPONSIVE DESIGN
+=========================== */
+
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xl);
+  }
+
+  input,
+  select,
+  textarea {
+    padding: var(--spacing-lg);
+    font-size: var(--font-size-base);
+    min-height: 48px;
+    border-radius: var(--radius-lg);
+  }
+
+  label {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .error-tooltip {
+    position: static;
+    display: block;
+    margin-top: var(--spacing-xs);
+    left: auto;
+    top: auto;
+    transform: none;
+  }
+
+  .error-tooltip::before {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-group {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .form-group label {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  input,
+  select,
+  textarea {
+    padding: var(--spacing-lg);
+    font-size: var(--font-size-base);
+    min-height: 52px;
+    border-radius: var(--radius-lg);
+  }
+
+  textarea {
+    min-height: 100px;
+    max-height: 150px;
+  }
+
+  #details {
+    min-height: 100px;
+    max-height: 150px;
+  }
+}

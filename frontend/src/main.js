@@ -7,9 +7,7 @@ import { renderRegister, addRegisterLogic } from "./pages/RegisterPage.js";
 import { renderResetPassword, addResetPasswordLogic } from "./pages/ResetPasswordPage.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
 import { requireAuth, requireGuest } from "./utils/authGuard.js";
-import "./styles/main.css";
-import "./styles/components.css";
-import "./styles/pages.css";
+import "./style.css";
 
 function mount(renderFn, logicFn) {
   const app = document.getElementById("app");

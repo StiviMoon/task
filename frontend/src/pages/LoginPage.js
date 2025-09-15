@@ -1,8 +1,5 @@
 import page from "page";
 import { login, forgotPassword } from "../services/authService.js";
-import "../styles/main.css";
-import "../styles/components.css";
-import "../styles/pages.css";
 
 // ====================== LOGIN ======================
 export function renderLogin() {
@@ -14,7 +11,7 @@ export function renderLogin() {
         <form id="loginForm">
           <input type="email" id="email" placeholder="Correo electrónico" required />
           <input type="password" id="password" placeholder="Contraseña" required />
-          <button type="submit">Ingresar</button>
+          <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
         </form>
         <p>
           <a href="#" id="forgotPassword">¿Olvidaste tu contraseña?</a>
@@ -39,7 +36,8 @@ export function addLoginLogic() {
 
     // Mostrar loading
     submitBtn.disabled = true;
-    submitBtn.innerHTML= '<span class="loader"></span> Iniciando sesión...';
+    submitBtn.classList.add('btn-loading');
+    submitBtn.textContent = 'Iniciando sesión...';
 
     try {
       const result = await login({ email, password });
@@ -57,6 +55,7 @@ export function addLoginLogic() {
     } finally {
       // Restaurar botón
       submitBtn.disabled = false;
+      submitBtn.classList.remove('btn-loading');
       submitBtn.textContent = originalBtnText;
     }
   });
@@ -82,8 +81,7 @@ export function renderForgotPassword() {
         <p>Ingresa tu correo para enviarte un enlace de restablecimiento</p>
         <form id="forgotForm">
           <input type="email" id="forgotEmail" placeholder="Correo electrónico" required />
-          <button type="submit">Enviar enlace</button>
-          <div id="spinner" class="hidden">⏳</div>
+          <button type="submit" class="btn btn-primary btn-full">Enviar enlace</button>
         </form>
         <div id="toast" class="toast hidden"></div>
         <p>
@@ -106,31 +104,31 @@ export function addForgotPasswordLogic() {
     const email = document.getElementById("forgotEmail").value.trim();
 
     if (!email) {
-      showToast("❌ Por favor ingresa tu correo", toast);
+      showToast("Por favor ingresa tu correo electrónico", toast);
       return;
     }
 
     // Mostrar loading
-    spinner.classList.remove("hidden");
     submitBtn.disabled = true;
-    submitBtn.textContent = "⏳ Enviando...";
+    submitBtn.classList.add('btn-loading');
+    submitBtn.textContent = "Enviando...";
 
     try {
       const result = await forgotPassword(email);
 
       if (result.success) {
-        showToast("✅ Revisa tu correo para continuar", toast);
+        showToast("Revisa tu correo para continuar", toast);
         console.log("Recuperación enviada a:", email);
       } else {
-        showToast(`❌ ${result.error}`, toast);
+        showToast(result.error, toast);
       }
     } catch (error) {
       console.error("Error en forgot password:", error);
-      showToast("❌ Error de conexión. Intenta de nuevo.", toast);
+      showToast("Error de conexión. Intenta de nuevo.", toast);
     } finally {
       // Restaurar UI
-      spinner.classList.add("hidden");
       submitBtn.disabled = false;
+      submitBtn.classList.remove('btn-loading');
       submitBtn.textContent = originalBtnText;
     }
   });
@@ -155,25 +153,17 @@ function showError(message) {
     errorEl = document.createElement("div");
     errorEl.id = "login-error";
     errorEl.className = "error-message";
-    errorEl.style.cssText = `
-      background: #fee;
-      color: #c33;
-      padding: 10px;
-      border-radius: 4px;
-      margin: 10px 0;
-      text-align: center;
-    `;
     const form = document.getElementById("loginForm");
     form.insertBefore(errorEl, form.firstChild);
   }
 
   errorEl.textContent = message;
-  errorEl.style.display = "block";
+  errorEl.classList.remove("hidden");
 
   // Auto-hide después de 5 segundos
   setTimeout(() => {
     if (errorEl) {
-      errorEl.style.display = "none";
+      errorEl.classList.add("hidden");
     }
   }, 5000);
 }

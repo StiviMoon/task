@@ -1,9 +1,5 @@
 import page from "page";
 import { register } from "../services/authService.js";
-import { renderLogin, addLoginLogic } from "./LoginPage.js";
-import "../styles/main.css";
-import "../styles/components.css";
-import "../styles/pages.css";
 
 export function renderRegister() {
   return `
@@ -42,7 +38,7 @@ export function renderRegister() {
             <div class="error" id="error-confirm"></div>
           </div>
 
-          <button type="submit" id="registerBtn" disabled>Registrarse</button>
+          <button type="submit" id="registerBtn" class="btn btn-primary btn-full" disabled>Registrarse</button>
         </form>
         <p>¿Ya tienes cuenta?
           <a href="#" id="goToLogin">Inicia sesión</a>
@@ -156,7 +152,8 @@ export function addRegisterLogic() {
     }
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="loader"></span> Creando cuenta...';
+    btn.classList.add('btn-loading');
+    btn.textContent = 'Creando cuenta...';
 
     try {
       // Preparar datos para el backend
@@ -170,11 +167,11 @@ export function addRegisterLogic() {
 
       const result = await register(userData);
 
-      console.log(result);    
+      console.log(result);
 
       if (result.success) {
         console.log("Usuario creado exitosamente:", result.data);
-        toast.textContent = "✅ Cuenta creada exitosamente";
+        toast.textContent = "Cuenta creada exitosamente";
         toast.classList.remove("hidden");
 
         // Redirigir al login después de 2 segundos
@@ -191,6 +188,7 @@ export function addRegisterLogic() {
       showErrorForm("Error de conexión. Intenta de nuevo.");
     } finally {
       btn.disabled = false;
+      btn.classList.remove('btn-loading');
       btn.textContent = "Registrarse";
     }
   });
@@ -203,25 +201,17 @@ export function addRegisterLogic() {
       errorEl = document.createElement("div");
       errorEl.id = "register-error";
       errorEl.className = "error-message";
-      errorEl.style.cssText = `
-        background: #fee;
-        color: #c33;
-        padding: 10px;
-        border-radius: 4px;
-        margin: 10px 0;
-        text-align: center;
-      `;
       const form = document.getElementById("registerForm");
       form.insertBefore(errorEl, form.firstChild);
     }
 
     errorEl.textContent = message;
-    errorEl.style.display = "block";
+    errorEl.classList.remove("hidden");
 
     // Auto-hide después de 5 segundos
     setTimeout(() => {
       if (errorEl) {
-        errorEl.style.display = "none";
+        errorEl.classList.add("hidden");
       }
     }, 5000);
   }
