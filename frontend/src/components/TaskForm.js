@@ -1,3 +1,16 @@
+/**
+ * Creates and returns a task form with real-time validation.
+ *
+ * This form includes fields for title, details, date, time, and status.
+ * Upon submission, attempts to create a new task using `createTask` and executes
+ * the `onTaskCreated` callback if provided.
+ * 
+ * @function TaskForm
+ * @param {function(Task):void} [onTaskCreated] - Optional callback executed
+ * after the task has been successfully created. It receives the created task.
+ *  
+ * @returns {HTMLFormElement} The task creation form ready to be inserted into the DOM.
+ */
 export function TaskForm(onTaskCreated) {
   const form = document.createElement("form");
   form.id = "task-form";
@@ -40,8 +53,12 @@ export function TaskForm(onTaskCreated) {
 
   const saveBtn = form.querySelector("#save-task");
   const spinner = form.querySelector("#spinner");
-
-  // Real-time validation
+/**
+   * `input` event that validates required fields in real time.
+   * Enables or disables the save button based on the state of the fields.
+   * 
+   * @event input
+   */
   form.addEventListener("input", () => {
     const title = form.querySelector("#title").value.trim();
     const date = form.querySelector("#date").value;
@@ -51,6 +68,17 @@ export function TaskForm(onTaskCreated) {
   });
 
   // Submit new task
+  /**
+   * `submit` event that creates a new task when the form is submitted.
+   *
+   * @event submit
+   * @property {Task} newTask - The task created from the form data.
+   * @property {string} newTask.title - Title of the task.
+   * @property {string} [newTask.details] - Details of the task.
+   * @property {string} newTask.date - Date in ISO format (yyyy-mm-dd).
+   * @property {string} [newTask.hour] - Time in HH:mm format.
+   * @property {"Por hacer"|"Haciendo"|"Hecho"} newTask.status - Status of the task.
+   */
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 

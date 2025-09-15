@@ -1,21 +1,20 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-/**    
- *  
- * Esquema de Mongoose para el modelo User.
- * Define la estructura y validaciones para los documentos de usuario en la base de datos.
- * Campos:
- * - name: Nombre del usuario (String, requerido).
- * - lastName: Apellido del usuario (String, requerido).
- * - age: Edad del usuario (Number, requerido, mínimo 13).
- *  - email: Correo electrónico del usuario (String, requerido, único, formato válido).
- * - password: Contraseña del usuario (String, requerido, mínimo 6 caracteres, debe incluir una mayúscula, un número y un carácter especial).
- * - createdAt: Fecha de creación del usuario (Date, por defecto la fecha actual). -> Con el timestamp
- * - updatedAt: Fecha de última actualización del usuario (Date, por defecto la fecha actual). -> Con el timestamp
- * 
-*/
-
+/**
+ * Mongoose schema for the User model.
+ * Defines the structure and validation rules for user documents in the database.
+ *
+ * Fields:
+ * - name: User's first name (String, required).
+ * - lastName: User's last name (String, required).
+ * - age: User's age (Number, required, minimum 13).
+ * - email: User's email (String, required, unique, valid email format).
+ * - password: User's password (String, required, minimum 8 characters, must include at least one uppercase letter, one number, and one special character).
+ * - resetPasswordJti: Identifier for password reset (String, optional, default null).
+ * - createdAt: User creation date (Date, automatically set by timestamps).
+ * - updatedAt: Last user update date (Date, automatically set by timestamps).
+ */
 const userSchema = new mongoose.Schema(
   {
     name: {

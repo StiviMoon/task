@@ -16,7 +16,7 @@ function mount(view, logic) {
   logic(); // attach the page-specific logic
 }
 
-// Función para mostrar loading mientras se verifica autenticación
+// Function to show loading while authentication is being verified
 const showLoading = () => {
   const app = document.getElementById("app");
   app.innerHTML = `

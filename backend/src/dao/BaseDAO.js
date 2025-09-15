@@ -1,16 +1,20 @@
 /**
- * BaseDAO - Clase base para operaciones CRUD comunes
- * Proporciona métodos genéricos que heredan todos los DAOs específicos
+ * BaseDAO - Generic base class for common CRUD operations.
+ * Provides reusable methods that all specific DAOs inherit from.
  */
 class BaseDAO {
     constructor(model) {
+         /**
+         * The Mongoose model associated with the DAO.
+         * @type {import("mongoose").Model}
+         */
         this.model = model;
     }
 
     /**
-     * Crear un nuevo documento
-     * @param {Object} data - Datos para crear el documento
-     * @returns {Promise<Object>} - Documento creado
+     * Create a new document.
+     * @param {Object} data - Data to create the document.
+     * @returns {Promise<Object>} - The created document.
      */
     async create(data) {
         try {
@@ -22,9 +26,9 @@ class BaseDAO {
     }
 
     /**
-     * Buscar un documento por ID
-     * @param {String} id - ID del documento
-     * @returns {Promise<Object|null>} - Documento encontrado o null
+     * Find a document by ID.
+     * @param {string} id - Document ID.
+     * @returns {Promise<Object|null>} - Found document or null if not found.
      */
     async findById(id) {
         try {
@@ -35,9 +39,9 @@ class BaseDAO {
     }
 
     /**
-     * Buscar un documento por criterio
-     * @param {Object} criteria - Criterios de búsqueda
-     * @returns {Promise<Object|null>} - Documento encontrado o null
+     * Find a single document by criteria.
+     * @param {Object} criteria - Search criteria.
+     * @returns {Promise<Object|null>} - Found document or null if not found.
      */
     async findOne(criteria) {
         try {
@@ -48,10 +52,10 @@ class BaseDAO {
     }
 
     /**
-     * Buscar múltiples documentos
-     * @param {Object} criteria - Criterios de búsqueda
-     * @param {Object} options - Opciones (sort, limit, etc.)
-     * @returns {Promise<Array>} - Array de documentos
+     * Find multiple documents with optional filters.
+     * @param {Object} [criteria={}] - Search criteria.
+     * @param {Object} [options={}] - Options (sort, limit, skip, populate).
+     * @returns {Promise<Array<Object>>} - Array of found documents.
      */
     async find(criteria = {}, options = {}) {
         try {
@@ -69,11 +73,11 @@ class BaseDAO {
     }
 
     /**
-     * Actualizar un documento por ID
-     * @param {String} id - ID del documento
-     * @param {Object} data - Datos a actualizar
-     * @param {Object} options - Opciones de actualización
-     * @returns {Promise<Object|null>} - Documento actualizado
+     * Update a document by ID.
+     * @param {string} id - Document ID.
+     * @param {Object} data - Data to update.
+     * @param {Object} [options={ new: true, runValidators: true }] - Update options.
+     * @returns {Promise<Object|null>} - Updated document or null if not found.
      */
     async updateById(id, data, options = { new: true, runValidators: true }) {
         try {
@@ -84,11 +88,11 @@ class BaseDAO {
     }
 
     /**
-     * Actualizar un documento por criterio
-     * @param {Object} criteria - Criterios de búsqueda
-     * @param {Object} data - Datos a actualizar
-     * @param {Object} options - Opciones de actualización
-     * @returns {Promise<Object|null>} - Documento actualizado
+     * Update a document by criteria.
+     * @param {Object} criteria - Search criteria.
+     * @param {Object} data - Data to update.
+     * @param {Object} [options={ new: true, runValidators: true }] - Update options.
+     * @returns {Promise<Object|null>} - Updated document or null if not found.
      */
     async updateOne(criteria, data, options = { new: true, runValidators: true }) {
         try {
@@ -99,9 +103,9 @@ class BaseDAO {
     }
 
     /**
-     * Eliminar un documento por ID
-     * @param {String} id - ID del documento
-     * @returns {Promise<Object|null>} - Documento eliminado
+     * Delete a document by ID.
+     * @param {string} id - Document ID.
+     * @returns {Promise<Object|null>} - Deleted document or null if not found.
      */
     async deleteById(id) {
         try {
@@ -112,9 +116,9 @@ class BaseDAO {
     }
 
     /**
-     * Eliminar un documento por criterio
-     * @param {Object} criteria - Criterios de búsqueda
-     * @returns {Promise<Object|null>} - Documento eliminado
+     * Delete a document by criteria.
+     * @param {Object} criteria - Search criteria.
+     * @returns {Promise<Object|null>} - Deleted document or null if not found.
      */
     async deleteOne(criteria) {
         try {
@@ -125,9 +129,9 @@ class BaseDAO {
     }
 
     /**
-     * Contar documentos
-     * @param {Object} criteria - Criterios de búsqueda
-     * @returns {Promise<Number>} - Número de documentos
+     * Count documents by criteria.
+     * @param {Object} [criteria={}] - Search criteria.
+     * @returns {Promise<number>} - Number of documents found.
      */
     async count(criteria = {}) {
         try {
@@ -138,9 +142,9 @@ class BaseDAO {
     }
 
     /**
-     * Verificar si existe un documento
-     * @param {Object} criteria - Criterios de búsqueda
-     * @returns {Promise<Boolean>} - true si existe, false si no
+     * Check if a document exists by criteria.
+     * @param {Object} criteria - Search criteria.
+     * @returns {Promise<boolean>} - True if a document exists, false otherwise.
      */
     async exists(criteria) {
         try {

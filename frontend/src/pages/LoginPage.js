@@ -1,7 +1,11 @@
 import page from "page";
 import { login, forgotPassword } from "../services/authService.js";
-
 // ====================== LOGIN ======================
+/**
+ * Renders the login page HTML structure.
+ * @function
+ * @returns {string} HTML string for the login page.
+ */
 export function renderLogin() {
   return `
     <div class="login-container">
@@ -24,11 +28,28 @@ export function renderLogin() {
   `;
 }
 
-export function addLoginLogic() {
+/**
+ * Adds logic to the login form:
+ * - Handles form submission.
+ * - Performs login with `login()` service.
+ * - Redirects to dashboard if successful.
+ * - Shows errors if login fails.
+ * - Handles navigation to register and forgot password pages.
+ *
+ * @function
+ * @returns {void}
+ */
+
+  export function addLoginLogic() {
   const form = document.getElementById("loginForm");
   const submitBtn = form.querySelector("button[type='submit']");
   const originalBtnText = submitBtn.textContent;
-
+ /**
+   * Handles login form submission.
+   * @event submit
+   * @property {string} email - User email.
+   * @property {string} password - User password.
+   */
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = form.email.value.trim();
@@ -72,6 +93,11 @@ export function addLoginLogic() {
 }
 
 // ====================== FORGOT PASSWORD ======================
+/**
+ * Renders the forgot password page HTML structure.
+ * @function
+ * @returns {string} HTML string for the forgot password page.
+ */
 export function renderForgotPassword() {
   return `
     <div class="login-container">
@@ -91,14 +117,27 @@ export function renderForgotPassword() {
     </div>
   `;
 }
-
+/**
+ * Adds logic to the forgot password form:
+ * - Handles form submission.
+ * - Calls `forgotPassword()` service.
+ * - Displays toast messages for success or failure.
+ * - Handles navigation back to login.
+ *
+ * @function
+ * @returns {void}
+ */
 export function addForgotPasswordLogic() {
   const form = document.getElementById("forgotForm");
   const spinner = document.getElementById("spinner");
   const toast = document.getElementById("toast");
   const submitBtn = form.querySelector("button[type='submit']");
   const originalBtnText = submitBtn.textContent;
-
+/**
+   * Handles forgot password form submission.
+   * @event submit
+   * @property {string} email - User email for password recovery.
+   */
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("forgotEmail").value.trim();
@@ -108,7 +147,7 @@ export function addForgotPasswordLogic() {
       return;
     }
 
-    // Mostrar loading
+    // Show loading
     submitBtn.disabled = true;
     submitBtn.classList.add('btn-loading');
     submitBtn.textContent = "Enviando...";
@@ -126,7 +165,7 @@ export function addForgotPasswordLogic() {
       console.error("Error en forgot password:", error);
       showToast("Error de conexión. Intenta de nuevo.", toast);
     } finally {
-      // Restaurar UI
+      // Restore UI
       submitBtn.disabled = false;
       submitBtn.classList.remove('btn-loading');
       submitBtn.textContent = originalBtnText;
@@ -140,14 +179,23 @@ export function addForgotPasswordLogic() {
 }
 
 // ====================== HELPER FUNCTIONS ======================
+/**
+ * Displays a temporary toast message.
+ * @param {string} message - Message to display.
+ * @param {HTMLElement} toastEl - Toast element container.
+ */
 function showToast(message, toastEl) {
   toastEl.textContent = message;
   toastEl.classList.remove("hidden");
   setTimeout(() => toastEl.classList.add("hidden"), 3000);
 }
 
+/**
+ * Displays an error message inside the login form.
+ * @param {string} message - Error message to display.
+ */
 function showError(message) {
-  // Crear o actualizar elemento de error
+  // Create or update error element
   let errorEl = document.getElementById("login-error");
   if (!errorEl) {
     errorEl = document.createElement("div");
@@ -160,7 +208,7 @@ function showError(message) {
   errorEl.textContent = message;
   errorEl.classList.remove("hidden");
 
-  // Auto-hide después de 5 segundos
+  // Auto-hide after 5 seconds
   setTimeout(() => {
     if (errorEl) {
       errorEl.classList.add("hidden");

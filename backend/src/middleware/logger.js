@@ -1,7 +1,17 @@
+/**
+ * Express middleware for logging HTTP requests and responses.
+ * Provides detailed logs including request method, URL, IP, User-Agent, 
+ * Origin, timestamp, and response time.
+ *
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
+ * @param {import("express").NextFunction} next - Callback to pass control to the next middleware.
+ * @returns {void}
+ */
 const logger = (req, res, next) => {
     const start = Date.now();
 
-    // Log más detallado para debugging móvil
+    // Detailed log for debugging (useful for mobile clients)
     console.log(`📥 ${req.method} ${req.originalUrl}`);
     console.log(`   IP: ${req.ip}`);
     console.log(`   User-Agent: ${req.get('User-Agent')?.substring(0, 100)}...`);

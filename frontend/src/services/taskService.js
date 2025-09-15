@@ -1,15 +1,17 @@
 import { getApiUrl, getAuthHeaders } from "../config/api.js";
 
 /**
- * Obtiene todas las tareas del usuario autenticado
- * @returns {Promise<Object>} Lista de tareas
+ * Fetches all tasks for the authenticated user
+ * @async
+ * @function getTasks
+ * @returns {Promise<Object>} Response object with tasks list
  */
 export const getTasks = async () => {
   try {
     const response = await fetch(getApiUrl("/tasks"), {
       method: "GET",
       headers: getAuthHeaders(),
-      credentials: "include", // Importante para las cookies de autenticación
+      credentials: "include", // Important for authentication cookies
     });
 
     const data = await response.json();
@@ -34,14 +36,16 @@ export const getTasks = async () => {
 };
 
 /**
- * Crea una nueva tarea
- * @param {Object} taskData - Datos de la tarea
- * @param {string} taskData.title - Título de la tarea
- * @param {string} taskData.details - Detalles de la tarea
- * @param {string} taskData.date - Fecha de la tarea (formato YYYY-MM-DD)
- * @param {string} taskData.hour - Hora de la tarea (formato HH:mm)
- * @param {string} taskData.status - Estado de la tarea
- * @returns {Promise<Object>} Respuesta del servidor
+ * Creates a new task
+ * @async
+ * @function createTask
+ * @param {Object} taskData - Task details
+ * @param {string} taskData.title - Task title
+ * @param {string} taskData.details - Task details
+ * @param {string} taskData.date - Task date (format YYYY-MM-DD)
+ * @param {string} taskData.hour - Task time (format HH:mm)
+ * @param {string} taskData.status - Task status
+ * @returns {Promise<Object>} Server response
  */
 export const createTask = async (taskData) => {
   try {
@@ -73,10 +77,12 @@ export const createTask = async (taskData) => {
 };
 
 /**
- * Actualiza una tarea existente
- * @param {string} taskId - ID de la tarea
- * @param {Object} taskData - Datos actualizados de la tarea
- * @returns {Promise<Object>} Respuesta del servidor
+ * Updates an existing task
+ * @async
+ * @function updateTask
+ * @param {string} taskId - Task ID
+ * @param {Object} taskData - Updated task data
+ * @returns {Promise<Object>} Server response
  */
 export const updateTask = async (taskId, taskData) => {
   try {
@@ -108,9 +114,11 @@ export const updateTask = async (taskId, taskData) => {
 };
 
 /**
- * Elimina una tarea
- * @param {string} taskId - ID de la tarea
- * @returns {Promise<Object>} Respuesta del servidor
+ * Deletes a task
+ * @async
+ * @function deleteTask
+ * @param {string} taskId - Task ID
+ * @returns {Promise<Object>} Server response
  */
 export const deleteTask = async (taskId) => {
   try {
@@ -141,9 +149,11 @@ export const deleteTask = async (taskId) => {
 };
 
 /**
- * Obtiene una tarea específica por ID
- * @param {string} taskId - ID de la tarea
- * @returns {Promise<Object>} Datos de la tarea
+ * Fetches a specific task by ID
+ * @async
+ * @function getTaskById
+ * @param {string} taskId - Task ID
+ * @returns {Promise<Object>} Task data
  */
 export const getTaskById = async (taskId) => {
   try {

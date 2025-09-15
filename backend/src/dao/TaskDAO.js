@@ -2,19 +2,29 @@ const BaseDAO = require('./BaseDAO');
 const Task = require('../models/Task');
 
 /**
- * TaskDAO - Data Access Object para operaciones de Tareas
- * Extiende BaseDAO con métodos específicos para Task
+ * Data Access Object (DAO) for task operations.
+ * Extends {@link BaseDAO} to provide task-specific database methods.
+ * 
+ * @class TaskDAO
+ * @extends BaseDAO
  */
 class TaskDAO extends BaseDAO {
+    /**
+     * Creates an instance of TaskDAO.
+     * Uses the {@link Task} model as the base.
+     */
     constructor() {
         super(Task);
     }
 
     /**
-     * Crear nueva tarea asociada a un usuario
-     * @param {Object} taskData - Datos de la tarea
-     * @param {String} userId - ID del usuario propietario
-     * @returns {Promise<Object>} - Tarea creada
+     * Create a new task associated with a user.
+     * 
+     * @async
+     * @param {Object} taskData - Task data (e.g., title, description, status).
+     * @param {string} userId - ID of the task owner.
+     * @returns {Promise<Object>} - The created task object.
+     * @throws {Error} - If an error occurs during task creation.
      */
     async createTask(taskData, userId) {
         try {
@@ -26,9 +36,12 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Obtener todas las tareas de un usuario
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Array>} - Array de tareas
+     * Get all tasks belonging to a user.
+     * 
+     * @async
+     * @param {string} userId - ID of the user.
+     * @returns {Promise<Array<Object>>} - List of tasks ordered by creation date.
+     * @throws {Error} - If an error occurs during retrieval.
      */
     async getUserTasks(userId) {
         try {
@@ -39,10 +52,13 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Buscar una tarea específica del usuario
-     * @param {String} taskId - ID de la tarea
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Object|null>} - Tarea encontrada o null
+     * Find a specific task of a user.
+     * 
+     * @async
+     * @param {string} taskId - ID of the task.
+     * @param {string} userId - ID of the task owner.
+     * @returns {Promise<Object|null>} - The task if found, otherwise `null`.
+     * @throws {Error} - If an error occurs during the search.
      */
     async getUserTask(taskId, userId) {
         try {
@@ -53,15 +69,18 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Actualizar una tarea del usuario
-     * @param {String} taskId - ID de la tarea
-     * @param {String} userId - ID del usuario
-     * @param {Object} updateData - Datos a actualizar
-     * @returns {Promise<Object|null>} - Tarea actualizada o null
+     * Update a user's task.
+     * 
+     * @async
+     * @param {string} taskId - ID of the task.
+     * @param {string} userId - ID of the task owner.
+     * @param {Object} updateData - Data to update in the task.
+     * @returns {Promise<Object|null>} - The updated task, or `null` if not found.
+     * @throws {Error} - If an error occurs during the update.
      */
     async updateUserTask(taskId, userId, updateData) {
         try {
-            // Verificar que la tarea pertenece al usuario
+            // Verify that the task belongs to the user
             const task = await this.getUserTask(taskId, userId);
             if (!task) {
                 return null;
@@ -74,10 +93,13 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Eliminar una tarea del usuario
-     * @param {String} taskId - ID de la tarea
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Object|null>} - Tarea eliminada o null
+     * Delete a user's task.
+     * 
+     * @async
+     * @param {string} taskId - ID of the task.
+     * @param {string} userId - ID of the task owner.
+     * @returns {Promise<Object|null>} - The deleted task, or `null` if not found.
+     * @throws {Error} - If an error occurs during deletion.
      */
     async deleteUserTask(taskId, userId) {
         try {

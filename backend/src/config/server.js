@@ -5,6 +5,17 @@ const cors = require('cors');
 // Import custom middleware
 const logger = require('../middleware/logger');
 
+/**
+ * Configures the Express application with middleware for:
+ * - CORS (Cross-Origin Resource Sharing)
+ * - Custom request logging
+ * - Body parsing (JSON and URL-encoded)
+ * - Serving static files
+ *
+ * @function configureServer
+ * @param {import("express").Express} app - The Express application instance.
+ * @returns {void} Configures the server with middleware and settings.
+ */
 const configureServer = (app) => {
     // CORS configuration
     const allowedOrigins = [
@@ -29,14 +40,14 @@ const configureServer = (app) => {
                 process.env.FRONTEND_URL
             ].filter(Boolean);
 
-            // Permitir peticiones sin origen (como Postman, curl, etc.)
+            // Allow requests with no origin (like Postman, curl, etc.)
             if (!origin) return callback(null, true);
 
-            // Verificar si el origen está en la lista permitida
+            // Check if the origin is in the allowed list
             if (allowedOrigins.indexOf(origin) !== -1) {
                 callback(null, true);
             } else {
-                // En desarrollo, permitir todos los orígenes
+                // In development, allow all origins
                 if (process.env.NODE_ENV === 'development') {
                     callback(null, true);
                 } else {
@@ -53,7 +64,7 @@ const configureServer = (app) => {
     }));
 
 
-    // Headers adicionales solo para OPTIONS que no manejó CORS
+    // Handle OPTIONS requests not covered by CORS
     app.use((req, res, next) => {
         // Solo manejar OPTIONS si no fue manejado por CORS
         if (req.method === 'OPTIONS') {

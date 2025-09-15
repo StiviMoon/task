@@ -15,7 +15,7 @@ function mount(renderFn, logicFn) {
   if (logicFn) logicFn();
 }
 
-// Función para mostrar loading mientras se verifica autenticación
+// Function to show loading while authentication is being verified
 const showLoading = () => {
   const app = document.getElementById("app");
   app.innerHTML = `
