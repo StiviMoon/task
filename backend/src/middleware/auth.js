@@ -33,16 +33,24 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Limitador de tasa para la ruta de inicio de sesión
+// Limitador de tasa MUY PERMISIVO para acceso universal
 const loginLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 5,
-    message: {
+  windowMs: 5 * 60 * 1000, // 5 minutos (ventana más corta)
+  max: 100, // 100 intentos por ventana (muy permisivo)
+  message: {
     success: false,
-    message: "Cuenta temporalmente bloqueada."
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
+    message: "Demasiados intentos. Espera 5 minutos."
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Solo por IP para máxima simplicidad
+  keyGenerator: (req) => {
+    return req.ip || 'unknown';
+  },
+  skip: (req) => {
+    // Opcional: skip rate limiting en desarrollo
+    return process.env.NODE_ENV === 'development' && process.env.SKIP_RATE_LIMIT === 'true';
+  }
 });
 
 module.exports = { authenticateToken, loginLimiter };
