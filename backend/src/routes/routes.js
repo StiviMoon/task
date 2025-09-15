@@ -12,6 +12,4 @@ router.use("/auth", userRoutes);
 
 router.use("/tasks", authenticateToken ,taskRoutes);
 
-
 module.exports = router;
-
