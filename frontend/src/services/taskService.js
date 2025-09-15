@@ -1,4 +1,4 @@
-import { getApiUrl, getAuthHeaders } from '../config/api.js';
+import { getApiUrl, getAuthHeaders } from "../config/api.js";
 
 /**
  * Obtiene todas las tareas del usuario autenticado
@@ -6,29 +6,29 @@ import { getApiUrl, getAuthHeaders } from '../config/api.js';
  */
 export const getTasks = async () => {
   try {
-    const response = await fetch(getApiUrl('/tasks'), {
-      method: 'GET',
+    const response = await fetch(getApiUrl("/tasks"), {
+      method: "GET",
       headers: getAuthHeaders(),
-      credentials: 'include' // Importante para las cookies de autenticación
+      credentials: "include", // Importante para las cookies de autenticación
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al obtener tareas');
+      throw new Error(data.message || "Error al obtener tareas");
     }
 
     return {
       success: true,
       data: data.tasks || [],
-      message: 'Tareas obtenidas exitosamente'
+      message: "Tareas obtenidas exitosamente",
     };
   } catch (error) {
-    console.error('Error en getTasks:', error);
+    console.error("Error en getTasks:", error);
     return {
       success: false,
       error: error.message,
-      data: []
+      data: [],
     };
   }
 };
@@ -45,29 +45,29 @@ export const getTasks = async () => {
  */
 export const createTask = async (taskData) => {
   try {
-    const response = await fetch(getApiUrl('/tasks'), {
-      method: 'POST',
+    const response = await fetch(getApiUrl("/tasks"), {
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(taskData),
-      credentials: 'include' // Importante para las cookies de autenticación
+      credentials: "include", // Importante para las cookies de autenticación
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al crear tarea');
+      throw new Error(data.message || "Error al crear tarea");
     }
 
     return {
       success: true,
       data: data,
-      message: 'Tarea creada exitosamente'
+      message: "Tarea creada exitosamente",
     };
   } catch (error) {
-    console.error('Error en createTask:', error);
+    console.error("Error en createTask:", error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -81,28 +81,28 @@ export const createTask = async (taskData) => {
 export const updateTask = async (taskId, taskData) => {
   try {
     const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
-      method: 'PUT',
+      method: "PUT",
       headers: getAuthHeaders(),
       body: JSON.stringify(taskData),
-      credentials: 'include'
+      credentials: "include",
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al actualizar tarea');
+      throw new Error(data.message || "Error al actualizar tarea");
     }
 
     return {
       success: true,
       data: data,
-      message: 'Tarea actualizada exitosamente'
+      message: "Tarea actualizada exitosamente",
     };
   } catch (error) {
-    console.error('Error en updateTask:', error);
+    console.error("Error en updateTask:", error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -115,27 +115,27 @@ export const updateTask = async (taskId, taskData) => {
 export const deleteTask = async (taskId) => {
   try {
     const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
-      method: 'DELETE',
+      method: "DELETE",
       headers: getAuthHeaders(),
-      credentials: 'include'
+      credentials: "include",
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al eliminar tarea');
+      throw new Error(data.message || "Error al eliminar tarea");
     }
 
     return {
       success: true,
       data: data,
-      message: 'Tarea eliminada exitosamente'
+      message: "Tarea eliminada exitosamente",
     };
   } catch (error) {
-    console.error('Error en deleteTask:', error);
+    console.error("Error en deleteTask:", error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -148,27 +148,27 @@ export const deleteTask = async (taskId) => {
 export const getTaskById = async (taskId) => {
   try {
     const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
-      credentials: 'include'
+      credentials: "include",
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al obtener tarea');
+      throw new Error(data.message || "Error al obtener tarea");
     }
 
     return {
       success: true,
       data: data,
-      message: 'Tarea obtenida exitosamente'
+      message: "Tarea obtenida exitosamente",
     };
   } catch (error) {
-    console.error('Error en getTaskById:', error);
+    console.error("Error en getTaskById:", error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };

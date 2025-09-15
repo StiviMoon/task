@@ -1,0 +1,304 @@
+/* ===========================
+   BUTTON COMPONENT STYLES
+=========================== */
+
+/* Button-specific CSS Properties */
+:root {
+  --btn-transition: var(--transition-base);
+  --btn-radius: var(--radius-md);
+  --btn-font-size: var(--font-size-sm);
+  --btn-font-weight: var(--font-weight-medium);
+  --btn-padding: var(--spacing-md) var(--spacing-xl);
+  --btn-shadow-hover: var(--shadow-lg);
+  --btn-transform-hover: translateY(-1px);
+}
+
+/* Base Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--btn-padding);
+  border: none;
+  border-radius: var(--btn-radius);
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
+  cursor: pointer;
+  transition: var(--btn-transition);
+  text-decoration: none;
+  outline: none;
+}
+
+.btn:hover {
+  transform: var(--btn-transform-hover);
+  color: aliceblue;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Button Variants */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+  box-shadow: var(--btn-shadow-hover) rgba(37, 99, 235, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--color-neutral) 0%, var(--color-neutral-dark) 100%);
+  color: var(--color-secondary);
+  border: 1px solid var(--color-neutral-dark);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-neutral-dark) 0%, var(--color-neutral-darker) 100%);
+  color: var(--color-secondary-dark);
+  border-color: var(--color-neutral-darker);
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.2);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-dark) 100%);
+  color: white;
+  box-shadow: 0 1px 3px rgba(5, 150, 105, 0.3);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-success-light) 0%, var(--color-success) 100%);
+  box-shadow: var(--btn-shadow-hover) rgba(5, 150, 105, 0.4);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-dark) 100%);
+  color: white;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.3);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-danger-light) 0%, var(--color-danger) 100%);
+  box-shadow: var(--btn-shadow-hover) rgba(220, 38, 38, 0.4);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-warning-dark) 100%);
+  color: white;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.3);
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-warning-light) 0%, var(--color-warning) 100%);
+  box-shadow: var(--btn-shadow-hover) rgba(217, 119, 6, 0.4);
+}
+
+/* Size Variants */
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* Special Buttons */
+.fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 300;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(157, 116, 223, 0.3);
+  transition: var(--transition-base);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fab:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(105, 132, 192, 0.144);
+}
+
+.fab:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.fab svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-base);
+  backdrop-filter: blur(10px);
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.mobile-menu-btn:hover:not(:disabled) {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.mobile-menu-btn:active {
+  transform: scale(0.95);
+}
+
+/* Loading Spinner */
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1rem;
+  height: 1rem;
+  margin: -0.5rem 0 0 -0.5rem;
+  border: 2px solid currentColor;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 1s linear infinite;
+}
+
+.btn-primary.btn-loading::after {
+  border-color: white;
+  border-bottom-color: transparent;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+=========================== */
+
+@media (max-width: 768px) {
+  :root {
+    --btn-padding: 1rem 1.5rem;
+    --btn-font-size: 0.875rem;
+  }
+
+  .btn {
+    min-height: 44px; /* Touch target mínimo recomendado */
+    font-weight: var(--font-weight-medium);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    width: 44px;
+    height: 44px;
+  }
+
+  .fab {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 56px;
+    height: 56px;
+    font-size: 1.25rem;
+  }
+
+  .fab svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --btn-padding: 0.875rem 1.25rem;
+    --btn-font-size: 0.875rem;
+  }
+
+  .btn {
+    min-height: 48px; /* Más grande en móviles pequeños */
+  }
+
+  .btn-full,
+  .btn-primary,
+  .btn-danger,
+  .btn-secondary {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .mobile-menu-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .fab {
+    bottom: 1rem;
+    right: 1rem;
+    width: 52px;
+    height: 52px;
+    font-size: 1.125rem;
+  }
+
+  .fab svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+@media (max-width: 360px) {
+  .fab {
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
+    bottom: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .fab svg {
+    width: 22px;
+    height: 22px;
+  }
+}
