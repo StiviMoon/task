@@ -33,22 +33,19 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Limitador de tasa MUY PERMISIVO para acceso universal
+// Limitador de tasa compatible con IPv6 para producción
 const loginLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutos (ventana más corta)
-  max: 100, // 100 intentos por ventana (muy permisivo)
+  windowMs: 5 * 60 * 1000, // 5 minutos
+  max: process.env.NODE_ENV === 'production' ? 50 : 100, // Más restrictivo en producción
   message: {
     success: false,
     message: "Demasiados intentos. Espera 5 minutos."
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Solo por IP para máxima simplicidad
-  keyGenerator: (req) => {
-    return req.ip || 'unknown';
-  },
+  // Usar el generador por defecto que maneja IPv6 correctamente
   skip: (req) => {
-    // Opcional: skip rate limiting en desarrollo
+    // Skip rate limiting en desarrollo con variable de entorno
     return process.env.NODE_ENV === 'development' && process.env.SKIP_RATE_LIMIT === 'true';
   }
 });
