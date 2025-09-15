@@ -6,16 +6,16 @@ const { sendMail } = require("../service/resendService");
 const config = require("../config/environment");
 
 /**
- * Registra un nuevo usuario en la base de datos.
+ * Registers a new user in the database.
  *
  * @async
  * @function register
- * @param {Request} req
- * @param {Response} res
- * @returns {Promise<void>} Devuelve un objeto JSON con:
- *  - 201: `{ message: user._id }` si el registro es exitoso.
- *  - 409: `{ message: "Este correo ya está registrado." }` si el email está duplicado.
- *  - 400: `{ message: error.message }` si ocurre un error de validación u otro.
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
+ * @returns {Promise<void>} Sends a JSON response:
+ * - 201: `{ userId }` if registration is successful.
+ * - 409: `{ message: "This email is already registered." }` if the email is duplicated.
+ * - 400: `{ message: error.message }` if a validation or other error occurs.
  */
 exports.register = async (req, res) => {
     try{
@@ -37,18 +37,17 @@ exports.register = async (req, res) => {
 
 
 /**
- * Inicia sesión verificando las credenciales del usuario.
+ * Logs in a user by verifying their credentials.
  *
  * @async
  * @function login
- * @param {Request} req
- * @param {Response} res
- * @returns { Promise<void>} Devuelve un objeto JSON con:
- *  - 200: `{ success: true, ,message: "Inicio de sesión exitoso."" ,token }` si las credenciales son correctas. y también manda el cookie.
- *  - 401: `{ success: false, message: "Correo o contraseña inválidos." }` si no coinciden email/contraseña.
- *  - 500: `{ success: false, message: err.message }` si ocurre un error interno.
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
+ * @returns {Promise<void>} Sends a JSON response:
+ * - 200: `{ success: true, message: "Login successful.", token }` if credentials are valid.
+ * - 401: `{ success: false, message: "Invalid email or password." }` if authentication fails.
+ * - 500: `{ success: false, message: "Try again later." }` if an internal error occurs.
  */
-
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -62,24 +61,24 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' } // Coincide con la duración de la cookie
+      { expiresIn: '24h' } // Matches the cookie lifetime
     );
 
-    // Configuración de cookie adaptativa según entorno
+    // Adaptive cookie configuration according to environment
     const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("access_token", token, {
-        httpOnly: false, // Accesible desde JavaScript para máxima compatibilidad
-        secure: false, // HTTP y HTTPS en todos los entornos para testing universal
-        sameSite: "lax", // Máxima compatibilidad cross-browser
-        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        httpOnly: false, // Accessible from JavaScript for maximum compatibility
+        secure: false, // HTTP and HTTPS in all environments for universal testing
+        sameSite: "lax", // Maximum cross-browser compatibility
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
         path: "/",
-        domain: undefined // Sin restricción de dominio
+        domain: undefined // No domain restriction
     });
 
     res.status(200).json({
         success: true,
         message: "Inicio de sesión exitoso.",
-        // Enviar token también en respuesta para máxima compatibilidad
+        // Send token also in response for maximum compatibility
         token: token
     });
   }
@@ -90,14 +89,14 @@ exports.login = async (req, res) => {
 };
 
 /**
- * Cierra la sesión del usuario eliminando la cookie del token.
- * @function logout
- * @param {Request} req
+ * Logs out the user by clearing the authentication cookie.
  *
- * @param {Response}  res
- * @returns {void} Devuelve un objeto JSON con:
- *  - 200: `{ message: "Sesión cerrada exitosamente." }` si la cookie se elimina correctamente.
- *  - 400: `{ message: error.message }` si ocurre un error interno.
+ * @function logout
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
+ * @returns {void} Sends a JSON response:
+ * - 200: `{ success: true, message: "Logged out successfully." }`
+ * - 400: `{ success: false, message: error.message }` if an error occurs.
  */
 
 exports.logout = (req, res) => {
@@ -118,17 +117,18 @@ exports.logout = (req, res) => {
 };
 
 /**
- * Verifica si el usuario está autenticado.
+ * Verifies if the user is authenticated.
+ *
  * @function verifyAuth
- * @param {Request} req - Request object (debe tener req.user del middleware authenticateToken)
- * @param {Response} res
- * @returns {void} Devuelve un objeto JSON con:
- *  - 200: `{ success: true, user: { id, email, name } }` si está autenticado.
- *  - 401: Si no está autenticado (manejado por el middleware authenticateToken).
+ * @param {import("express").Request} req - Express request object (must include `req.user` from `authenticateToken` middleware).
+ * @param {import("express").Response} res - Express response object.
+ * @returns {void} Sends a JSON response:
+ * - 200: `{ success: true, user: { id, email } }` if authenticated.
+ * - 401: Unauthorized (handled by middleware).
  */
 exports.verifyAuth = (req, res) => {
     try {
-        // Si llegamos aquí, el middleware authenticateToken ya verificó que el token es válido
+        // If we get here, the authenticateToken middleware has already verified that the token is valid
         res.status(200).json({
             success: true,
             user: {
@@ -141,21 +141,18 @@ exports.verifyAuth = (req, res) => {
     }
 };
 
-
-
-/** * Envía un correo electrónico con un enlace para restablecer la contraseña.
+/**
+ * Sends a password reset email with a JWT-based link.
  *
  * @async
  * @function forgotPassword
- * @param {Request} req
- * @param {Response} res
- * @returns {Promise<void>} Devuelve un objeto JSON con:
- *  - 200: `{ success: true, message: "Si el correo existe, se ha enviado un enlace de restablecimiento." }` si el proceso es exitoso.
- * - 500: `{ success: false, message: err.message }` si ocurre un error interno.
- * /
-**/
-
-
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
+ * @returns {Promise<void>} Sends a JSON response:
+ * - 200: `{ success: true }` if reset link is sent.
+ * - 202: `{ success: false, message: "Email not registered." }` if no user is found.
+ * - 500: `{ success: false, message: err.message }` if an internal error occurs.
+ */
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -175,7 +172,7 @@ exports.forgotPassword = async (req, res) => {
 
     const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
-    // En desarrollo, enviar a email verificado de Resend
+    // In development, send to verified Resend email
     const emailToSend = process.env.NODE_ENV === 'production'
         ? 'johan.steven.rodriguez@correounivalle.edu.co'
         : email;
@@ -199,16 +196,16 @@ exports.forgotPassword = async (req, res) => {
 };
 
 /**
- * Restablece la contraseña del usuario utilizando un token JWT.
+ * Resets the user's password using a valid JWT reset token.
+ *
  * @async
  * @function resetPassword
- * @param {Request} req
- * @param {Response} res
- * @return {Promise<void>}  Devuelve un objeto JSON con:
- *  - 200: `{ success: true, message: "Contraseña actualizada." }` si la contraseña se actualiza correctamente.
- * - 400: `{ success: false, message: "Enlace inválido o ya utilizado." }` si el token es inválido o ya fue usado.
- * - 500: `{ success: false, message: err.message }` si ocurre un error interno.
- *
+ * @param {import("express").Request} req - Express request object containing `token` and `newPassword`.
+ * @param {import("express").Response} res - Express response object.
+ * @returns {Promise<void>} Sends a JSON response:
+ * - 200: `{ success: true, message: "Password updated." }` if successful.
+ * - 400: `{ success: false, message: "Invalid or already used link." }` if token is invalid/expired.
+ * - 500: `{ success: false, message: "Try again later." }` if an internal error occurs.
  */
 exports.resetPassword = async (req, res) => {
   try {
@@ -223,7 +220,7 @@ exports.resetPassword = async (req, res) => {
         return res.status(400).json({ success: false, message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial" });
     }
 
-    // Invalida el token y actualiza la contraseña
+    // Invalidate the token and update the password
     await UserDAO.updateResetPasswordJti(user._id, null);
     await UserDAO.updatePassword(user._id, newPassword);
     console.log(user.password)

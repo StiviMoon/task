@@ -1,6 +1,12 @@
 import page from "page";
 import { register } from "../services/authService.js";
 
+/**
+ * Renders the register page HTML structure.
+ * @function
+ * @returns {string} HTML string for the register page.
+ */
+
 export function renderRegister() {
   return `
     <div class="register-container">
@@ -49,6 +55,12 @@ export function renderRegister() {
   `;
 }
 
+/**
+ * Adds register form logic: validation, API call, error handling,
+ * toast notifications, and navigation to login.
+ * @function
+ * @returns {void}
+ */
 export function addRegisterLogic() {
   const form = document.getElementById("registerForm");
   const btn = document.getElementById("registerBtn");
@@ -65,6 +77,11 @@ export function addRegisterLogic() {
   };
 
   // validate fields
+  /**
+   * Validates an individual field and shows/hides error messages.
+   * @param {"names"|"surnames"|"age"|"email"|"password"|"confirm"} field - The field to validate.
+   * @returns {boolean} Whether the field is valid.
+   */
   function validateField(field) {
     if (field === "names") {
       if (inputs.names.value.trim() === "") {
@@ -108,6 +125,10 @@ export function addRegisterLogic() {
   }
 
   // Check if the entire form is valid
+  /**
+   * Checks if the whole form is valid.
+   * @returns {boolean} Whether the form is valid.
+   */
   function isFormValid() {
     return (
       inputs.names.value.trim() !== "" &&
@@ -119,14 +140,21 @@ export function addRegisterLogic() {
       inputs.confirm.value !== ""
     );
   }
-
+  /**
+   * Shows an error message for a specific field.
+   * @param {string} field - The field ID.
+   * @param {string} msg - The error message.
+   */
   function showError(field, msg) {
     const errorEl = document.getElementById(`error-${field}`);
     errorEl.innerText = msg;
     errorEl.classList.add("show-tooltip");
 
   }
-
+  /**
+   * Hides the error message for a specific field.
+   * @param {string} field - The field ID.
+   */
   function hideError(field) {
     const errorEl = document.getElementById(`error-${field}`);
     errorEl.innerText = "";
@@ -194,6 +222,10 @@ export function addRegisterLogic() {
   });
 
  // Helper function to show errors
+  /**
+   * Shows a form-level error (not tied to a single field).
+   * @param {string} message - The error message to display.
+   */
   function showErrorForm(message) {
     // Crear o actualizar elemento de error
     let errorEl = document.getElementById("register-error");

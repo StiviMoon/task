@@ -3,10 +3,16 @@ const rateLimit = require("express-rate-limit");
 
 
 /**
- * Middleware para autenticar solicitudes usando JWT.
- * @param {Request} req  objeto de solicitud HTTP.
- * @param {Response} res objeto de respuesta HTTP.
- * @param {Next} next   función para pasar al siguiente middleware.
+ * Middleware to authenticate requests using JWT.
+ *
+ * Extracts the token from cookies or the Authorization header,
+ * verifies it, and attaches the decoded user object to `req.user`.
+ *
+ * @function authenticateToken
+ * @param {import("express").Request} req - HTTP request object.
+ * @param {import("express").Response} res - HTTP response object.
+ * @param {import("express").NextFunction} next - Function to pass control to the next middleware.
+ * @returns {void}
  */
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -33,19 +39,26 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Limitador de tasa compatible con IPv6 para producción
+/**
+ * Rate limiter for login requests.
+ *
+ * Restricts the number of login attempts within a given time window.
+ * IPv6-compatible and stricter in production mode.
+ *
+ * @constant
+ */
 const loginLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutos
-  max: process.env.NODE_ENV === 'production' ? 50 : 100, // Más restrictivo en producción
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: process.env.NODE_ENV === 'production' ? 50 : 100, //More restrictive in production
   message: {
     success: false,
     message: "Demasiados intentos. Espera 5 minutos."
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Usar el generador por defecto que maneja IPv6 correctamente
+  // Use the default generator that handles IPv6 correctly
   skip: (req) => {
-    // Skip rate limiting en desarrollo con variable de entorno
+    // Skip rate limiting in development with environment variable
     return process.env.NODE_ENV === 'development' && process.env.SKIP_RATE_LIMIT === 'true';
   }
 });

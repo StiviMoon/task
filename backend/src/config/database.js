@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 const config = require('./environment');
 
+/**
+ * Establishes a connection to the MongoDB database using Mongoose.
+ * Logs connection details if successful, or handles errors if the connection fails.
+ *
+ * @async
+ * @function connectDB
+ * @returns {Promise<void>} Resolves when the connection is established or the process exits on failure in production.
+ */
 const connectDB = async () => {
     try {
         const conn = await mongoose.connect(config.MONGODB_URI);

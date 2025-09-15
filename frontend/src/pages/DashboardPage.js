@@ -3,6 +3,24 @@ import { logout } from "../services/authService.js";
 import { handleLogout } from "../utils/authGuard.js";
 import { TaskForm } from "../components/TaskForm.js";
 
+/**
+ * @typedef {Object} Task
+ * @property {string} title - Title of the task.
+ * @property {string} [details] - Optional description of the task.
+ * @property {"Por hacer"|"Haciendo"|"Hecho"} status - Current status of the task.
+ * @property {string} date - Date of the task (YYYY-MM-DD).
+ * @property {string} [hour] - Optional time of the task (HH:mm).
+ */
+
+/**
+ * Renders the dashboard page with tasks organized in a Kanban board.
+ * Handles task creation, detail viewing, editing, deletion, and user logout.
+ *
+ * @async
+ * @function DashboardPage
+ * @returns {Promise<void>} Does not return a value, just renders the interface and binds events.
+ */
+
 export async function DashboardPage() {
   const root = document.getElementById("app");
 
@@ -222,16 +240,25 @@ export async function DashboardPage() {
         </div>
       </div>
     </div>
-  `;
-
-  // === Helpers ===
+  `;    
+ /** Helpers  
+ * Converts the internal status to a user-friendly string.
+ * @param {"todo"|"doing"|"done"} status - Internal task status.
+ * @returns {string} Localized status text.
+ */
   function mapStatus(status) {
     const map = { todo: "Pendiente", doing: "En progreso", done: "Hecho" };
     return map[status] || "Desconocido";
   }
 
+  /**
+ * Renders a task in the Kanban board inside its respective column.
+ * @param {Task} task - Task object to render.
+ * @returns {void}
+ */
+
   function renderTask(task) {
-    // Mapear estados del backend a los del frontend
+    // Map backend states to frontend states
     const statusMap = {
       "Por hacer": "todo",
       Haciendo: "doing",
@@ -262,6 +289,12 @@ export async function DashboardPage() {
     column.appendChild(taskEl);
   }
 
+  /**
+ * Formats a date string into a human-readable localized format.
+ * @param {string} dateString - Date string in YYYY-MM-DD format.
+ * @returns {string} Formatted date string or "Sin fecha" if invalid.
+ */
+
   function formatDate(dateString) {
     if (!dateString) return "Sin fecha";
     const date = new Date(dateString);
@@ -272,17 +305,23 @@ export async function DashboardPage() {
     });
   }
 
-  // Variables para el modal de detalle
+  // Variables for the detail modal
   let currentTask = null;
 
-  // Función para abrir el modal de detalle de tarea
+  // Function to open the task detail modal
+  /**
+ * Opens the task detail modal and fills it with the task data.
+ * @param {Task} task - Task object to display in the detail modal.
+ * @returns {void}
+ */
+
   function openTaskDetailModal(task) {
     currentTask = task;
 
-    // Cerrar sidebar en móvil para que se vea el modal
+    // Close sidebar on mobile so the modal can be seen
     closeMobileSidebar();
 
-    // Llenar los datos en el modo de vista
+    // Fill the data in view mode
     document.getElementById("detail-title").textContent = task.title;
     document.getElementById("detail-description").textContent = task.details || "Sin descripción";
 
@@ -293,18 +332,23 @@ export async function DashboardPage() {
     document.getElementById("detail-date").textContent = formatDate(task.date);
     document.getElementById("detail-time").textContent = task.hour || "Sin hora";
 
-    // Configurar el botón de toggle status
+    // Configure the status toggle button
     updateToggleStatusButton(task.status);
 
-    // Mostrar modo vista y ocultar modo edición
+    // Show view mode and hide edit mode
     document.getElementById("task-view-mode").classList.remove("hidden");
     document.getElementById("task-edit-mode").classList.add("hidden");
 
-    // Mostrar el modal
+    // Show the modal
     detailModal.classList.remove("hidden");
   }
 
-  // Función para actualizar el botón de toggle status
+  // Function to update the toggle button status
+  /**
+ * Updates the toggle button text and style depending on the task status.
+ * @param {"Por hacer"|"Haciendo"|"Hecho"} currentStatus - Current status of the task.
+ * @returns {void}
+ */
   function updateToggleStatusButton(currentStatus) {
     const toggleBtn = document.getElementById("toggle-status-btn");
     const toggleText = document.getElementById("toggle-status-text");
@@ -324,51 +368,69 @@ export async function DashboardPage() {
     }
   }
 
-  // Función para cambiar al modo de edición
+  // Function to switch to edit mode
+  /**
+ * Switches the detail modal to edit mode and fills the form with the task data.
+ * @returns {void}
+ */
   function switchToEditMode() {
     if (!currentTask) return;
 
-    // Llenar el formulario de edición con los datos actuales
+    // Fill the edit form with the current data
     document.getElementById("edit-title").value = currentTask.title;
     document.getElementById("edit-details").value = currentTask.details || "";
     document.getElementById("edit-date").value = currentTask.date;
     document.getElementById("edit-hour").value = currentTask.hour || "";
     document.getElementById("edit-status").value = currentTask.status;
 
-    // Cambiar modos
+    // Change modes
     document.getElementById("task-view-mode").classList.add("hidden");
     document.getElementById("task-edit-mode").classList.remove("hidden");
   }
 
-  // Función para volver al modo de vista
+  // Function to return to view mode
+  /**
+ * Switches the detail modal back to view mode.
+ * @returns {void}
+ */
   function switchToViewMode() {
     document.getElementById("task-edit-mode").classList.add("hidden");
     document.getElementById("task-view-mode").classList.remove("hidden");
   }
 
-  // Función para toggle del status (placeholder para backend)
+  // Function for status toggle (placeholder for backend)
+  /**
+ * Toggles the status of the current task between "Por hacer" and "Hecho".
+ * Simulates a backend call.
+ * @returns {void}
+ */
   function toggleTaskStatus() {
     if (!currentTask) return;
 
     const newStatus = currentTask.status === "Hecho" ? "Por hacer" : "Hecho";
 
-    // TODO: Aquí irá la llamada al backend
+    // TODO: The call to the backend will go here
     console.log(`Cambiando status de "${currentTask.title}" de "${currentTask.status}" a "${newStatus}"`);
 
-    // Simular cambio local (temporal)
+    // Simulate local (temporal) change
     currentTask.status = newStatus;
 
-    // Actualizar la UI
+    // Update the UI
     const statusBadge = document.getElementById("detail-status");
     statusBadge.textContent = newStatus;
     statusBadge.setAttribute("data-status", newStatus);
     updateToggleStatusButton(newStatus);
 
-    // Mostrar mensaje temporal
+    // Show temporary message
     showToast(`Tarea marcada como "${newStatus}"`);
   }
 
-  // Función para guardar edición (placeholder para backend)
+  // Function to save edit (placeholder for backend)
+  /**
+ * Saves the edits made to the current task.
+ * Simulates a backend call and updates the view.
+ * @returns {void}
+ */
   function saveTaskEdit() {
     if (!currentTask) return;
 
@@ -381,38 +443,48 @@ export async function DashboardPage() {
       status: document.getElementById("edit-status").value
     };
 
-    // TODO: Aquí irá la llamada al backend
+    // TODO: The call to the backend will go here
     console.log("Guardando cambios:", updatedTask);
 
-    // Simular guardado exitoso
+    // Simulate successful save
     currentTask = updatedTask;
 
-    // Actualizar la vista
+    // Update the view
     openTaskDetailModal(currentTask);
     showToast("Tarea actualizada exitosamente");
   }
 
-  // Función para eliminar tarea (placeholder para backend)
+  // Function to delete task (placeholder for backend)
+  /**
+ * Deletes the current task after confirmation.
+ * Simulates a backend call and updates the UI.
+ * @returns {void}
+ */
   function deleteTask() {
     if (!currentTask) return;
 
     if (confirm(`¿Estás seguro de que quieres eliminar la tarea "${currentTask.title}"?`)) {
-      // TODO: Aquí irá la llamada al backend
+      // TODO: The call to the backend will go here
       console.log("Eliminando tarea:", currentTask.title);
 
-      // Cerrar modal
+      // Close modal
       detailModal.classList.add("hidden");
 
-      // Mostrar mensaje
+      // Show message
       showToast("Tarea eliminada");
 
-      // TODO: Actualizar la vista del kanban
+      // TODO: Update the kanban view
     }
   }
 
-  // Función para mostrar toast messages
+  // Function to display toast messages
+  /**
+ * Displays a temporary toast notification.
+ * @param {string} message - Message to show in the toast.
+ * @returns {void}
+ */
   function showToast(message) {
-    // Crear o usar toast existente
+    // Create or use existing toast
     let toast = document.getElementById("temp-toast");
     if (!toast) {
       toast = document.createElement("div");
@@ -424,7 +496,7 @@ export async function DashboardPage() {
     toast.textContent = message;
     toast.classList.remove("hidden");
 
-    // Auto-hide después de 3 segundos
+    // Auto-hide after 3 seconds
     setTimeout(() => {
       toast.classList.add("hidden");
     }, 3000);
@@ -458,7 +530,7 @@ export async function DashboardPage() {
       const result = await createTask(taskData);
       if (result.success) {
         taskModal.classList.add("hidden");
-        // Recargar todas las tareas para mostrar la nueva
+        // Reload all tasks to show the new one
         location.reload();
       } else {
         showError(result.error || "Error al crear la tarea");
@@ -472,10 +544,10 @@ export async function DashboardPage() {
 
   // Modal events
   addTaskBtn.addEventListener("click", () => {
-    // Cerrar sidebar en móvil para que se vea el modal
+    // Close sidebar on mobile so the modal can be seen
     closeMobileSidebar();
 
-    // Abrir modal de nueva tarea
+    // Open new task modal
     taskModal.classList.remove("hidden");
   });
   taskForm
@@ -485,12 +557,12 @@ export async function DashboardPage() {
     detailModal.classList.add("hidden")
   );
 
-  // Event listeners para los botones del modal de detalle
+  // Event listeners for the detail modal buttons
   document.getElementById("edit-task-btn").addEventListener("click", switchToEditMode);
   document.getElementById("toggle-status-btn").addEventListener("click", toggleTaskStatus);
   document.getElementById("delete-task-btn").addEventListener("click", deleteTask);
 
-  // Event listeners para el modo de edición
+  // Event listeners for edit mode
   document.getElementById("cancel-edit-btn").addEventListener("click", switchToViewMode);
   document.getElementById("edit-task-form").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -509,16 +581,16 @@ export async function DashboardPage() {
   // Toggle sidebar functionality
   const toggleSidebar = () => {
     if (isMobile()) {
-      // En móvil: mostrar/ocultar sidebar con overlay
+      // On mobile: show/hide sidebar with overlay
       sidebar.classList.toggle("mobile-open");
       sidebarOverlay.classList.toggle("active");
     } else {
-      // En desktop: colapsar/expandir sidebar
+      // On desktop: collapse/expand sidebar
       sidebarMenu.classList.toggle("hidden");
     }
   };
 
-  // Cerrar sidebar en móvil
+  // Close sidebar on mobile
   const closeMobileSidebar = () => {
     if (isMobile()) {
       sidebar.classList.remove("mobile-open");
@@ -526,10 +598,10 @@ export async function DashboardPage() {
     }
   };
 
-  // Mejorar el overlay para que también cierre cuando hay modales abiertos
+  // Improve the overlay so that it also closes when there are open modals
   const isMobile = () => window.innerWidth <= 768;
 
-  // Función para verificar si hay algún modal abierto
+  // Function to check if there is any modal open
   const hasOpenModal = () => {
     const modals = document.querySelectorAll('.modal:not(.hidden)');
     return modals.length > 0;
@@ -542,25 +614,25 @@ export async function DashboardPage() {
   }
   sidebarOverlay.addEventListener("click", closeMobileSidebar);
 
-  // Manejar items del menú (incluyendo todos los nuevos)
+  // Manage menu items (including all new ones)
   const allMenuItems = document.querySelectorAll(".menu-item:not(#logout-btn)");
 
   allMenuItems.forEach((item) => {
     item.addEventListener("click", (e) => {
-      // Remover clase active de todos los items
+      // Remove active class from all items
       allMenuItems.forEach((i) => i.classList.remove("active"));
-      // Añadir clase active al item clickeado
+      // Add active class to the clicked item
       e.currentTarget.classList.add("active");
 
-      // Cerrar sidebar en móvil después de seleccionar
+      // Close sidebar on mobile after selecting
       closeMobileSidebar();
 
-      // Aquí puedes añadir la lógica para cambiar de vista
+      // Here you can add the logic to change views
       const itemId = e.currentTarget.id;
       handleMenuNavigation(itemId);
     });
 
-    // Añadir soporte para navegación con teclado
+    // Add support for keyboard navigation
     item.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -569,12 +641,12 @@ export async function DashboardPage() {
     });
   });
 
-  // Función para manejar navegación del menú
+  // Function to handle menu navigation
   const handleMenuNavigation = (itemId) => {
     switch (itemId) {
       case "tasks-btn":
         console.log("Navegando a Mis Tareas");
-        // Ya estamos en tareas, no hacer nada
+        // We are already in tasks, do nothing
         break;
       default:
         console.log("Navegación no implementada para:", itemId);
@@ -583,10 +655,10 @@ export async function DashboardPage() {
   };
 
 
-  // Manejar redimensionamiento de ventana
+  // Handle window resizing
   window.addEventListener("resize", () => {
     if (!isMobile()) {
-      // Si cambiamos a desktop, remover clases de móvil
+      // If we switch to desktop, remove mobile classes
       sidebar.classList.remove("mobile-open");
       sidebarOverlay.classList.remove("active");
     }
@@ -599,10 +671,10 @@ export async function DashboardPage() {
   const cancelLogout = document.getElementById("cancel-logout");
 
   logoutBtn.addEventListener("click", () => {
-    // Cerrar sidebar en móvil para que se vea el modal
+    // Close sidebar on mobile so the modal can be seen
     closeMobileSidebar();
 
-    // Abrir modal de logout
+    // Open logout modal
     logoutModal.classList.remove("hidden");
   });
   cancelLogout.addEventListener("click", () =>
@@ -610,13 +682,18 @@ export async function DashboardPage() {
   );
 
   confirmLogout.addEventListener("click", async () => {
-    // Usar la función handleLogout que maneja todo el proceso
+    // Use the handleLogout function that handles the entire process
     await handleLogout(logout);
   });
 
   // Helper function to show errors
+  /**
+ * Displays an error message at the bottom of the page.
+ * @param {string} message - Error message to display.
+ * @returns {void}
+ */
   function showError(message) {
-    // Crear o actualizar elemento de error
+    // Create or update error element
     let errorEl = document.getElementById("dashboard-error");
     if (!errorEl) {
       errorEl = document.createElement("div");
@@ -628,7 +705,7 @@ export async function DashboardPage() {
     errorEl.textContent = message;
     errorEl.classList.remove("hidden");
 
-    // Auto-hide después de 5 segundos
+    // Auto-hide after 5 seconds
     setTimeout(() => {
       if (errorEl) {
         errorEl.classList.add("hidden");

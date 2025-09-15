@@ -3,23 +3,21 @@ const config = require("../config/environment");
 
 
 /**
- * Controlador para manejar las operaciones relacionadas con las tareas.
+ * Controller for handling task-related operations.
  */
 
-
-
 /**
+ * Create a new task.
+ * The task is associated with the authenticated user via the userId extracted from the JWT token.
  *
- * Crear una nueva tarea.
- * La tarea se asocia al usuario autenticado mediante el userId extraído del token JWT.
- *
- * @param {*} req
- * @param {*} res
- * @return {void}
- * Si la creación es exitosa, responde con el ID de la nueva tarea y un estado 201.
- * Si hay un error de validación, responde con un estado 400 y el mensaje de error.
- * Si hay un error del servidor, responde con un estado 500 y si esta en modo desarrollo se imprime el error.
- *
+ * @async
+ * @function createTask
+ * @param {import("express").Request} req - Express request object containing task details in the body.
+ * @param {import("express").Response} res - Express response object.
+ * @returns {Promise<void>} Sends a JSON response:
+ * - 201: `{ success: true, taskId, task }` if the task is created successfully.
+ * - 400: `{ success: false, message }` if a validation error occurs.
+ * - 500: `{ success: false, message }` if a server error occurs (logs error in development mode).
  */
 exports.createTask = async (req, res) => {
     try {
@@ -37,13 +35,16 @@ exports.createTask = async (req, res) => {
 };
 
 /**
- * leer todas las tareas del usuario autenticado.
- * @param {*} req
- * @param {*} res
- * @return {void}
- * Si la operación es exitosa, responde con un estado 200 y un json con las tareas.
+ * Get all tasks for the authenticated user.
+ *
+ * @async
+ * @function getTasks
+ * @param {import("express").Request} req - Express request object with authenticated user.
+ * @param {import("express").Response} res - Express response object.
+ * @returns {Promise<void>} Sends a JSON response:
+ * - 200: `{ tasks }` if tasks are retrieved successfully.
+ * - 400: `{ success: false, message }` if an error occurs.
  */
-
 exports.getTasks = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -55,14 +56,17 @@ exports.getTasks = async (req, res) => {
 };
 
 /**
- * Actualiza una tarea existente.
- * @param {*} req
- * @param {*} res
- * @return {void}
- * Si la actualización es exitosa, responde con la tarea actualizada y un estado 200.
- * Si la tarea no existe o no pertenece al usuario, responde con un estado 404.
- * Si hay un error de validación, responde con un estado 400 y el mensaje de error.
- * Si hay un error del servidor, responde con un estado 500.
+ * Update an existing task.
+ *
+ * @async
+ * @function updateTask
+ * @param {import("express").Request} req - Express request object containing task ID in params and update data in body.
+ * @param {import("express").Response} res - Express response object.
+ * @returns {Promise<void>} Sends a JSON response:
+ * - 200: `{ success: true, task }` if the task is updated successfully.
+ * - 404: `{ success: false, message: "Task not found." }` if the task does not exist or does not belong to the user.
+ * - 400: `{ success: false, message }` if a validation error occurs.
+ * - 500: `{ success: false, message }` if a server error occurs (logs error in development mode).
  */
 exports.updateTask = async (req, res) => {
     try {
@@ -86,13 +90,16 @@ exports.updateTask = async (req, res) => {
 };
 
 /**
- * Elimina una tarea existente.
- * @param {*} req
- * @param {*} res
- * @return {void}
- * Si la eliminación es exitosa, responde con un mensaje de confirmación y un estado 200.
- * Si la tarea no existe o no pertenece al usuario, responde con un estado 404.
- * Si hay un error del servidor, responde con un estado 500.
+ * Delete an existing task.
+ *
+ * @async
+ * @function deleteTask
+ * @param {import("express").Request} req - Express request object containing task ID in params.
+ * @param {import("express").Response} res - Express response object.
+ * @returns {Promise<void>} Sends a JSON response:
+ * - 200: `{ success: true, message: "Task deleted successfully." }` if the task is deleted.
+ * - 404: `{ success: false, message: "Task not found." }` if the task does not exist or does not belong to the user.
+ * - 500: `{ success: false, message }` if a server error occurs (logs error in development mode).
  */
 exports.deleteTask = async (req, res) => {
     try {

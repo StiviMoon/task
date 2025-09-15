@@ -1,14 +1,17 @@
 import { getApiUrl, getAuthHeaders } from "../config/api.js";
 
 /**
- * Registra un nuevo usuario en el sistema
- * @param {Object} userData - Datos del usuario
- * @param {string} userData.name - Nombre del usuario
- * @param {string} userData.lastName - Apellido del usuario
- * @param {number} userData.age - Edad del usuario
- * @param {string} userData.email - Email del usuario
- * @param {string} userData.password - Contraseña del usuario
- * @returns {Promise<Object>} Respuesta del servidor
+ * Registers a new user in the system.
+ *
+ * @async
+ * @function register
+ * @param {Object} userData - User data.
+ * @param {string} userData.name - User's first name.
+ * @param {string} userData.lastName - User's last name.
+ * @param {number} userData.age - User's age.
+ * @param {string} userData.email - User's email.
+ * @param {string} userData.password - User's password.
+ * @returns {Promise<Object>} Server response containing success, data, or error.
  */
 export const register = async (userData) => {
   try {
@@ -40,11 +43,14 @@ export const register = async (userData) => {
 };
 
 /**
- * Inicia sesión en el sistema
- * @param {Object} credentials - Credenciales de login
- * @param {string} credentials.email - Email del usuario
- * @param {string} credentials.password - Contraseña del usuario
- * @returns {Promise<Object>} Respuesta del servidor
+ * Logs a user into the system.
+ *
+ * @async
+ * @function login
+ * @param {Object} credentials - Login credentials.
+ * @param {string} credentials.email - User's email.
+ * @param {string} credentials.password - User's password.
+ * @returns {Promise<Object>} Server response containing success, data, or error.
  */
 export const login = async (credentials) => {
   try {
@@ -73,7 +79,7 @@ export const login = async (credentials) => {
     const data = await response.json();
     console.log('✅ Login exitoso:', data);
 
-    // Guardar token en localStorage como backup
+    // Save token in localStorage as a backup
     if (data.token) {
       localStorage.setItem('access_token', data.token);
     }
@@ -95,8 +101,11 @@ export const login = async (credentials) => {
 };
 
 /**
- * Cierra la sesión del usuario
- * @returns {Promise<Object>} Respuesta del servidor
+ * Logs out the current user.
+ *
+ * @async
+ * @function logout
+ * @returns {Promise<Object>} Server response containing success, data, or error.
  */
 export const logout = async () => {
   try {
@@ -127,9 +136,12 @@ export const logout = async () => {
 };
 
 /**
- * Solicita restablecimiento de contraseña
- * @param {string} email - Email del usuario
- * @returns {Promise<Object>} Respuesta del servidor
+ * Requests a password reset email.
+ *
+ * @async
+ * @function forgotPassword
+ * @param {string} email - User's email.
+ * @returns {Promise<Object>} Server response containing success, data, or error.
  */
 export const forgotPassword = async (email) => {
   try {
@@ -162,11 +174,14 @@ export const forgotPassword = async (email) => {
 };
 
 /**
- * Restablece la contraseña con un token
- * @param {Object} resetData - Datos para restablecer contraseña
- * @param {string} resetData.token - Token de restablecimiento
- * @param {string} resetData.newPassword - Nueva contraseña
- * @returns {Promise<Object>} Respuesta del servidor
+ * Resets the user's password with a token.
+ *
+ * @async
+ * @function resetPassword
+ * @param {Object} resetData - Reset data.
+ * @param {string} resetData.token - Reset token.
+ * @param {string} resetData.newPassword - New password.
+ * @returns {Promise<Object>} Server response containing success, data, or error.
  */
 export const resetPassword = async (resetData) => {
   try {
@@ -198,8 +213,11 @@ export const resetPassword = async (resetData) => {
 };
 
 /**
- * Verifica si el usuario está autenticado
- * @returns {Promise<boolean>} True si está autenticado
+ * Checks if the user is currently authenticated.
+ *
+ * @async
+ * @function isAuthenticated
+ * @returns {Promise<boolean>} True if authenticated, false otherwise.
  */
 export const isAuthenticated = async () => {
   try {

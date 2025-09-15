@@ -1,16 +1,19 @@
-/**
- * Middleware de manejo de errores global para Express.
- * Envía un mensaje genérico para errores 5XX y muestra detalles solo en desarrollo.
- *
- * @param {Error} err - Objeto de error lanzado.
- * @param {Request} req - Objeto de solicitud de Express.
- * @param {Response} res - Objeto de respuesta de Express.
- * @param {Function} next - Función next de Express.
- * @returns {void}
- */
-
 const config = require('../config/environment');
 
+/**
+ * Global error-handling middleware for Express.
+ *
+ * Handles various error types (Mongoose, JWT, SyntaxError, rate limiting)
+ * and ensures a consistent JSON response. In development mode, it provides
+ * detailed error logs and stack traces.
+ *
+ * @function errorHandler
+ * @param {Error} err - The error object thrown.
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
+ * @param {import("express").NextFunction} next - Express next middleware function.
+ * @returns {void}
+ */
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message;
