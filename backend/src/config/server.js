@@ -9,8 +9,6 @@ const configureServer = (app) => {
     // CORS configuration
     const allowedOrigins = [
         'http://localhost:3000',
-        'http://localhost:3001', // Puerto alternativo del frontend
-        'http://localhost:5173',
         'https://task-three-blue.vercel.app',
         process.env.FRONTEND_URL
     ].filter(Boolean); // Remove undefined values
@@ -23,27 +21,47 @@ const configureServer = (app) => {
 
     app.use(cors({
         origin: function (origin, callback) {
-            // Allow requests with no origin (like mobile apps or curl requests)
+            // Lista de orígenes permitidos
+            const allowedOrigins = [
+                'http://localhost:3000',
+                'http://localhost:5173', // Vite dev server
+                'https://task-three-blue.vercel.app',
+                process.env.FRONTEND_URL
+            ].filter(Boolean);
+
+            // Permitir peticiones sin origen (como Postman, curl, etc.)
             if (!origin) return callback(null, true);
 
-            console.log('CORS checking origin:', origin);
-            console.log('Allowed origins:', allowedOrigins);
-
+            // Verificar si el origen está en la lista permitida
             if (allowedOrigins.indexOf(origin) !== -1) {
-                console.log('CORS allowed origin:', origin);
                 callback(null, true);
             } else {
-                console.log('CORS blocked origin:', origin);
-                callback(new Error('Not allowed by CORS'));
+                // En desarrollo, permitir todos los orígenes
+                if (process.env.NODE_ENV === 'development') {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'));
+                }
             }
         },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'User-Agent', 'X-Requested-With', 'Accept'],
         exposedHeaders: ['Set-Cookie'],
-        optionsSuccessStatus: 200 // Para compatibilidad con navegadores antiguos
+        optionsSuccessStatus: 200,
+        preflightContinue: false
     }));
 
+
+    // Headers adicionales solo para OPTIONS que no manejó CORS
+    app.use((req, res, next) => {
+        // Solo manejar OPTIONS si no fue manejado por CORS
+        if (req.method === 'OPTIONS') {
+            res.sendStatus(200);
+        } else {
+            next();
+        }
+    });
 
     // Logging middleware
     app.use(logger);

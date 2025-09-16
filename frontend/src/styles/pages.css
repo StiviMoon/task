@@ -1,308 +1,254 @@
-/* === LOGIN & REGISTER === */
-/* Container for login and register pages (centers content vertically & horizontally) */
-.register-container, .login-container {
+/* ===========================
+   PAGE-SPECIFIC STYLES
+=========================== */
+
+/* ===========================
+   LOGIN & REGISTER PAGES
+=========================== */
+
+.register-container,
+.login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   flex-direction: column;
+  background: var(--bg-secondary);
+  padding: var(--spacing-lg);
 }
 
-/* Card for login and register forms */
-.register-card, .login-card {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+.register-card,
+.login-card {
+  background: var(--bg-primary);
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
   text-align: center;
-  width: 350px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid var(--border-primary);
 }
 
-/* Spinner inside forms */
-#spinner {
-  margin-top: 1rem;
+.register-card h1,
+.login-card h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xl);
 }
 
-/* Links inside login/register cards */
-.login-card a, .register-card a {
-  color: #6a1b9a;
+.register-card h2,
+.login-card h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Links in auth pages */
+.login-card a,
+.register-card a {
+  color: var(--color-primary);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: var(--transition-fast);
 }
 
-.login-card a:hover, .register-card a:hover {
+.login-card a:hover,
+.register-card a:hover {
+  color: var(--color-primary-dark);
   text-decoration: underline;
 }
 
-/* === DASHBOARD === */
-/* General dashboard layout (sidebar + main content) */
+/* Auth form specific styling */
+.auth-form {
+  text-align: left;
+}
+
+.auth-form .form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.auth-form .form-actions {
+  margin-top: var(--spacing-xl);
+}
+
+/* Logo in auth pages */
+.logo,
+.auth-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: var(--spacing-xl);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  transition: var(--transition-base);
+}
+
+.logo:hover,
+.auth-logo:hover {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+  transform: scale(1.02);
+}
+
+/* Auth footer links */
+.auth-footer {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-primary);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.auth-footer a {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ===========================
+   DASHBOARD LAYOUT
+=========================== */
+
 .dashboard-container {
   display: flex;
   height: 100vh;
-  background: #f8f9fa;
+  background: var(--bg-secondary);
 }
 
-/* Sidebar with navigation buttons */
-.sidebar {
-  width: 60px;
-  background: #f2e3f6;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem 0;
-  gap: 1rem;
-}
-
-/* Main content area (top bar + kanban board) */
 .main-content {
   flex: 1;
+  margin-left: 280px;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  background: var(--bg-secondary);
+  transition: var(--transition-base);
 }
 
-/* === TOP BAR === */
-.topbar {
+/* Sidebar collapsed state */
+.sidebar-menu.hidden + .main-content {
+  margin-left: 80px;
+}
+
+/* ===========================
+   ERROR & SUCCESS PAGES
+=========================== */
+
+.error-page,
+.success-page {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-/* Search input inside top bar */
-.search-input {
-  flex: 1;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-/* Search button */
-.search-btn {
-  background: #6a1b9a;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-}
-
-/* === KANBAN BOARD === */
-.kanban-board {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-
-/* Kanban column (To Do, In Progress, etc.) */
-.kanban-column {
-  background: #e9f2fb;
-  padding: 1rem;
-  border-radius: 10px;
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-}
-
-.kanban-column h2 {
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-/* Task card inside kanban columns */
-.task-card {
-  background: white;
-  border-radius: 8px;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Floating action button (FAB) for adding tasks */
-.fab {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: none;
-  background: #6c63ff;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-}
-
-/* === SIDEBAR MENU === */
-.sidebar-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-/* Dropdown menu from sidebar */
-.sidebar-menu {
-  position: absolute;
-  top: 50px;
-  left: 60px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  z-index: 10;
-}
-
-.sidebar-menu.hidden {
-  display: none;
-}
-
-/* Items inside sidebar menu */
-.menu-item {
-  background: none;
-  color: #333;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  text-align: left;
-  width: 100%;
-}
-
-.menu-item:hover {
-  background: #f2e3f6;
-}
-
-/* === MODAL === */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
-
-.modal.hidden {
-  display: none;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  max-width: 400px;
-  width: 90%;
+  height: 100vh;
   text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  background: var(--bg-secondary);
+  padding: var(--spacing-2xl);
 }
 
-.modal-content h2 {
-  margin-bottom: 1rem;
+.error-page h1,
+.success-page h1 {
+  font-size: var(--font-size-3xl);
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-lg);
 }
 
-/* Modal action buttons (Confirm / Cancel) */
-.modal-actions {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 1.5rem;
+.success-page h1 {
+  color: var(--color-success);
 }
 
-.modal-actions button {
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
+.error-page p,
+.success-page p {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-2xl);
+  max-width: 500px;
 }
 
-/* Danger button (e.g. delete) */
-.modal-actions .danger {
-  background: #d32f2f;
-  color: white;
+/* ===========================
+   RESPONSIVE DESIGN
+=========================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: 0;
+  }
+
+  .sidebar-menu.hidden + .main-content {
+    margin-left: 0;
+  }
 }
 
-.modal-actions .danger:hover {
-  background: #b71c1c;
+/* Tablet */
+@media (max-width: 1024px) {
+  .logo,
+  .auth-logo {
+    width: 110px;
+  }
 }
 
-.modal-actions button:hover {
-  opacity: 0.9;
-}
-
-/* Hidden utility class */
-.hidden {
-  display: none;
-}
-
-/* Toast notification */
-.toast {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background: #4caf50;
-  color: white;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-/* === RESPONSIVE (MOBILE) === */
-/* Sidebar menu becomes a panel on mobile */
+/* Mobile */
 @media (max-width: 768px) {
-  .sidebar-menu {
-    position: absolute;
-    top: 3rem;
-    left: 0;
-    background: #6a1b9a;
-    width: 200px;
-    padding: 1rem;
-    border-radius: 0 0.5rem 0.5rem 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  .register-container,
+  .login-container {
+    padding: var(--spacing-md);
   }
 
-  /* Dashboard switches to vertical layout */
-  .kanban-board {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  .register-card,
+  .login-card {
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
   }
 
-  .kanban-column {
+  .logo,
+  .auth-logo {
+    width: 100px;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .sidebar.mobile-open ~ .main-content {
+    margin-left: 0;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .register-container,
+  .login-container {
+    padding: var(--spacing-sm);
+  }
+
+  .register-card,
+  .login-card {
     width: 100%;
-    min-height: auto;
-    padding: 0.5rem;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
   }
 
-  .task-card {
-    width: 100%;
-    border-radius: 12px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  .register-card h1,
+  .login-card h1 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-lg);
   }
 
-  /* Compact top bar */
-  .topbar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+  .logo,
+  .auth-logo {
+    width: 100px;
+    margin-bottom: var(--spacing-lg);
   }
 
-  /* FAB closer to the corner */
-  .fab {
-    right: 1rem;
-    bottom: 1rem;
+  .error-page h1,
+  .success-page h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .error-page p,
+  .success-page p {
+    font-size: var(--font-size-base);
   }
 }

@@ -33,16 +33,21 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Limitador de tasa para la ruta de inicio de sesión
+// Limitador de tasa compatible con IPv6 para producción
 const loginLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 5,
-    message: {
+  windowMs: 5 * 60 * 1000, // 5 minutos
+  max: process.env.NODE_ENV === 'production' ? 50 : 100, // Más restrictivo en producción
+  message: {
     success: false,
-    message: "Cuenta temporalmente bloqueada."
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
+    message: "Demasiados intentos. Espera 5 minutos."
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Usar el generador por defecto que maneja IPv6 correctamente
+  skip: (req) => {
+    // Skip rate limiting en desarrollo con variable de entorno
+    return process.env.NODE_ENV === 'development' && process.env.SKIP_RATE_LIMIT === 'true';
+  }
 });
 
 module.exports = { authenticateToken, loginLimiter };

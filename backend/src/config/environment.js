@@ -16,14 +16,12 @@ const config = {
 
     // API configuration
     API_VERSION: process.env.API_VERSION || 'v1',
-    API_PREFIX: process.env.API_PREFIX || '/api',
+    API_PREFIX: (process.env.API_PREFIX || '/api').replace(/\/$/, ''), // Elimina slash final si existe
 
     // JWT configuration
     JWT_SECRET: process.env.JWT_SECRET || 'your_jwt_secret',
     JWT_RESET_PASSWORD_SECRET: process.env.JWT_RESET_PASSWORD_SECRET || 'your_jwt_reset_secret',
 
-
-    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
     // Email configuration (Resend)
     RESEND_API_KEY: process.env.RESEND_API_KEY || ''
 };

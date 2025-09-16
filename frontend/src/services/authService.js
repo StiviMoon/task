@@ -1,4 +1,4 @@
-import { getApiUrl, getAuthHeaders } from '../config/api.js';
+import { getApiUrl, getAuthHeaders } from "../config/api.js";
 
 /**
  * Registra un nuevo usuario en el sistema
@@ -12,29 +12,29 @@ import { getApiUrl, getAuthHeaders } from '../config/api.js';
  */
 export const register = async (userData) => {
   try {
-    const response = await fetch(getApiUrl('/auth/register'), {
-      method: 'POST',
+    const response = await fetch(getApiUrl("/auth/register"), {
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(userData),
-      credentials: 'include' // Importante para las cookies
+      credentials: "include", // Importante para las cookies
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al registrar usuario');
+      throw new Error(data.message || "Error al registrar usuario");
     }
 
     return {
       success: true,
       data: data,
-      message: 'Usuario registrado exitosamente'
+      message: "Usuario registrado exitosamente",
     };
   } catch (error) {
-    console.error('Error en register:', error);
+    console.error("Error en register:", error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -48,29 +48,48 @@ export const register = async (userData) => {
  */
 export const login = async (credentials) => {
   try {
-    const response = await fetch(getApiUrl('/auth/login'), {
-      method: 'POST',
+    console.log('🔄 Intentando login con URL:', getApiUrl("/auth/login"));
+
+    const response = await fetch(getApiUrl("/auth/login"), {
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(credentials),
-      credentials: 'include' // Importante para las cookies
+      credentials: "include", // Importante para las cookies
     });
 
-    const data = await response.json();
+    console.log('📡 Respuesta recibida:', response.status, response.statusText);
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al iniciar sesión');
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (parseError) {
+        console.error('Error parsing error response:', parseError);
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    console.log('✅ Login exitoso:', data);
+
+    // Guardar token en localStorage como backup
+    if (data.token) {
+      localStorage.setItem('access_token', data.token);
     }
 
     return {
       success: true,
       data: data,
-      message: 'Inicio de sesión exitoso'
+      message: "Inicio de sesión exitoso",
     };
   } catch (error) {
-    console.error('Error en login:', error);
+    console.error("❌ Error en login:", error);
+    console.error("URL utilizada:", getApiUrl("/auth/login"));
+
     return {
       success: false,
-      error: error.message
+      error: error.message || "Error de conexión con el servidor",
     };
   }
 };
@@ -81,28 +100,28 @@ export const login = async (credentials) => {
  */
 export const logout = async () => {
   try {
-    const response = await fetch(getApiUrl('/auth/logout'), {
-      method: 'POST',
+    const response = await fetch(getApiUrl("/auth/logout"), {
+      method: "POST",
       headers: getAuthHeaders(),
-      credentials: 'include'
+      credentials: "include",
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al cerrar sesión');
+      throw new Error(data.message || "Error al cerrar sesión");
     }
 
     return {
       success: true,
       data: data,
-      message: 'Sesión cerrada exitosamente'
+      message: "Sesión cerrada exitosamente",
     };
   } catch (error) {
-    console.error('Error en logout:', error);
+    console.error("Error en logout:", error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -114,29 +133,30 @@ export const logout = async () => {
  */
 export const forgotPassword = async (email) => {
   try {
-    const response = await fetch(getApiUrl('/auth/forgot-password'), {
-      method: 'POST',
+    const response = await fetch(getApiUrl("/auth/forgot-password"), {
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({ email }),
-      credentials: 'include'
+      credentials: "include",
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al solicitar restablecimiento');
+      throw new Error(data.message || "Error al solicitar restablecimiento");
     }
 
     return {
       success: true,
       data: data,
-      message: 'Si el correo existe, se ha enviado un enlace de restablecimiento'
+      message:
+        "Si el correo existe, se ha enviado un enlace de restablecimiento",
     };
   } catch (error) {
-    console.error('Error en forgotPassword:', error);
+    console.error("Error en forgotPassword:", error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -150,29 +170,29 @@ export const forgotPassword = async (email) => {
  */
 export const resetPassword = async (resetData) => {
   try {
-    const response = await fetch(getApiUrl('/auth/reset-password'), {
-      method: 'POST',
+    const response = await fetch(getApiUrl("/auth/reset-password"), {
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(resetData),
-      credentials: 'include'
+      credentials: "include",
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al restablecer contraseña');
+      throw new Error(data.message || "Error al restablecer contraseña");
     }
 
     return {
       success: true,
       data: data,
-      message: 'Contraseña restablecida exitosamente'
+      message: "Contraseña restablecida exitosamente",
     };
   } catch (error) {
-    console.error('Error en resetPassword:', error);
+    console.error("Error en resetPassword:", error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -183,19 +203,49 @@ export const resetPassword = async (resetData) => {
  */
 export const isAuthenticated = async () => {
   try {
-    const response = await fetch(getApiUrl('/auth/verify'), {
-      method: 'GET',
-      credentials: 'include'
+    console.log('🔄 Verificando autenticación...');
+
+    // Primero intentar con cookies
+    let response = await fetch(getApiUrl("/auth/verify"), {
+      method: "GET",
+      credentials: "include",
     });
+
+    console.log('📡 Respuesta verificación (cookies):', response.status);
 
     if (response.ok) {
       const data = await response.json();
+      console.log('✅ Autenticado con cookies');
       return data.success === true;
     }
 
+    // Si falla con cookies, intentar con token de localStorage
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      console.log('🔄 Intentando con token localStorage...');
+
+      response = await fetch(getApiUrl("/auth/verify"), {
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: "include",
+      });
+
+      console.log('📡 Respuesta verificación (localStorage):', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Autenticado con localStorage token');
+        return data.success === true;
+      }
+    }
+
+    console.log('❌ No autenticado');
     return false;
   } catch (error) {
-    console.error('Error verificando autenticación:', error);
+    console.error("❌ Error verificando autenticación:", error);
     return false;
   }
 };
