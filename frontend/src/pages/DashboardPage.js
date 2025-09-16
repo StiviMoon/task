@@ -2,6 +2,7 @@ import { getTasks, createTask } from "../services/taskService.js";
 import { logout } from "../services/authService.js";
 import { handleLogout } from "../utils/authGuard.js";
 import { TaskForm } from "../components/TaskForm.js";
+import { renderEditAccountForm } from "../components/EditAccountForm.js";
 
 export async function DashboardPage() {
   const root = document.getElementById("app");
@@ -49,6 +50,17 @@ export async function DashboardPage() {
 
           <!-- Bottom Menu Items -->
           <div class="menu-items-bottom">
+            <button class="menu-item" id="account-btn" title="Cuenta" tabindex="0" aria-label="Cuenta">
+              <span class="menu-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="7" r="4"></circle>
+                  <path d="M5.5 21a7.5 7.5 0 0 1 13 0"></path>
+                </svg>
+              </span>
+              <span>MI cuenta</span>
+            </button>
+
+
             <button class="menu-item" id="logout-btn" title="Cerrar sesión" tabindex="0" aria-label="Cerrar sesión">
               <span class="menu-item-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -220,6 +232,43 @@ export async function DashboardPage() {
           <button id="confirm-logout" class="btn btn-danger">Sí, cerrar sesión</button>
           <button id="cancel-logout" class="btn btn-secondary">Cancelar</button>
         </div>
+      </div>
+    </div>
+
+
+    <div id="user-profile-modal" class="modal hidden">
+      <div class="modal-content">
+
+        <!-- Información de usuario -->
+        <h2 class="text-xl font-semibold mb-4">Perfil de Usuario</h2>
+        
+        <div class="space-y-2">
+          <p><span class="font-medium">Nombre:</span> Juan Pérez</p>
+          <p><span class="font-medium">Apellido:</span> García</p>
+          <p><span class="font-medium">Email:</span> juan.perez@example.com</p>
+          <p><span class="font-medium">Miembro desde:</span> 12/03/2023</p>
+        </div>
+
+        <!-- Botones -->
+        <div class="modal-actions">
+          <button id="edit-account-button" class="btn btn-primary">
+            Editar cuenta
+          </button>
+          <button class="btn btn-danger">
+            Eliminar
+          </button>
+          <button id="return" class="btn btn-secondary">Volver</button>
+        </div>
+
+      </div>
+    </div>
+
+
+     <! -- Modal Edit Account -->
+    <div id="edit-account-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Editar cuenta</h2>
+        <div id="edit-account-form-container"></div>
       </div>
     </div>
   `;
@@ -591,6 +640,51 @@ export async function DashboardPage() {
       sidebarOverlay.classList.remove("active");
     }
   });
+
+
+  // === edit account ===
+  const AccountBtn = document.getElementById("account-btn");
+  const AccountModal = document.getElementById("user-profile-modal");
+  const editAccountButton = document.getElementById("edit-account-button");
+  const returnFromUser = document.getElementById("return");
+  
+  AccountBtn.addEventListener("click", () => {
+    
+    // Cerrar sidebar en móvil para que se vea el modal
+
+    closeMobileSidebar();
+    
+    // Abrir modal de editar cuenta
+    
+    AccountModal.classList.remove("hidden");
+    editAccountButton.addEventListener("click", () => {
+
+      AccountModal.classList.add("hidden");
+
+      editaccount();
+      AccountModal.classList.remove("hidden");
+    })
+
+    returnFromUser.addEventListener("click", () => AccountModal.classList.add("hidden"));
+  });
+  
+const editaccount = () => {
+  const editAccountForm = document.getElementById("edit-account-modal");
+  const editAccountFormContainer = document.getElementById("edit-account-form-container");
+
+  // Cerrar modal de perfil de usuario
+  AccountModal.classList.add("hidden");
+  // Abrir modal de editar cuenta
+  editAccountForm.classList.remove("hidden"); 
+  // Renderizar el formulario de editar cuenta
+  
+  editAccountFormContainer.innerHTML = renderEditAccountForm();
+  editAccountFormContainer
+  .querySelector("#cancel-edit")
+  .addEventListener("click", () => editAccountForm.classList.add("hidden"));
+
+}
+
 
   // === Logout ===
   const logoutBtn = document.getElementById("logout-btn");
