@@ -99,14 +99,29 @@ class UserDAO extends BaseDAO {
                 name: user.name,
                 lastName: user.lastName,
                 age: user.age,
-                email: user.email,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt
+                email: user.email
             };
         } catch (error) {
             throw new Error(`Error al obtener perfil: ${error.message}`);
         }
     }
+
+    /**
+     * Actualizar perfil del usuario (sin contraseña)
+     * @param {String} userId - ID del usuario
+     * @param {Object} profileData - Datos del perfil a actualizar
+     * @returns {Promise<Object|null>} - Usuario actualizado
+     */
+    async updateUserProfile(userId, profileData) {
+        try {
+            delete profileData.password;
+            return await this.updateById(userId, profileData);
+        } catch (error) {
+            throw new Error(`Error al actualizar perfil: ${error.message}`);
+        }
+    }
+
+
 
     /**
      * Buscar usuarios por criterios múltiples
