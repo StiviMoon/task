@@ -6,9 +6,11 @@ import { DashboardPage } from "./pages/DashboardPage.js";
 import { requireAuth, requireGuest } from "./utils/authGuard.js";
 
 /**
- * Mounts a view inside the #app element
- * @param {Function} view - Function that returns HTML string
- * @param {Function} logic - Function that adds event listeners / page logic
+ * Mounts a view inside the #app element.
+ * Renders the given HTML template and attaches the page-specific logic.
+ *
+ * @param {Function} view - Function that returns an HTML string
+ * @param {Function} logic - Function that attaches event listeners / page logic
  */
 function mount(view, logic) {
   const app = document.getElementById("app");
@@ -16,7 +18,10 @@ function mount(view, logic) {
   logic(); // attach the page-specific logic
 }
 
-// Función para mostrar loading mientras se verifica autenticación
+/**
+ * Shows a loading spinner while authentication is being verified.
+ * Useful in protected routes before rendering the actual view.
+ */
 const showLoading = () => {
   const app = document.getElementById("app");
   app.innerHTML = `
@@ -52,7 +57,7 @@ page("/", () => {
   );
 });
 
-// Ruta de registro - solo accesible si NO estás autenticado
+// Login route
 page("/signup", () => {
   requireGuest(
     () => mount(renderRegister, addRegisterLogic),
@@ -60,7 +65,7 @@ page("/signup", () => {
   );
 });
 
-// Ruta de recuperación de contraseña - solo accesible si NO estás autenticado
+// Forgot password route
 page("/forgot-password", () => {
   requireGuest(
     () => mount(renderForgotPassword, addForgotPasswordLogic),
@@ -68,12 +73,12 @@ page("/forgot-password", () => {
   );
 });
 
-// Ruta de restablecimiento de contraseña - accesible sin autenticación
+// Reset password route (public)
 page("/reset-password", () => {
   mount(renderResetPassword, addResetPasswordLogic);
 });
 
-// Ruta de dashboard - solo accesible si estás autenticado
+// Dashboard route (protected)
 page("/tasks", () => {
   requireAuth(
     async () => {
@@ -85,16 +90,19 @@ page("/tasks", () => {
   );
 });
 
-// Redirigir cualquier ruta desconocida
+// Fallback route (handles unknown paths)
 page("*", () => {
-  // Verificar si está autenticado para decidir a dónde redirigir
+  // Check if you are authenticated to decide where to redirect
   requireAuth(
-    () => window.location.href = '/tasks',
-    () => window.location.href = '/'
+    () => window.location.href = '/tasks', // If logged in → go to dashboard
+    () => window.location.href = '/' // If not → go to login
   );
 });
 
-// Starts the Page.js router
+/**
+ * Initializes the Page.js router.
+ * This should be called once in the app entry point.
+ */
 export function initRouter() {
   page.start();
 }

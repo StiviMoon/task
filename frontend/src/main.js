@@ -9,13 +9,26 @@ import { DashboardPage } from "./pages/DashboardPage.js";
 import { requireAuth, requireGuest } from "./utils/authGuard.js";
 import "./style.css";
 
+/**
+ * Mounts a page into the #app container.
+ * Calls the render function to produce the HTML,
+ * then attaches the corresponding logic (event listeners, validation, etc).
+ * 
+ * @param {Function} renderFn - Function that returns HTML string
+ * @param {Function} [logicFn] - Function to attach behavior after rendering
+ */
+
 function mount(renderFn, logicFn) {
   const app = document.getElementById("app");
   app.innerHTML = renderFn ? renderFn() : "";
   if (logicFn) logicFn();
 }
 
-// Función para mostrar loading mientras se verifica autenticación
+/**
+ * Function to show loading while verifying authentication
+ * Displays a loading spinner while authentication is being checked.
+ * Used in protected routes before the actual content is rendered.
+ */
 const showLoading = () => {
   const app = document.getElementById("app");
   app.innerHTML = `
@@ -34,9 +47,13 @@ const showLoading = () => {
   `;
 };
 
-// ================== routes ==================
+// ================== ROUTES ==================
 
-// Ruta de login - solo accesible si NO estás autenticado
+/**
+ * Login route ("/")
+ * - Only accessible if the user is NOT authenticated.
+ * - Otherwise, redirect to /tasks.
+ */
 page("/", () => {
   requireGuest(
     () => mount(renderLogin, addLoginLogic),
@@ -44,7 +61,11 @@ page("/", () => {
   );
 });
 
-// Ruta de registro - solo accesible si NO estás autenticado
+/**
+ * Signup route ("/signup")
+ * - Only accessible if the user is NOT authenticated.
+ * - Otherwise, redirect to /tasks.
+ */
 page("/signup", () => {
   requireGuest(
     () => mount(renderRegister, addRegisterLogic),
@@ -52,17 +73,29 @@ page("/signup", () => {
   );
 });
 
-// Ruta de forgot password - accesible sin autenticación (para recuperar contraseña)
+/**
+ * Forgot password route ("/forgot-password")
+ * - Accessible without authentication.
+ * - Allows the user to start a password recovery process.
+ */
 page("/forgot-password", () => {
   mount(renderForgotPassword, addForgotPasswordLogic);
 });
 
-// Ruta de reset password - accesible sin autenticación (para restablecer contraseña)
+/**
+ * Reset password route ("/reset-password")
+ * - Accessible without authentication.
+ * - Allows the user to set a new password.
+ */
 page("/reset-password", () => {
   mount(renderResetPassword, addResetPasswordLogic);
 });
 
-// Ruta de dashboard - solo accesible si estás autenticado
+/**
+ * Dashboard route ("/tasks")
+ * - Only accessible if the user IS authenticated.
+ * - Otherwise, redirect to "/".
+ */
 page("/tasks", () => {
   requireAuth(
     async () => {
@@ -74,9 +107,12 @@ page("/tasks", () => {
   );
 });
 
-// Redirigir cualquier ruta desconocida
+/**
+ * Fallback route
+ * - Redirects any unknown path to "/".
+ */
 page("*", () => {
   window.location.href = '/';
 });
-
+// Start the client-side router
 page.start();

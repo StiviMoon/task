@@ -1,8 +1,12 @@
 import { resetPassword } from "../services/authService.js";
 
+// ====================== RESET PASSWORD VIEW ======================
+
 /**
- * Renderiza la página de restablecimiento de contraseña
- * @returns {string} HTML de la página
+ * Render the Reset Password screen template.
+ * Provides input fields for new password and confirmation.
+ *
+ * @returns {string} HTML markup for the reset password view
  */
 export function renderResetPassword() {
   return `
@@ -25,8 +29,14 @@ export function renderResetPassword() {
   `;
 }
 
+// ====================== RESET PASSWORD LOGIC ======================
+
 /**
- * Añade la lógica para la página de restablecimiento de contraseña
+ * Attach logic for the Reset Password page:
+ * - Extracts token from URL
+ * - Validates new password rules
+ * - Calls backend to reset password
+ * - Handles success, error, and UI state updates
  */
 export function addResetPasswordLogic() {
   const form = document.getElementById("resetForm");
@@ -35,10 +45,10 @@ export function addResetPasswordLogic() {
   const submitBtn = form.querySelector("button[type='submit']");
   const originalBtnText = submitBtn.textContent;
 
-  // Obtener el token de la URL
+   // Retrieve token from query parameters
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
-
+  // If token is missing or invalid → redirect to login
   if (!token) {
     showToast("Token de restablecimiento no válido", toast);
     setTimeout(() => {
@@ -46,13 +56,13 @@ export function addResetPasswordLogic() {
     }, 3000);
     return;
   }
-
+  // ---------- Form Submission ----------
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const newPassword = document.getElementById("newPassword").value.trim();
     const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
-    // Validaciones
+    // ---------- Validation ----------   
     if (!newPassword || !confirmPassword) {
       showToast("Por favor completa todos los campos", toast);
       return;
@@ -83,19 +93,20 @@ export function addResetPasswordLogic() {
       return;
     }
 
-    // Mostrar loading
+    // ---------- UI State: Loading ----------
     submitBtn.disabled = true;
     submitBtn.classList.add('btn-loading');
     submitBtn.textContent = "Restableciendo...";
 
     try {
+      // Call backend to reset password
       const result = await resetPassword({ token, newPassword });
 
       if (result.success) {
         showToast("Contraseña restablecida exitosamente", toast);
         console.log("Contraseña restablecida");
 
-        // Redirigir al login después de 2 segundos
+        // Redirect to login after 2s
         setTimeout(() => {
           window.location.href = '/';
         }, 2000);
@@ -106,23 +117,26 @@ export function addResetPasswordLogic() {
       console.error("Error en reset password:", error);
       showToast("Error de conexión. Intenta de nuevo.", toast);
     } finally {
-      // Restaurar UI
+      // Restore UI state
       submitBtn.disabled = false;
       submitBtn.classList.remove('btn-loading');
       submitBtn.textContent = originalBtnText;
     }
   });
-
+  // ---------- Navigation ----------
   document.getElementById("backToLogin").addEventListener("click", (e) => {
     e.preventDefault();
     window.location.href = '/';
   });
 }
 
+// ====================== HELPERS ======================
+
 /**
- * Muestra un mensaje toast
- * @param {string} message - Mensaje a mostrar
- * @param {HTMLElement} toastEl - Elemento toast
+ * Display a temporary toast message.
+ *
+ * @param {string} message - Message to display
+ * @param {HTMLElement} toastEl - Toast container element
  */
 function showToast(message, toastEl) {
   toastEl.textContent = message;

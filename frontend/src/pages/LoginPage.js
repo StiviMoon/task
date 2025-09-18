@@ -2,6 +2,10 @@ import page from "page";
 import { login, forgotPassword } from "../services/authService.js";
 
 // ====================== LOGIN ======================
+/**
+ * Render the login page template.
+ * @returns {string} HTML markup for the login screen
+ */
 export function renderLogin() {
   return `
     <div class="login-container">
@@ -23,7 +27,12 @@ export function renderLogin() {
     </div>
   `;
 }
-
+/**
+ * Attach login logic:
+ * - Handles form submission
+ * - Calls backend login API
+ * - Redirects on success or shows error
+ */
 export function addLoginLogic() {
   const form = document.getElementById("loginForm");
   const submitBtn = form.querySelector("button[type='submit']");
@@ -34,7 +43,7 @@ export function addLoginLogic() {
     const email = form.email.value.trim();
     const password = form.password.value.trim();
 
-    // Mostrar loading
+    // Show loading
     submitBtn.disabled = true;
     submitBtn.classList.add('btn-loading');
     submitBtn.textContent = 'Iniciando sesión...';
@@ -44,7 +53,7 @@ export function addLoginLogic() {
 
       if (result.success) {
         console.log("Login exitoso:", result);
-        // Redirigir al dashboard
+        // Redirect to the dashboard
         page("/tasks");
       } else {
         showError(result.error);
@@ -53,7 +62,7 @@ export function addLoginLogic() {
       console.error("Error en login:", error);
       showError("Error de conexión. Intenta de nuevo.");
     } finally {
-      // Restaurar botón
+      // Restore button
       submitBtn.disabled = false;
       submitBtn.classList.remove('btn-loading');
       submitBtn.textContent = originalBtnText;
@@ -72,6 +81,10 @@ export function addLoginLogic() {
 }
 
 // ====================== FORGOT PASSWORD ======================
+/**
+ * Render the forgot password page template.
+ * @returns {string} HTML markup for forgot password screen
+ */
 export function renderForgotPassword() {
   return `
     <div class="login-container">
@@ -91,7 +104,12 @@ export function renderForgotPassword() {
     </div>
   `;
 }
-
+/**
+ * Attach forgot password logic:
+ * - Handles form submission
+ * - Calls backend forgotPassword API
+ * - Displays toast messages
+ */
 export function addForgotPasswordLogic() {
   const form = document.getElementById("forgotForm");
   const spinner = document.getElementById("spinner");
@@ -108,7 +126,7 @@ export function addForgotPasswordLogic() {
       return;
     }
 
-    // Mostrar loading
+    // show loading
     submitBtn.disabled = true;
     submitBtn.classList.add('btn-loading');
     submitBtn.textContent = "Enviando...";
@@ -126,7 +144,7 @@ export function addForgotPasswordLogic() {
       console.error("Error en forgot password:", error);
       showToast("Error de conexión. Intenta de nuevo.", toast);
     } finally {
-      // Restaurar UI
+      // Restore UI
       submitBtn.disabled = false;
       submitBtn.classList.remove('btn-loading');
       submitBtn.textContent = originalBtnText;
@@ -140,14 +158,22 @@ export function addForgotPasswordLogic() {
 }
 
 // ====================== HELPER FUNCTIONS ======================
+/**
+ * Display a temporary toast message.
+ * @param {string} message - The message to show
+ * @param {HTMLElement} toastEl - The toast element
+ */
 function showToast(message, toastEl) {
   toastEl.textContent = message;
   toastEl.classList.remove("hidden");
   setTimeout(() => toastEl.classList.add("hidden"), 3000);
 }
-
+/**
+ * Display an error message inside the login form.
+ * @param {string} message - The error text
+ */
 function showError(message) {
-  // Crear o actualizar elemento de error
+  // Create or update error element
   let errorEl = document.getElementById("login-error");
   if (!errorEl) {
     errorEl = document.createElement("div");
@@ -160,7 +186,7 @@ function showError(message) {
   errorEl.textContent = message;
   errorEl.classList.remove("hidden");
 
-  // Auto-hide después de 5 segundos
+  // Auto-hide after 5 seconds
   setTimeout(() => {
     if (errorEl) {
       errorEl.classList.add("hidden");
