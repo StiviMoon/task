@@ -286,7 +286,7 @@ export async function DashboardPage() {
     </div>
 
 
-     <! -- Modal Edit Account -->
+     <!-- Modal Edit Account -->
     <div id="edit-account-modal" class="modal hidden">
       <div class="modal-content">
         <h2>Editar cuenta</h2>
@@ -303,7 +303,6 @@ export async function DashboardPage() {
  * @param {string} status - Status code (`todo`, `doing`, `done`).
  * @returns {string} Mapped status (`Pendiente`, `En progreso`, `Hecho`, or `Desconocido`).
  */
-function
   function mapStatus(status) {
     const map = { todo: "Pendiente", doing: "En progreso", done: "Hecho" };
     return map[status] || "Desconocido";
