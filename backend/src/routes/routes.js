@@ -9,8 +9,7 @@ const router = express.Router();
 
 router.use("/auth", authRoutes);
 
-// Implementar luego las rutas protegidas aquí. ( por el Auth.js )
-
+// Implement the protected routes here (via Auth.js).
 
 router.use("/tasks", authenticateToken ,taskRoutes);
 

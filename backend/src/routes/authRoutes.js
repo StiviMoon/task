@@ -4,22 +4,22 @@ const authController = require("../controllers/authController");
 const userController = require("../controllers/userController");
 const { loginLimiter, authenticateToken } = require("../middleware/auth");
 
-// Crear un nuevo usuario
+// Create a new user
 router.post("/register", authController.register);
 
-// Iniciar sesión
+// Login
 router.post("/login", loginLimiter, authController.login);
 
-// Cerrar sesión
+// Logout
 router.post("/logout", authController.logout);
 
-// Verificar autenticación
+// Verify authentication
 router.get("/verify", authenticateToken, authController.verifyAuth);
 
-// Olvidé mi contraseña
+// Forgot password
 router.post("/forgot-password", authController.forgotPassword);
 
-// Reestablecer contraseña
+// Reset password
 router.post("/reset-password", authController.resetPassword);
 
 module.exports = router;
