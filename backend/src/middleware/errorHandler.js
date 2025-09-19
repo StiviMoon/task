@@ -1,13 +1,13 @@
 /**
- * Middleware de manejo de errores global para Express.
- * Envía un mensaje genérico para errores 5XX y muestra detalles solo en desarrollo.
- *
- * @param {Error} err - Objeto de error lanzado.
- * @param {Request} req - Objeto de solicitud de Express.
- * @param {Response} res - Objeto de respuesta de Express.
- * @param {Function} next - Función next de Express.
- * @returns {void}
- */
+* Global error handling middleware for Express.
+* Sends a generic message for 5XX errors and displays details in development only.
+*
+* @param {Error} err - The error object thrown.
+* @param {Request} req - The Express request object.
+* @param {Response} res - The Express response object.
+* @param {Function} next - The Express next function.
+* @returns {void}
+*/
 
 const config = require('../config/environment');
 

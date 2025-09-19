@@ -23,6 +23,13 @@ const API_CONFIG = {
     TASKS: "/tasks",
     CREATE_TASK: "/tasks",
     GET_TASKS: "/tasks",
+    UPDATE_TASK: "/tasks/:id",
+    DELETE_TASK: "/tasks/:id",
+
+    // User endpoints
+    GET_USER: "/user",
+    UPDATE_USER: "/user",
+
 
     // Health check
     HEALTH: "/health",

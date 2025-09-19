@@ -3,11 +3,11 @@ const rateLimit = require("express-rate-limit");
 
 
 /**
- * Middleware para autenticar solicitudes usando JWT.
- * @param {Request} req  objeto de solicitud HTTP.
- * @param {Response} res objeto de respuesta HTTP.
- * @param {Next} next   función para pasar al siguiente middleware.
- */
+* Middleware for authenticating requests using JWT.
+* @param {Request} req HTTP request object.
+* @param {Response} res HTTP response object.
+* @param {Next} next function to pass to the next middleware.
+*/
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token =
@@ -33,7 +33,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Limitador de tasa compatible con IPv6 para producción
+// Rate limiter for the login route
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutos
   max: process.env.NODE_ENV === 'production' ? 50 : 100, // Más restrictivo en producción

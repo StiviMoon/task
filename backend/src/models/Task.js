@@ -1,19 +1,19 @@
 const mongoose = require("mongoose");
 
 /**
- *  
- * Esquema de Mongoose para el modelo Task.
- * Define la estructura y validaciones para los documentos de tarea en la base de datos.
- * Campos:
- * - title: Título de la tarea (String, requerido, 50 caracteres max).
- * - details: Detalles adicionales de la tarea (String, opcional, 500 caracteres max).
- * - fecha: Fecha límite para completar la tarea (Date, opcional).
- * - hora: Hora límite para completar la tarea (String, opcional, formato HH:mm).
- * - estado: Estado de la tarea (String, requerido, valores permitidos: "pendiente", "en progreso", "completada").
- * - userId: ID del usuario que creó la tarea (ObjectId, referencia al modelo User, requerido).
- * - createdAt: Fecha de creación de la tarea (Date, por defecto la fecha actual). -> Con el timestamp
- * - updatedAt: Fecha de última actualización de la tarea (Date, por defecto la fecha actual). -> Con el timestamp
- * 
+* 
+* Mongoose schema for the Task model.
+* Defines the structure and validations for task documents in the database.
+* Fields:
+* - title: Task title (String, required, 50 characters max).
+* - details: Additional details about the task (String, optional, 500 characters max).
+* - date: Deadline for task completion (Date, optional).
+* - time: Deadline for task completion (String, optional, HH:mm format).
+* - status: Task status (String, required, allowed values: "pending", "in progress", "completed").
+* - userId: ID of the user who created the task (ObjectId, a reference to the User model, required).
+* - createdAt: Task creation date (Date, the current date by default). -> With the timestamp
+* - updatedAt: Date the task was last updated (Date, by default the current date). -> With the timestamp
+* 
 */
 
 const taskSchema = new mongoose.Schema(
