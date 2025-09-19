@@ -1,20 +1,22 @@
 const mongoose = require("mongoose");
 
 /**
-* 
-* Mongoose schema for the Task model.
-* Defines the structure and validations for task documents in the database.
-* Fields:
-* - title: Task title (String, required, 50 characters max).
-* - details: Additional details about the task (String, optional, 500 characters max).
-* - date: Deadline for task completion (Date, optional).
-* - time: Deadline for task completion (String, optional, HH:mm format).
-* - status: Task status (String, required, allowed values: "pending", "in progress", "completed").
-* - userId: ID of the user who created the task (ObjectId, a reference to the User model, required).
-* - createdAt: Task creation date (Date, the current date by default). -> With the timestamp
-* - updatedAt: Date the task was last updated (Date, by default the current date). -> With the timestamp
-* 
-*/
+ * Task Schema definition for MongoDB using Mongoose.
+ *
+ * Defines the structure, constraints, and validations for task documents.
+ *
+ * Fields:
+ * - title {String} - Task title (required, max length 50).
+ * - details {String} - Additional details (optional, max length 500).
+ * - date {Date} - Deadline for task completion (optional, cannot be in the past).
+ * - hour {String} - Time for task completion (optional, format HH:mm).
+ * - status {String} - Task status (required, allowed: "Por hacer", "Haciendo", "Hecho").
+ * - userId {ObjectId} - Reference to the user who created the task (required).
+ * - createdAt {Date} - Automatically set creation timestamp.
+ * - updatedAt {Date} - Automatically set last update timestamp.
+ *
+ * @module Task
+ */
 
 const taskSchema = new mongoose.Schema(
   {

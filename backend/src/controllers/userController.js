@@ -5,12 +5,19 @@ const UserDAO = require("../dao/UserDAO");
  *
  * @async
  * @function editProfile
- * @param {Request} req - Must include `req.user` from the `authenticateToken` middleware.
- * @param {Response} res - Express response object.
- * @returns {Promise<void>} Returns a JSON object with:
- * - 200: `{ success: true, user: { id, email, name, lastName, age } }` if the update is successful.
- * - 400: `{ success: false, message: error.message }` if a validation or other error occurs.
- * - 401: Unauthorized, if the user is not authenticated (handled by `authenticateToken` middleware).
+ * @param {Request} req Express request object. Must include `req.user` from the `authenticateToken` middleware.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON response with:
+ * 
+ * - 200: `{ success: true, user: { id, email, name, lastName, age, updatedAt } }`  
+ *   If the update is successful.
+ * - 404: `{ success: false, message: "Usuario no encontrado." }`  
+ *   If the user does not exist.
+ * - 409: `{ success: false, message: "Este correo ya está registrado." }`  
+ *   If the email is already in use.
+ * - 400: `{ success: false, message: error.message }`  
+ *   If validation fails or another error occurs.
+ * - 401: Unauthorized (handled by the `authenticateToken` middleware).
  */
 
 exports.editProfile = async (req, res) => {
@@ -47,12 +54,17 @@ exports.editProfile = async (req, res) => {
  *
  * @async
  * @function getProfile
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response with:
- * - 200: `{ success: true, user: profile }` if the profile is found.
- * - 404: `{ success: false, message: "User not found." }` if no profile exists.
- * - 400: `{ success: false, message: error.message }` on unexpected errors.
+ * @param {Request} req Express request object. Must include `req.user` from the `authenticateToken` middleware.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON response with:
+ * 
+ * - 200: `{ success: true, user: profile }`  
+ *   If the profile is found.
+ * - 404: `{ success: false, message: "Usuario no encontrado." }`  
+ *   If the user profile does not exist.
+ * - 400: `{ success: false, message: error.message }`  
+ *   If an error occurs.
+ * - 401: Unauthorized (handled by the `authenticateToken` middleware).
  */
 exports.getProfile = async (req, res) => {
     try {

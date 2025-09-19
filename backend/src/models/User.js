@@ -1,20 +1,27 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+
 /**
-*
-* Mongoose schema for the User model.
-* Defines the structure and validations for user documents in the database.
-* Fields:
-* - name: User's first name (String, required).
-* - lastName: User's last name (String, required).
-* - age: User's age (Number, required, minimum 13).
-* - email: User's email address (String, required, unique, valid format).
-* - password: User's password (String, required, minimum 6 characters, must include one capital letter, one number, and one special character).
-* - createdAt: User creation date (Date, defaults to the current date). -> With the timestamp
-* - updatedAt: User last update date (Date, defaults to the current date). -> With the timestamp
-* 
-*/
+ * User Schema definition for MongoDB using Mongoose.
+ *
+ * Defines the structure, constraints, and validations for user documents.
+ *
+ * Fields:
+ * - name {String} - User's first name (required).
+ * - lastName {String} - User's last name (required).
+ * - age {Number} - User's age (required, must be >= 13).
+ * - email {String} - Unique email address (required, valid format).
+ * - password {String} - User's password (required, min length 8,
+ *   must include at least one uppercase letter, one number, and one special character).
+ * - resetPasswordJti {String|null} - Token ID for password reset, defaults to null.
+ * - createdAt {Date} - Automatically set creation timestamp.
+ * - updatedAt {Date} - Automatically set last update timestamp.
+ *
+ * @module User
+ */
 
 const userSchema = new mongoose.Schema(
   {
@@ -62,18 +69,16 @@ const userSchema = new mongoose.Schema(
 
 
 /**
-* Mongoose middleware that runs before saving a User document.
-*
-* - Checks if the `password` field has been modified.
-* - If it has been modified (or is new), generates a salt and hashes the password with bcrypt.
-* - Replaces the plaintext password with the hash before saving to the database.
-*
-* @function
-* @name preSavePasswordHash
-* @memberof UserSchema
-* @param {Function} next - Callback that tells Mongoose to continue with the save operation.
-*
-*/
+ * Middleware executed before saving a User document.
+ *
+ * - Hashes the password if it is new or has been modified.
+ * - Uses bcrypt to generate a salt and replace the plain password with its hash.
+ *
+ * @function preSavePasswordHash
+ * @memberof UserSchema
+ * @param {Function} next - Callback to continue with the save operation.
+ * @throws {Error} If bcrypt hashing fails.
+ */
 userSchema.pre("save", async function (next){
    if (!this.isModified("password")) return next();
     try {
