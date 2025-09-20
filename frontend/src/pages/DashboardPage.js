@@ -747,6 +747,7 @@ const editaccount = () => {
     }, 5000);
   }
 
+  // === About Us Modal ===
   const aboutUsBtn = document.getElementById("about-us-btn");
   const modal = document.getElementById("about-us-modal");
   const content = document.getElementById("about-us-content");
