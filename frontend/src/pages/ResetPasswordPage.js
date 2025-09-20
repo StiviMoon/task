@@ -1,7 +1,4 @@
 import { resetPassword } from "../services/authService.js";
-import "../styles/main.css";
-import "../styles/components.css";
-import "../styles/pages.css";
 
 /**
  * Renderiza la página de restablecimiento de contraseña
@@ -17,8 +14,7 @@ export function renderResetPassword() {
         <form id="resetForm">
           <input type="password" id="newPassword" placeholder="Nueva contraseña" required />
           <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required />
-          <button type="submit">Restablecer contraseña</button>
-          <div id="spinner" class="hidden">⏳</div>
+          <button type="submit" class="btn btn-primary btn-full">Restablecer contraseña</button>
         </form>
         <div id="toast" class="toast hidden"></div>
         <p>
@@ -44,7 +40,7 @@ export function addResetPasswordLogic() {
   const token = urlParams.get('token');
 
   if (!token) {
-    showToast("❌ Token de restablecimiento no válido", toast);
+    showToast("Token de restablecimiento no válido", toast);
     setTimeout(() => {
       window.location.href = '/';
     }, 3000);
@@ -58,45 +54,45 @@ export function addResetPasswordLogic() {
 
     // Validaciones
     if (!newPassword || !confirmPassword) {
-      showToast("❌ Por favor completa todos los campos", toast);
+      showToast("Por favor completa todos los campos", toast);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      showToast("❌ Las contraseñas no coinciden", toast);
+      showToast("Las contraseñas no coinciden", toast);
       return;
     }
 
     if (newPassword.length < 8) {
-      showToast("❌ La contraseña debe tener al menos 8 caracteres", toast);
+      showToast("La contraseña debe tener al menos 8 caracteres", toast);
       return;
     }
 
     if (!/[A-Z]/.test(newPassword)) {
-      showToast("❌ La contraseña debe tener al menos una mayúscula", toast);
+      showToast("La contraseña debe tener al menos una mayúscula", toast);
       return;
     }
 
     if (!/\d/.test(newPassword)) {
-      showToast("❌ La contraseña debe tener al menos un número", toast);
+      showToast("La contraseña debe tener al menos un número", toast);
       return;
     }
 
     if (!/[^A-Za-z0-9]/.test(newPassword)) {
-      showToast("❌ La contraseña debe tener al menos un carácter especial", toast);
+      showToast("La contraseña debe tener al menos un carácter especial", toast);
       return;
     }
 
     // Mostrar loading
-    spinner.classList.remove("hidden");
     submitBtn.disabled = true;
-    submitBtn.textContent = "⏳ Restableciendo...";
+    submitBtn.classList.add('btn-loading');
+    submitBtn.textContent = "Restableciendo...";
 
     try {
       const result = await resetPassword({ token, newPassword });
 
       if (result.success) {
-        showToast("✅ Contraseña restablecida exitosamente", toast);
+        showToast("Contraseña restablecida exitosamente", toast);
         console.log("Contraseña restablecida");
 
         // Redirigir al login después de 2 segundos
@@ -104,15 +100,15 @@ export function addResetPasswordLogic() {
           window.location.href = '/';
         }, 2000);
       } else {
-        showToast(`❌ ${result.error}`, toast);
+        showToast(result.error, toast);
       }
     } catch (error) {
       console.error("Error en reset password:", error);
-      showToast("❌ Error de conexión. Intenta de nuevo.", toast);
+      showToast("Error de conexión. Intenta de nuevo.", toast);
     } finally {
       // Restaurar UI
-      spinner.classList.add("hidden");
       submitBtn.disabled = false;
+      submitBtn.classList.remove('btn-loading');
       submitBtn.textContent = originalBtnText;
     }
   });

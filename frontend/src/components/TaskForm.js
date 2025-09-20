@@ -1,5 +1,3 @@
-// src/components/TaskForm.js
-
 export function TaskForm(onTaskCreated) {
   const form = document.createElement("form");
   form.id = "task-form";
@@ -11,7 +9,7 @@ export function TaskForm(onTaskCreated) {
     </label>
     <label>
       Detalles
-      <textarea id="details" maxlength="500" rows="2" cols="50" placeholder="Describe los detalles de tu tarea..."></textarea>
+      <textarea id="details" maxlength="500" rows="2" cols="50" placeholder="Describe los detalles de tu tarea.. ( Opcional )"></textarea>
     </label>
     <label>
       Fecha *
@@ -34,10 +32,10 @@ export function TaskForm(onTaskCreated) {
       <span id="status-error" class="error" aria-live="polite"></span>
     </label>
     <div class="modal-actions">
-      <button type="submit" id="save-task" disabled>Guardar</button>
-      <button type="button" id="cancel-task">Cancelar</button>
+      <button type="submit" id="save-task" class="btn btn-primary" disabled>Guardar</button>
+      <button type="button" id="cancel-task" class="btn btn-secondary">Cancelar</button>
     </div>
-    <div id="spinner" class="hidden">⏳ Guardando...</div>
+    <div id="spinner" class="hidden">Guardando...</div>
   `;
 
   const saveBtn = form.querySelector("#save-task");

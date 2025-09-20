@@ -1,4 +1,4 @@
-const task = require("../models/Task");
+const TaskDAO = require("../dao/TaskDAO");
 const config = require("../config/environment");
 
 
@@ -25,8 +25,8 @@ exports.createTask = async (req, res) => {
     try {
         const { title, details, date, hour, status } = req.body;
         const userId = req.user.userId;
-        const newTask = new task({ title, details, date , hour , status, userId });
-        await newTask.save();
+
+        const newTask = await TaskDAO.createTask({ title, details, date, hour, status }, userId);
         res.status(201).json({ success: true, taskId: newTask._id, task: newTask });
     } catch (error) {
         if(config.NODE_ENV === "development") {
@@ -47,15 +47,10 @@ exports.createTask = async (req, res) => {
 exports.getTasks = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const tasks = await task.find({ userId });
+        const tasks = await TaskDAO.getUserTasks(userId);
         res.status(200).json({ tasks });
     } catch (error) {
-        if(error.status >= 500) {
-            res.status(error.status).json({ success: false, message: error.message });
-        }
-        else{
-            res.status(400).json({ success: false, message: error.message });
-        }
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 
@@ -75,16 +70,11 @@ exports.updateTask = async (req, res) => {
         const { title, details, date, hour, status } = req.body;
         const userId = req.user.userId;
 
-        const taskToUpdate = await task.findOne({ _id: id, userId });
-        if (!taskToUpdate) {
+        const updatedTask = await TaskDAO.updateUserTask(id, userId, { title, details, date, hour, status });
+
+        if (!updatedTask) {
             return res.status(404).json({ success: false, message: "Tarea no encontrada." });
         }
-
-        const updatedTask = await task.findByIdAndUpdate(
-            id,
-            { title, details, date, hour, status },
-            { new: true, runValidators: true }
-        );
 
         res.status(200).json({ success: true, task: updatedTask });
     } catch (error) {
@@ -109,12 +99,12 @@ exports.deleteTask = async (req, res) => {
         const { id } = req.params;
         const userId = req.user.userId;
 
-        const taskToDelete = await task.findOne({ _id: id, userId });
-        if (!taskToDelete) {
+        const deletedTask = await TaskDAO.deleteUserTask(id, userId);
+
+        if (!deletedTask) {
             return res.status(404).json({ success: false, message: "Tarea no encontrada." });
         }
 
-        await task.findByIdAndDelete(id);
         res.status(200).json({ success: true, message: "Tarea eliminada exitosamente." });
     } catch (error) {
         if (config.NODE_ENV === "development") {

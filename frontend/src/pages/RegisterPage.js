@@ -1,9 +1,5 @@
 import page from "page";
 import { register } from "../services/authService.js";
-import { renderLogin, addLoginLogic } from "./LoginPage.js";
-import "../styles/main.css";
-import "../styles/components.css";
-import "../styles/pages.css";
 
 export function renderRegister() {
   return `
@@ -12,26 +8,37 @@ export function renderRegister() {
         <img src="logo.png" alt="Logo" class="logo" />
         <h2>Crear cuenta</h2>
         <form id="registerForm" novalidate>
-          <input type="text" id="names" placeholder="Nombres" required />
-          <div class="error" id="error-names"></div>
+          <div class="input-group">
+            <input type="text" id="names" placeholder="Nombres" required />
+            <div class="error" id="error-names"></div>
+          </div>
 
-          <input type="text" id="surnames" placeholder="Apellidos" required />
-          <div class="error" id="error-surnames"></div>
+          <div class="input-group">
+            <input type="text" id="surnames" placeholder="Apellidos" required />
+            <div class="error" id="error-surnames"></div>
+          </div>
 
-          <input type="number" id="age" placeholder="Edad" required />
-          <div class="error" id="error-age"></div>
+          <div class="input-group">
+            <input type="number" id="age" placeholder="Edad" required />
+            <div class="error" id="error-age"></div>
+          </div>
 
-          <input type="email" id="email" placeholder="Correo electrónico" required />
-          <div class="error" id="error-email"></div>
+          <div class="input-group">
+            <input type="email" id="email" placeholder="Correo electrónico" required />
+            <div class="error" id="error-email"></div>
+          </div>
 
-          <input type="password" id="password" placeholder="Contraseña" required />
-          <div class="error" id="error-password"></div>
+          <div class="input-group">
+            <input type="password" id="password" placeholder="Contraseña" required />
+            <div class="error" id="error-password"></div>
+          </div>
 
-          <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required />
-          <div class="error" id="error-confirm"></div>
+          <div class="input-group">
+            <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required />
+            <div class="error" id="error-confirm"></div>
+          </div>
 
-          <button type="submit" id="registerBtn" disabled>Registrarse</button>
-          <div id="spinner" class="hidden">⏳ Procesando...</div>
+          <button type="submit" id="registerBtn" class="btn btn-primary btn-full" disabled>Registrarse</button>
         </form>
         <p>¿Ya tienes cuenta?
           <a href="#" id="goToLogin">Inicia sesión</a>
@@ -61,39 +68,39 @@ export function addRegisterLogic() {
   function validateField(field) {
     if (field === "names") {
       if (inputs.names.value.trim() === "") {
-        return showError("names", "Ingrese sus nombres"), false;
+        return showError("names", "Ingrese sus nombres."), false;
       } else hideError("names");
     }
 
     if (field === "surnames") {
       if (inputs.surnames.value.trim() === "") {
-        return showError("surnames", "Ingrese sus apellidos"), false;
+        return showError("surnames", "Ingrese sus apellidos."), false;
       } else hideError("surnames");
     }
 
     if (field === "age") {
       const age = parseInt(inputs.age.value, 10);
       if (isNaN(age) || age < 13) {
-        return showError("age", "Edad ≥ 13"), false;
+        return showError("age", "La edad ingresada debe ser mayor o igual a 13."), false;
       } else hideError("age");
     }
 
     if (field === "email") {
       if (!/\S+@\S+\.\S+/.test(inputs.email.value)) {
-        return showError("email", "Correo inválido"), false;
+        return showError("email", "Correo inválido."), false;
       } else hideError("email");
     }
 
     if (field === "password") {
       const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
       if (!passRegex.test(inputs.password.value)) {
-        return showError("password", "Mínimo 8 caracteres, mayúscula, número y carácter especial"), false;
+        return showError("password", "Mínimo 8 caracteres, mayúscula, número y carácter especial."), false;
       } else hideError("password");
     }
 
     if (field === "confirm") {
       if (inputs.password.value !== inputs.confirm.value || inputs.confirm.value === "") {
-        return showError("confirm", "Las contraseñas no coinciden"), false;
+        return showError("confirm", "Las contraseñas no coinciden."), false;
       } else hideError("confirm");
     }
 
@@ -114,11 +121,16 @@ export function addRegisterLogic() {
   }
 
   function showError(field, msg) {
-    document.getElementById(`error-${field}`).innerText = msg;
+    const errorEl = document.getElementById(`error-${field}`);
+    errorEl.innerText = msg;
+    errorEl.classList.add("show-tooltip");
+
   }
 
   function hideError(field) {
-    document.getElementById(`error-${field}`).innerText = "";
+    const errorEl = document.getElementById(`error-${field}`);
+    errorEl.innerText = "";
+    errorEl.classList.remove("show-tooltip");
   }
 
   // Real-time validation
@@ -139,9 +151,9 @@ export function addRegisterLogic() {
       return;
     }
 
-    spinner.classList.remove("hidden");
     btn.disabled = true;
-    btn.textContent = "⏳ Creando cuenta...";
+    btn.classList.add('btn-loading');
+    btn.textContent = 'Creando cuenta...';
 
     try {
       // Preparar datos para el backend
@@ -155,9 +167,11 @@ export function addRegisterLogic() {
 
       const result = await register(userData);
 
+      console.log(result);
+
       if (result.success) {
         console.log("Usuario creado exitosamente:", result.data);
-        toast.textContent = "✅ Cuenta creada exitosamente";
+        toast.textContent = "Cuenta creada exitosamente";
         toast.classList.remove("hidden");
 
         // Redirigir al login después de 2 segundos
@@ -167,18 +181,40 @@ export function addRegisterLogic() {
         }, 2000);
       } else {
         console.error("Error al crear usuario:", result.error);
-        showError(result.error || "Error al crear la cuenta");
+        showErrorForm(result.error || "Error al crear la cuenta");
       }
     } catch (error) {
       console.error("Error en registro:", error);
-      showError("Error de conexión. Intenta de nuevo.");
+      showErrorForm("Error de conexión. Intenta de nuevo.");
     } finally {
-      // Restaurar UI
-      spinner.classList.add("hidden");
       btn.disabled = false;
+      btn.classList.remove('btn-loading');
       btn.textContent = "Registrarse";
     }
   });
+
+ // Helper function to show errors
+  function showErrorForm(message) {
+    // Crear o actualizar elemento de error
+    let errorEl = document.getElementById("register-error");
+    if (!errorEl) {
+      errorEl = document.createElement("div");
+      errorEl.id = "register-error";
+      errorEl.className = "error-message";
+      const form = document.getElementById("registerForm");
+      form.insertBefore(errorEl, form.firstChild);
+    }
+
+    errorEl.textContent = message;
+    errorEl.classList.remove("hidden");
+
+    // Auto-hide después de 5 segundos
+    setTimeout(() => {
+      if (errorEl) {
+        errorEl.classList.add("hidden");
+      }
+    }, 5000);
+  }
 
   // Button to go to login
   document.getElementById("goToLogin").addEventListener("click", (e) => {
@@ -186,34 +222,4 @@ export function addRegisterLogic() {
     page("/");
   });
 
-  // Helper function to show errors
-  function showError(message) {
-    // Crear o actualizar elemento de error
-    let errorEl = document.getElementById("register-error");
-    if (!errorEl) {
-      errorEl = document.createElement("div");
-      errorEl.id = "register-error";
-      errorEl.className = "error-message";
-      errorEl.style.cssText = `
-        background: #fee;
-        color: #c33;
-        padding: 10px;
-        border-radius: 4px;
-        margin: 10px 0;
-        text-align: center;
-      `;
-      const form = document.getElementById("registerForm");
-      form.insertBefore(errorEl, form.firstChild);
-    }
-
-    errorEl.textContent = message;
-    errorEl.style.display = "block";
-
-    // Auto-hide después de 5 segundos
-    setTimeout(() => {
-      if (errorEl) {
-        errorEl.style.display = "none";
-      }
-    }, 5000);
-  }
 }
