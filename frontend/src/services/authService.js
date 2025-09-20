@@ -1,22 +1,22 @@
 import { getApiUrl, getAuthHeaders } from "../config/api.js";
 
 /**
- * Registra un nuevo usuario en el sistema
- * @param {Object} userData - Datos del usuario
- * @param {string} userData.name - Nombre del usuario
- * @param {string} userData.lastName - Apellido del usuario
- * @param {number} userData.age - Edad del usuario
- * @param {string} userData.email - Email del usuario
- * @param {string} userData.password - Contraseña del usuario
- * @returns {Promise<Object>} Respuesta del servidor
- */
+* Registers a new user in the system
+* @param {Object} userData - User data
+* @param {string} userData.name - User's first name
+* @param {string} userData.lastName - User's last name
+* @param {number} userData.age - User's age
+* @param {string} userData.email - User's email
+* @param {string} userData.password - User's password
+* @returns {Promise<Object>} Server response
+*/
 export const register = async (userData) => {
   try {
     const response = await fetch(getApiUrl("/auth/register"), {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(userData),
-      credentials: "include", // Importante para las cookies
+      credentials: "include", // Important for cookies
     });
 
     const data = await response.json();
@@ -40,12 +40,12 @@ export const register = async (userData) => {
 };
 
 /**
- * Inicia sesión en el sistema
- * @param {Object} credentials - Credenciales de login
- * @param {string} credentials.email - Email del usuario
- * @param {string} credentials.password - Contraseña del usuario
- * @returns {Promise<Object>} Respuesta del servidor
- */
+* Log in to the system
+* @param {Object} credentials - Login credentials
+* @param {string} credentials.email - User's email
+* @param {string} credentials.password - User's password
+* @returns {Promise<Object>} Server response
+*/
 export const login = async (credentials) => {
   try {
     console.log('🔄 Intentando login con URL:', getApiUrl("/auth/login"));
@@ -54,7 +54,7 @@ export const login = async (credentials) => {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(credentials),
-      credentials: "include", // Importante para las cookies
+      credentials: "include", // Important for cookies
     });
 
     console.log('📡 Respuesta recibida:', response.status, response.statusText);
@@ -73,7 +73,7 @@ export const login = async (credentials) => {
     const data = await response.json();
     console.log('✅ Login exitoso:', data);
 
-    // Guardar token en localStorage como backup
+    // Save token to localStorage as backup
     if (data.token) {
       localStorage.setItem('access_token', data.token);
     }
@@ -95,9 +95,9 @@ export const login = async (credentials) => {
 };
 
 /**
- * Cierra la sesión del usuario
- * @returns {Promise<Object>} Respuesta del servidor
- */
+* Logs out the user
+* @returns {Promise<Object>} Server response
+*/
 export const logout = async () => {
   try {
     const response = await fetch(getApiUrl("/auth/logout"), {
@@ -127,10 +127,10 @@ export const logout = async () => {
 };
 
 /**
- * Solicita restablecimiento de contraseña
- * @param {string} email - Email del usuario
- * @returns {Promise<Object>} Respuesta del servidor
- */
+* Requests a password reset
+* @param {string} email - User's email
+* @returns {Promise<Object>} Server response
+*/
 export const forgotPassword = async (email) => {
   try {
     const response = await fetch(getApiUrl("/auth/forgot-password"), {
@@ -162,12 +162,12 @@ export const forgotPassword = async (email) => {
 };
 
 /**
- * Restablece la contraseña con un token
- * @param {Object} resetData - Datos para restablecer contraseña
- * @param {string} resetData.token - Token de restablecimiento
- * @param {string} resetData.newPassword - Nueva contraseña
- * @returns {Promise<Object>} Respuesta del servidor
- */
+* Resets the password with a token
+* @param {Object} resetData - Data to reset the password to
+* @param {string} resetData.token - Reset token
+* @param {string} resetData.newPassword - New password
+* @returns {Promise<Object>} Server response
+*/
 export const resetPassword = async (resetData) => {
   try {
     const response = await fetch(getApiUrl("/auth/reset-password"), {
@@ -198,14 +198,14 @@ export const resetPassword = async (resetData) => {
 };
 
 /**
- * Verifica si el usuario está autenticado
- * @returns {Promise<boolean>} True si está autenticado
- */
+* Checks if the user is authenticated
+* @returns {Promise<boolean>} True if authenticated
+*/
 export const isAuthenticated = async () => {
   try {
     console.log('🔄 Verificando autenticación...');
 
-    // Primero intentar con cookies
+    // Try with cookies first
     let response = await fetch(getApiUrl("/auth/verify"), {
       method: "GET",
       credentials: "include",
@@ -219,7 +219,7 @@ export const isAuthenticated = async () => {
       return data.success === true;
     }
 
-    // Si falla con cookies, intentar con token de localStorage
+    // If cookies fail, try with localStorage token
     const token = localStorage.getItem('access_token');
     if (token) {
       console.log('🔄 Intentando con token localStorage...');

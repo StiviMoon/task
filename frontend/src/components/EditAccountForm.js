@@ -1,3 +1,38 @@
+/**
+ * Renders and initializes the "Edit Account" form.
+ *
+ * The form includes fields for:
+ * - Names (required)
+ * - Surnames (required)
+ * - Age (required, must be at least 13 years old)
+ * - Email (required, validated with a simplified RFC 5322 regex)
+ *
+ * Features:
+ * - Real-time validation of all fields (`input` events).
+ * - Prevents form submission if validation fails.
+ * - Shows a loading spinner during submission.
+ * - Displays a success toast message when the process finishes.
+ *
+ * @function renderEditAccountForm
+ * @param {Object} [user={}] - Optional user data to prefill the form (not currently applied).
+ * @param {string} [user.names] - User's first names.
+ * @param {string} [user.surnames] - User's last names.
+ * @param {number} [user.age] - User's age.
+ * @param {string} [user.email] - User's email.
+ *
+ * @returns {string} HTML string representing the "Edit Account" form ready to insert into the DOM.
+ *
+ * @example
+ * // Insert the form into a container
+ * document.getElementById("container").innerHTML = renderEditAccountForm();
+ *
+ * @event input
+ * @description Triggered on form fields to perform real-time validation.
+ *
+ * @event submit
+ * @description Prevents default submit, validates fields, shows spinner,
+ *              and displays a toast notification on success.
+ */
 export function renderEditAccountForm(user = {}) {
   const html = `
     <form id="editAccountForm" novalidate>
@@ -47,10 +82,16 @@ export function renderEditAccountForm(user = {}) {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // RFC 5322 simplificado
 
+    /**
+     * Validates form fields in real time.
+     *
+     * @private
+     * @returns {boolean} True if all fields are valid, false otherwise.
+     */
     function validate() {
       let valid = true;
 
-      // Validación de nombres
+      // Name validation
       if (!names.value.trim()) {
         document.getElementById("error-names").textContent = "⚠ Los nombres son obligatorios";
         valid = false;
@@ -58,7 +99,7 @@ export function renderEditAccountForm(user = {}) {
         document.getElementById("error-names").textContent = "";
       }
 
-      // Validación de apellidos
+      // Last name validation
       if (!surnames.value.trim()) {
         document.getElementById("error-surnames").textContent = "⚠ Los apellidos son obligatorios";
         valid = false;
@@ -66,7 +107,7 @@ export function renderEditAccountForm(user = {}) {
         document.getElementById("error-surnames").textContent = "";
       }
 
-      // Validación de edad
+      // Age validation
       if (!age.value || parseInt(age.value, 10) < 13) {
         document.getElementById("error-age").textContent = "⚠ Debe tener al menos 13 años";
         valid = false;
@@ -74,7 +115,7 @@ export function renderEditAccountForm(user = {}) {
         document.getElementById("error-age").textContent = "";
       }
 
-      // Validación de correo
+      // Mail validation
       if (!emailRegex.test(email.value)) {
         document.getElementById("error-email").textContent = "⚠ Correo electrónico inválido";
         valid = false;
@@ -98,7 +139,7 @@ export function renderEditAccountForm(user = {}) {
       spinner.classList.remove("hidden");
       saveBtn.disabled = true;
 
-      // Simular procesamiento
+      // Simulate processing
       setTimeout(() => {
         spinner.classList.add("hidden");
         saveBtn.disabled = false;
