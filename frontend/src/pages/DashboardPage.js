@@ -3,6 +3,8 @@ import { logout } from "../services/authService.js";
 import { handleLogout } from "../utils/authGuard.js";
 import { TaskForm } from "../components/TaskForm.js";
 import { renderEditAccountForm } from "../components/EditAccountForm.js";
+import { renderAboutUs } from "./AboutUsPage.js";
+
 
 export async function DashboardPage() {
   const root = document.getElementById("app");
@@ -50,7 +52,7 @@ export async function DashboardPage() {
 
           <!-- Bottom Menu Items -->
           <div class="menu-items-bottom">
-            <button class="menu-item" id="account-btn" title="Cuenta" tabindex="0" aria-label="Cuenta">
+            <button class="menu-item" id="account-btn" title="account" tabindex="0" aria-label="Cuenta">
               <span class="menu-item-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="7" r="4"></circle>
@@ -58,6 +60,11 @@ export async function DashboardPage() {
                 </svg>
               </span>
               <span>MI cuenta</span>
+            </button>
+
+          
+            <button class="menu-item" id="about-us-btn" title="about-us" tabindex="0" aria-label="about-us">
+                <span>Sobre nosotros</span>
             </button>
 
 
@@ -271,6 +278,16 @@ export async function DashboardPage() {
         <div id="edit-account-form-container"></div>
       </div>
     </div>
+
+
+    <!-- Modal about us -->
+    <div id="about-us-modal" class="modal hidden">
+      <div class="modal-content">
+        <span id="close-about-us" class="close-btn">&times;</span>
+        <div id="about-us-content"></div> <!-- Aquí se inyecta AboutUsPage -->
+      </div>
+    </div>
+
   `;
 
   // === Helpers ===
@@ -729,4 +746,19 @@ const editaccount = () => {
       }
     }, 5000);
   }
+
+  const aboutUsBtn = document.getElementById("about-us-btn");
+  const modal = document.getElementById("about-us-modal");
+  const content = document.getElementById("about-us-content");
+
+  aboutUsBtn?.addEventListener("click", () => {
+    content.innerHTML = renderAboutUs();
+    modal.classList.remove("hidden");
+  });
+
+  modal?.addEventListener("click", (e) => {
+    if (e.target.id === "about-us-modal" || e.target.id === "close-about-us") {
+      modal.classList.add("hidden");
+    }
+  });
 }
