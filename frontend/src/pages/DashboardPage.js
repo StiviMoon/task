@@ -2,7 +2,31 @@ import { getTasks, createTask } from "../services/taskService.js";
 import { logout } from "../services/authService.js";
 import { handleLogout } from "../utils/authGuard.js";
 import { TaskForm } from "../components/TaskForm.js";
-
+import { renderEditAccountForm } from "../components/EditAccountForm.js";
+import { renderAboutUs } from "./AboutUsPage.js";
+/**
+ * DashboardPage Component
+ *
+ * This function is responsible for rendering the **main dashboard page** of the application.
+ * It creates the full UI structure, including:
+ * - Sidebar navigation (tasks, account, logout)
+ * - Header with mobile menu button
+ * - Kanban board (tasks by status: To-do, In progress, Done)
+ * - Floating action button (FAB) to add tasks
+ * - Modals:
+ *   - Create Task
+ *   - Task Detail (view & edit mode)
+ *   - Logout confirmation
+ *   - User profile
+ *   - Edit account
+ *
+ * It also sets up containers (`div`s and `form`s) that will later be filled by components like `TaskForm`
+ * or `EditAccountForm`.
+ *
+ * @async
+ * @function DashboardPage
+ * @returns {Promise<void>} Renders the dashboard into the root `#app` element.
+ */
 export async function DashboardPage() {
   const root = document.getElementById("app");
 
@@ -49,6 +73,22 @@ export async function DashboardPage() {
 
           <!-- Bottom Menu Items -->
           <div class="menu-items-bottom">
+            <button class="menu-item" id="account-btn" title="account" tabindex="0" aria-label="Cuenta">
+              <span class="menu-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="7" r="4"></circle>
+                  <path d="M5.5 21a7.5 7.5 0 0 1 13 0"></path>
+                </svg>
+              </span>
+              <span>MI cuenta</span>
+            </button>
+
+
+            <button class="menu-item" id="about-us-btn" title="about-us" tabindex="0" aria-label="about-us">
+                <span>Sobre nosotros</span>
+            </button>
+
+
             <button class="menu-item" id="logout-btn" title="Cerrar sesión" tabindex="0" aria-label="Cerrar sesión">
               <span class="menu-item-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -222,16 +262,80 @@ export async function DashboardPage() {
         </div>
       </div>
     </div>
+
+
+    <div id="user-profile-modal" class="modal hidden">
+      <div class="modal-content">
+
+        <!-- Información de usuario -->
+        <h2 class="text-xl font-semibold mb-4">Perfil de Usuario</h2>
+
+        <div class="space-y-2">
+          <p><span class="font-medium">Nombre:</span> Juan Pérez</p>
+          <p><span class="font-medium">Apellido:</span> García</p>
+          <p><span class="font-medium">Email:</span> juan.perez@example.com</p>
+          <p><span class="font-medium">Miembro desde:</span> 12/03/2023</p>
+        </div>
+
+        <!-- Botones -->
+        <div class="modal-actions">
+          <button id="edit-account-button" class="btn btn-primary">
+            Editar cuenta
+          </button>
+          <button class="btn btn-danger">
+            Eliminar
+          </button>
+          <button id="return" class="btn btn-secondary">Volver</button>
+        </div>
+
+      </div>
+    </div>
+
+
+     <!-- Modal Edit Account -->
+    <div id="edit-account-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Editar cuenta</h2>
+        <div id="edit-account-form-container"></div>
+      </div>
+    </div>
+
+
+    <!-- Modal about us -->
+    <div id="about-us-modal" class="modal hidden">
+      <div class="modal-content">
+        <span id="close-about-us" class="close-btn">&times;</span>
+        <div id="about-us-content"></div> <!-- Aquí se inyecta AboutUsPage -->
+      </div>
+    </div>
+
   `;
 
   // === Helpers ===
+/**
+ * Maps a task status code to its human-readable label in Spanish.
+ *
+ * @function mapStatus
+ * @param {string} status - Status code (`todo`, `doing`, `done`).
+ * @returns {string} Mapped status (`Pendiente`, `En progreso`, `Hecho`, or `Desconocido`).
+ */
   function mapStatus(status) {
     const map = { todo: "Pendiente", doing: "En progreso", done: "Hecho" };
     return map[status] || "Desconocido";
   }
 
+  /**
+ * Renders a single task element inside the Kanban board.
+ *
+ * @function renderTask
+ * @param {Object} task - Task object to render.
+ * @param {string} task.title - Task title.
+ * @param {string} task.status - Task status from backend (`Por hacer`, `Haciendo`, `Hecho`).
+ * @param {string} [task.date] - Task due date (ISO string).
+ * @param {string} [task.hour] - Task due hour (optional).
+ */
   function renderTask(task) {
-    // Mapear estados del backend a los del frontend
+    // Map backend states to frontend states
     const statusMap = {
       "Por hacer": "todo",
       Haciendo: "doing",
@@ -261,7 +365,13 @@ export async function DashboardPage() {
 
     column.appendChild(taskEl);
   }
-
+/**
+ * Formats a date string into a localized Spanish format.
+ *
+ * @function formatDate
+ * @param {string} dateString - ISO date string.
+ * @returns {string} Formatted date (`dd MMM yyyy`) or `"Sin fecha"`.
+ */
   function formatDate(dateString) {
     if (!dateString) return "Sin fecha";
     const date = new Date(dateString);
@@ -272,17 +382,23 @@ export async function DashboardPage() {
     });
   }
 
-  // Variables para el modal de detalle
+  // Variables for the detail modal
   let currentTask = null;
 
-  // Función para abrir el modal de detalle de tarea
+  // Function to open the task detail modal
+/**
+ * Opens the task detail modal and fills it with task information.
+ *
+ * @function openTaskDetailModal
+ * @param {Object} task - Task to display.
+ */
   function openTaskDetailModal(task) {
     currentTask = task;
 
-    // Cerrar sidebar en móvil para que se vea el modal
+    // Close sidebar on mobile so the modal can be seen
     closeMobileSidebar();
 
-    // Llenar los datos en el modo de vista
+    // Fill the data in view mode
     document.getElementById("detail-title").textContent = task.title;
     document.getElementById("detail-description").textContent = task.details || "Sin descripción";
 
@@ -293,18 +409,24 @@ export async function DashboardPage() {
     document.getElementById("detail-date").textContent = formatDate(task.date);
     document.getElementById("detail-time").textContent = task.hour || "Sin hora";
 
-    // Configurar el botón de toggle status
+    // Configure the status toggle button
     updateToggleStatusButton(task.status);
 
-    // Mostrar modo vista y ocultar modo edición
+    // Show view mode and hide edit mode
     document.getElementById("task-view-mode").classList.remove("hidden");
     document.getElementById("task-edit-mode").classList.add("hidden");
 
-    // Mostrar el modal
+    // Show the modal
     detailModal.classList.remove("hidden");
   }
 
-  // Función para actualizar el botón de toggle status
+  // Function to update the toggle button status
+/**
+ * Updates the "toggle status" button inside the detail modal based on current status.
+ *
+ * @function updateToggleStatusButton
+ * @param {string} currentStatus - Current task status (`Hecho` or not).
+ */
   function updateToggleStatusButton(currentStatus) {
     const toggleBtn = document.getElementById("toggle-status-btn");
     const toggleText = document.getElementById("toggle-status-text");
@@ -324,51 +446,73 @@ export async function DashboardPage() {
     }
   }
 
-  // Función para cambiar al modo de edición
+// Function to switch to edit mode
+/**
+ * Switches the task detail modal into edit mode.
+ *
+ * @function switchToEditMode
+ */
   function switchToEditMode() {
     if (!currentTask) return;
 
-    // Llenar el formulario de edición con los datos actuales
+    // Fill the edit form with the current data
     document.getElementById("edit-title").value = currentTask.title;
     document.getElementById("edit-details").value = currentTask.details || "";
     document.getElementById("edit-date").value = currentTask.date;
     document.getElementById("edit-hour").value = currentTask.hour || "";
     document.getElementById("edit-status").value = currentTask.status;
 
-    // Cambiar modos
+    // Change modes
     document.getElementById("task-view-mode").classList.add("hidden");
     document.getElementById("task-edit-mode").classList.remove("hidden");
   }
 
-  // Función para volver al modo de vista
+ // Function to return to view mode
+/**
+ * Switches the task detail modal into view mode.
+ *
+ * @function switchToViewMode
+ */
   function switchToViewMode() {
     document.getElementById("task-edit-mode").classList.add("hidden");
     document.getElementById("task-view-mode").classList.remove("hidden");
   }
 
-  // Función para toggle del status (placeholder para backend)
+  // Function for status toggle (placeholder for backend)
+  /**
+   * Toggles the status of the currently selected task.
+   * (Placeholder: backend integration required).
+   *
+   * @function toggleTaskStatus
+   */
   function toggleTaskStatus() {
     if (!currentTask) return;
 
     const newStatus = currentTask.status === "Hecho" ? "Por hacer" : "Hecho";
 
-    // TODO: Aquí irá la llamada al backend
+    // TODO: The call to the backend will go here
     console.log(`Cambiando status de "${currentTask.title}" de "${currentTask.status}" a "${newStatus}"`);
 
-    // Simular cambio local (temporal)
+    // Simulate local (temporal) change
     currentTask.status = newStatus;
 
-    // Actualizar la UI
+    // Update the UI
     const statusBadge = document.getElementById("detail-status");
     statusBadge.textContent = newStatus;
     statusBadge.setAttribute("data-status", newStatus);
     updateToggleStatusButton(newStatus);
 
-    // Mostrar mensaje temporal
+    // Show temporary message
     showToast(`Tarea marcada como "${newStatus}"`);
   }
 
-  // Función para guardar edición (placeholder para backend)
+   // Function to save edit (placeholder for backend)
+   /**
+   * Saves edits made in the task edit form.
+   * (Placeholder: backend integration required).
+   *
+   * @function saveTaskEdit
+   */
   function saveTaskEdit() {
     if (!currentTask) return;
 
@@ -381,38 +525,50 @@ export async function DashboardPage() {
       status: document.getElementById("edit-status").value
     };
 
-    // TODO: Aquí irá la llamada al backend
+    // TODO: The call to the backend will go here
     console.log("Guardando cambios:", updatedTask);
 
-    // Simular guardado exitoso
+    // Simulate successful save
     currentTask = updatedTask;
 
-    // Actualizar la vista
+    // Update the view
     openTaskDetailModal(currentTask);
     showToast("Tarea actualizada exitosamente");
   }
 
-  // Función para eliminar tarea (placeholder para backend)
+  // Function to delete task (placeholder for backend)
+  /**
+   * Deletes the currently selected task after user confirmation.
+   * (Placeholder: backend integration required).
+   *
+   * @function deleteTask
+   */
   function deleteTask() {
     if (!currentTask) return;
 
     if (confirm(`¿Estás seguro de que quieres eliminar la tarea "${currentTask.title}"?`)) {
-      // TODO: Aquí irá la llamada al backend
+      // TODO: The call to the backend will go here
       console.log("Eliminando tarea:", currentTask.title);
 
-      // Cerrar modal
+      // Close modal
       detailModal.classList.add("hidden");
 
-      // Mostrar mensaje
+      // Show message
       showToast("Tarea eliminada");
 
-      // TODO: Actualizar la vista del kanban
+      // TODO: Update the kanban view
     }
   }
 
-  // Función para mostrar toast messages
+  // Function to display toast messages
+  /**
+   * Displays a temporary toast message on screen.
+   *
+   * @function showToast
+   * @param {string} message - The message to display.
+   */
   function showToast(message) {
-    // Crear o usar toast existente
+    // Create or use existing toast
     let toast = document.getElementById("temp-toast");
     if (!toast) {
       toast = document.createElement("div");
@@ -424,7 +580,7 @@ export async function DashboardPage() {
     toast.textContent = message;
     toast.classList.remove("hidden");
 
-    // Auto-hide después de 3 segundos
+    // Auto-hide after 3 seconds
     setTimeout(() => {
       toast.classList.add("hidden");
     }, 3000);
@@ -458,7 +614,7 @@ export async function DashboardPage() {
       const result = await createTask(taskData);
       if (result.success) {
         taskModal.classList.add("hidden");
-        // Recargar todas las tareas para mostrar la nueva
+        // Reload all tasks to show the new one
         location.reload();
       } else {
         showError(result.error || "Error al crear la tarea");
@@ -472,10 +628,10 @@ export async function DashboardPage() {
 
   // Modal events
   addTaskBtn.addEventListener("click", () => {
-    // Cerrar sidebar en móvil para que se vea el modal
+    // Close sidebar on mobile so the modal can be seen
     closeMobileSidebar();
 
-    // Abrir modal de nueva tarea
+    // Open new task modal
     taskModal.classList.remove("hidden");
   });
   taskForm
@@ -485,12 +641,12 @@ export async function DashboardPage() {
     detailModal.classList.add("hidden")
   );
 
-  // Event listeners para los botones del modal de detalle
+  // Event listeners for the detail modal buttons
   document.getElementById("edit-task-btn").addEventListener("click", switchToEditMode);
   document.getElementById("toggle-status-btn").addEventListener("click", toggleTaskStatus);
   document.getElementById("delete-task-btn").addEventListener("click", deleteTask);
 
-  // Event listeners para el modo de edición
+  // Event listeners for edit mode
   document.getElementById("cancel-edit-btn").addEventListener("click", switchToViewMode);
   document.getElementById("edit-task-form").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -507,18 +663,28 @@ export async function DashboardPage() {
 
 
   // Toggle sidebar functionality
+  /**
+   * Toggles sidebar visibility depending on device size.
+   *
+   * @function toggleSidebar
+   */
   const toggleSidebar = () => {
     if (isMobile()) {
-      // En móvil: mostrar/ocultar sidebar con overlay
+     // On mobile: show/hide sidebar with overlay
       sidebar.classList.toggle("mobile-open");
       sidebarOverlay.classList.toggle("active");
     } else {
-      // En desktop: colapsar/expandir sidebar
+      // On desktop: collapse/expand sidebar
       sidebarMenu.classList.toggle("hidden");
     }
   };
 
-  // Cerrar sidebar en móvil
+  // Close sidebar on mobile
+  /**
+   * Closes the sidebar on mobile devices.
+   *
+   * @function closeMobileSidebar
+   */
   const closeMobileSidebar = () => {
     if (isMobile()) {
       sidebar.classList.remove("mobile-open");
@@ -526,10 +692,22 @@ export async function DashboardPage() {
     }
   };
 
-  // Mejorar el overlay para que también cierre cuando hay modales abiertos
+  // Improve the overlay so that it also closes when there are open modals
+  /**
+   * Checks if the current device width should be considered mobile.
+   *
+   * @function isMobile
+   * @returns {boolean} True if window width <= 768px.
+   */
   const isMobile = () => window.innerWidth <= 768;
 
-  // Función para verificar si hay algún modal abierto
+  // Function to check if there is any modal open
+  /**
+   * Returns whether any modal is currently open.
+   *
+   * @function hasOpenModal
+   * @returns {boolean} True if at least one modal is visible.
+   */
   const hasOpenModal = () => {
     const modals = document.querySelectorAll('.modal:not(.hidden)');
     return modals.length > 0;
@@ -542,25 +720,26 @@ export async function DashboardPage() {
   }
   sidebarOverlay.addEventListener("click", closeMobileSidebar);
 
-  // Manejar items del menú (incluyendo todos los nuevos)
+  // Manage menu items (including all new ones)
+
   const allMenuItems = document.querySelectorAll(".menu-item:not(#logout-btn)");
 
   allMenuItems.forEach((item) => {
     item.addEventListener("click", (e) => {
-      // Remover clase active de todos los items
+      // Remove active class from all items
       allMenuItems.forEach((i) => i.classList.remove("active"));
-      // Añadir clase active al item clickeado
+      // Add active class to the clicked item
       e.currentTarget.classList.add("active");
 
-      // Cerrar sidebar en móvil después de seleccionar
+      // Close sidebar on mobile after selecting
       closeMobileSidebar();
 
-      // Aquí puedes añadir la lógica para cambiar de vista
+      // Here you can add the logic to change views
       const itemId = e.currentTarget.id;
       handleMenuNavigation(itemId);
     });
 
-    // Añadir soporte para navegación con teclado
+    // Add support for keyboard navigation
     item.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -569,12 +748,18 @@ export async function DashboardPage() {
     });
   });
 
-  // Función para manejar navegación del menú
+  // Function to handle menu navigation
+  /**
+   * Handles sidebar menu navigation.
+   *
+   * @function handleMenuNavigation
+   * @param {string} itemId - The id of the clicked menu item.
+   */
   const handleMenuNavigation = (itemId) => {
     switch (itemId) {
       case "tasks-btn":
         console.log("Navegando a Mis Tareas");
-        // Ya estamos en tareas, no hacer nada
+        // We are already in tasks, do nothing
         break;
       default:
         console.log("Navegación no implementada para:", itemId);
@@ -583,14 +768,64 @@ export async function DashboardPage() {
   };
 
 
-  // Manejar redimensionamiento de ventana
+  // Handle window resizing
   window.addEventListener("resize", () => {
     if (!isMobile()) {
-      // Si cambiamos a desktop, remover clases de móvil
+      // If we switch to desktop, remove mobile classes
       sidebar.classList.remove("mobile-open");
       sidebarOverlay.classList.remove("active");
     }
   });
+
+
+  // === edit account ===
+  const AccountBtn = document.getElementById("account-btn");
+  const AccountModal = document.getElementById("user-profile-modal");
+  const editAccountButton = document.getElementById("edit-account-button");
+  const returnFromUser = document.getElementById("return");
+
+  AccountBtn.addEventListener("click", () => {
+
+    // Close sidebar on mobile so the modal can be seen
+
+    closeMobileSidebar();
+
+    // Open edit account modal
+
+    AccountModal.classList.remove("hidden");
+    editAccountButton.addEventListener("click", () => {
+
+      AccountModal.classList.add("hidden");
+
+      editaccount();
+      AccountModal.classList.remove("hidden");
+    })
+
+    returnFromUser.addEventListener("click", () => AccountModal.classList.add("hidden"));
+  });
+
+  /**
+   * Opens the Edit Account modal, rendering the form inside it.
+   *
+   * @function editaccount
+   */
+const editaccount = () => {
+  const editAccountForm = document.getElementById("edit-account-modal");
+  const editAccountFormContainer = document.getElementById("edit-account-form-container");
+
+  // Close user profile modal
+  AccountModal.classList.add("hidden");
+  // Open edit account modal
+  editAccountForm.classList.remove("hidden");
+  // Render the edit account form
+
+  editAccountFormContainer.innerHTML = renderEditAccountForm();
+  editAccountFormContainer
+  .querySelector("#cancel-edit")
+  .addEventListener("click", () => editAccountForm.classList.add("hidden"));
+
+}
+
 
   // === Logout ===
   const logoutBtn = document.getElementById("logout-btn");
@@ -599,10 +834,10 @@ export async function DashboardPage() {
   const cancelLogout = document.getElementById("cancel-logout");
 
   logoutBtn.addEventListener("click", () => {
-    // Cerrar sidebar en móvil para que se vea el modal
+   // Close sidebar on mobile so the modal can be seen
     closeMobileSidebar();
 
-    // Abrir modal de logout
+    // Open logout modal
     logoutModal.classList.remove("hidden");
   });
   cancelLogout.addEventListener("click", () =>
@@ -610,13 +845,19 @@ export async function DashboardPage() {
   );
 
   confirmLogout.addEventListener("click", async () => {
-    // Usar la función handleLogout que maneja todo el proceso
+    // Use the handleLogout function that handles the entire process
     await handleLogout(logout);
   });
 
   // Helper function to show errors
+  /**
+   * Shows an error message inside the dashboard.
+   *
+   * @function showError
+   * @param {string} message - The error message to display.
+   */
   function showError(message) {
-    // Crear o actualizar elemento de error
+    // Create or update error element
     let errorEl = document.getElementById("dashboard-error");
     if (!errorEl) {
       errorEl = document.createElement("div");
@@ -628,11 +869,27 @@ export async function DashboardPage() {
     errorEl.textContent = message;
     errorEl.classList.remove("hidden");
 
-    // Auto-hide después de 5 segundos
+    // Auto-hide after 5 seconds
     setTimeout(() => {
       if (errorEl) {
         errorEl.classList.add("hidden");
       }
     }, 5000);
   }
+
+  // === About Us Modal ===
+  const aboutUsBtn = document.getElementById("about-us-btn");
+  const modal = document.getElementById("about-us-modal");
+  const content = document.getElementById("about-us-content");
+
+  aboutUsBtn?.addEventListener("click", () => {
+    content.innerHTML = renderAboutUs();
+    modal.classList.remove("hidden");
+  });
+
+  modal?.addEventListener("click", (e) => {
+    if (e.target.id === "about-us-modal" || e.target.id === "close-about-us") {
+      modal.classList.add("hidden");
+    }
+  });
 }
