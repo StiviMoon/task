@@ -1,3 +1,12 @@
+/**
+* Renders the "About Us" section view.
+*
+* This function returns HTML markup describing the mission,
+* goals, and features of the **Timely** app.
+* 
+* @function renderAboutUs
+* @returns {string} HTML of the "About Us" page
+*/
 export function renderAboutUs() {
   return `
     <div class="about-us-container">
