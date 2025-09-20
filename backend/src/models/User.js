@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-/**    
- *  
+/**
+ *
  * Esquema de Mongoose para el modelo User.
  * Define la estructura y validaciones para los documentos de usuario en la base de datos.
  * Campos:
@@ -13,7 +13,7 @@ const bcrypt = require("bcrypt");
  * - password: Contraseña del usuario (String, requerido, mínimo 6 caracteres, debe incluir una mayúscula, un número y un carácter especial).
  * - createdAt: Fecha de creación del usuario (Date, por defecto la fecha actual). -> Con el timestamp
  * - updatedAt: Fecha de última actualización del usuario (Date, por defecto la fecha actual). -> Con el timestamp
- * 
+ *
 */
 
 const userSchema = new mongoose.Schema(
@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
         type: Number,
         required: [true, "La edad es obligatoria."],
         min: [13,"{VALUE} no es válido, la edad debe ser mayor o igual a 13."]
-        
+
     },
 
     email: {
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       match:
-            [                     
+            [
             /^\S+@\S+\.\S+$/,
             "El formato del email no es válido"
             ]
@@ -92,5 +92,3 @@ const User = mongoose.model("User", userSchema);
 
 
 module.exports = User;
-
-

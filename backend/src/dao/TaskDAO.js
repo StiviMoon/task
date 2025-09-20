@@ -26,15 +26,28 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Obtener todas las tareas de un usuario
+     * Obtener todas las tareas de un usuario (no eliminadas)
      * @param {String} userId - ID del usuario
      * @returns {Promise<Array>} - Array de tareas
      */
     async getUserTasks(userId) {
         try {
-            return await this.find({ userId }, { sort: { createdAt: -1 } });
+            return await this.find({ userId, isDeleted: false }, { sort: { createdAt: -1 } });
         } catch (error) {
             throw new Error(`Error al obtener tareas del usuario: ${error.message}`);
+        }
+    }
+
+    /**
+     * Obtener tareas eliminadas de un usuario (papelera)
+     * @param {String} userId - ID del usuario
+     * @returns {Promise<Array>} - Array de tareas eliminadas
+     */
+    async getDeletedTasks(userId) {
+        try {
+            return await this.find({ userId, isDeleted: true }, { sort: { updatedAt: -1 } });
+        } catch (error) {
+            throw new Error(`Error al obtener tareas eliminadas: ${error.message}`);
         }
     }
 
@@ -74,22 +87,65 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Eliminar una tarea del usuario
+     * Eliminar una tarea del usuario (eliminación lógica)
      * @param {String} taskId - ID de la tarea
      * @param {String} userId - ID del usuario
-     * @returns {Promise<Object|null>} - Tarea eliminada o null
+     * @returns {Promise<Object|null>} - Tarea marcada como eliminada o null
      */
     async deleteUserTask(taskId, userId) {
         try {
-            // Verificar que la tarea pertenece al usuario antes de eliminar
-            const task = await this.getUserTask(taskId, userId);
+            // Verificar que la tarea pertenece al usuario
+            const task = await this.findOne({ _id: taskId, userId });
             if (!task) {
                 return null;
             }
 
-            return await this.deleteById(taskId);
+            // Marcar como eliminada en lugar de eliminar físicamente
+            return await this.updateById(taskId, { isDeleted: true });
         } catch (error) {
             throw new Error(`Error al eliminar tarea: ${error.message}`);
+        }
+    }
+
+    /**
+     * Restaurar una tarea de la papelera
+     * @param {String} taskId - ID de la tarea
+     * @param {String} userId - ID del usuario
+     * @returns {Promise<Object|null>} - Tarea restaurada o null
+     */
+    async restoreUserTask(taskId, userId) {
+        try {
+            // Verificar que la tarea eliminada pertenece al usuario
+            const task = await this.findOne({ _id: taskId, userId, isDeleted: true });
+            if (!task) {
+                return null;
+            }
+
+            // Restaurar la tarea
+            return await this.updateById(taskId, { isDeleted: false });
+        } catch (error) {
+            throw new Error(`Error al restaurar tarea: ${error.message}`);
+        }
+    }
+
+    /**
+     * Eliminar permanentemente una tarea de la papelera
+     * @param {String} taskId - ID de la tarea
+     * @param {String} userId - ID del usuario
+     * @returns {Promise<Object|null>} - Tarea eliminada permanentemente o null
+     */
+    async permanentlyDeleteUserTask(taskId, userId) {
+        try {
+            // Verificar que la tarea eliminada pertenece al usuario
+            const task = await this.findOne({ _id: taskId, userId, isDeleted: true });
+            if (!task) {
+                return null;
+            }
+
+            // Eliminar permanentemente
+            return await this.deleteById(taskId);
+        } catch (error) {
+            throw new Error(`Error al eliminar permanentemente: ${error.message}`);
         }
     }
 

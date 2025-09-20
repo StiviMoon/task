@@ -1,10 +1,43 @@
-import { getTasks, createTask } from "../services/taskService.js";
 import { logout } from "../services/authService.js";
 import { handleLogout } from "../utils/authGuard.js";
 import { TaskForm } from "../components/TaskForm.js";
 
+// Import logic modules
+import {
+  loadTasks,
+  createNewTask,
+  updateExistingTask,
+  deleteExistingTask,
+  toggleTaskStatus,
+  getAllTasks,
+  setCurrentTask,
+  getCurrentTask,
+  showToast,
+  showError,
+  setupMobileSidebar,
+  setupMenuItems,
+  setupModalListeners,
+  TaskDetailModal,
+  UserProfileModal,
+  TrashModal,
+  AboutUsModal,
+  renderKanbanBoard
+} from "../logic/index.js";
+
+/**
+ * DashboardPage Component
+ *
+ * Main dashboard page that renders the task management interface.
+ * Uses modular logic components for better organization and maintainability.
+ */
 export async function DashboardPage() {
   const root = document.getElementById("app");
+
+  // === Initialize Modals ===
+  const taskDetailModal = new TaskDetailModal();
+  const userProfileModal = new UserProfileModal();
+  const trashModal = new TrashModal();
+  const aboutUsModal = new AboutUsModal();
 
   // === Main render ===
   root.innerHTML = `
@@ -45,10 +78,34 @@ export async function DashboardPage() {
               </span>
               <span class="menu-item-text">Mis Tareas</span>
             </button>
+
+            <button class="menu-item" id="trash-btn" title="Papelera" tabindex="0" aria-label="Papelera">
+              <span class="menu-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3,6 5,6 21,6"></polyline>
+                  <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                </svg>
+              </span>
+              <span class="menu-item-text">Papelera</span>
+            </button>
           </div>
 
           <!-- Bottom Menu Items -->
           <div class="menu-items-bottom">
+            <button class="menu-item" id="account-btn" title="account" tabindex="0" aria-label="Cuenta">
+              <span class="menu-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="7" r="4"></circle>
+                  <path d="M5.5 21a7.5 7.5 0 0 1 13 0"></path>
+                </svg>
+              </span>
+              <span>MI cuenta</span>
+            </button>
+
+            <button class="menu-item" id="about-us-btn" title="about-us" tabindex="0" aria-label="about-us">
+                <span>Sobre nosotros</span>
+            </button>
+
             <button class="menu-item" id="logout-btn" title="Cerrar sesión" tabindex="0" aria-label="Cerrar sesión">
               <span class="menu-item-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -222,244 +279,276 @@ export async function DashboardPage() {
         </div>
       </div>
     </div>
+
+    <!-- User Profile Modal -->
+    <div id="user-profile-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="close-profile" class="close-btn" aria-label="Cerrar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <div class="modal-header">
+          <h2>Perfil de Usuario</h2>
+        </div>
+
+        <div id="user-profile-content">
+          <div id="profile-loading" class="profile-loading">
+            <div class="spinner"></div>
+            <p>Cargando información del usuario...</p>
+          </div>
+
+          <div id="profile-info" class="hidden">
+            <div class="profile-info-item">
+              <span class="font-medium">Nombre:</span>
+              <span id="profile-name">-</span>
+            </div>
+            <div class="profile-info-item">
+              <span class="font-medium">Apellido:</span>
+              <span id="profile-lastname">-</span>
+            </div>
+            <div class="profile-info-item">
+              <span class="font-medium">Email:</span>
+              <span id="profile-email">-</span>
+            </div>
+            <div class="profile-info-item">
+              <span class="font-medium">Edad:</span>
+              <span id="profile-age">-</span>
+            </div>
+            <div class="profile-info-item">
+              <span class="font-medium">Miembro desde:</span>
+              <span id="profile-created">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button id="edit-account-button" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Editar cuenta
+          </button>
+          <button id="delete-account-button" class="btn btn-danger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3,6 5,6 21,6"></polyline>
+              <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+            </svg>
+            Eliminar cuenta
+          </button>
+          <button id="return" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"></path>
+            </svg>
+            Volver
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Account Modal -->
+    <div id="edit-account-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Editar cuenta</h2>
+        <div id="edit-account-form-container"></div>
+      </div>
+    </div>
+
+    <!-- About Us Modal -->
+    <div id="about-us-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="close-about-us" class="close-btn" aria-label="Cerrar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <div class="modal-header">
+          <h2>Sobre nosotros</h2>
+        </div>
+
+        <div id="about-us-content">
+          <!-- Content will be loaded dynamically from AboutUsPage.js -->
+        </div>
+
+        <div class="modal-actions">
+          <button id="close-about-us-btn" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"></path>
+            </svg>
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirmation-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>¿Eliminar tarea?</h2>
+        <p id="delete-confirmation-message">¿Estás seguro de que quieres eliminar esta tarea? Se moverá a la papelera.</p>
+        <div class="modal-actions">
+          <button id="confirm-delete" class="btn btn-danger">Sí, eliminar</button>
+          <button id="cancel-delete" class="btn btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trash Modal -->
+    <div id="trash-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Papelera</h2>
+          <button id="close-trash" class="close-btn" aria-label="Cerrar papelera">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div id="trash-content">
+          <div id="trash-loading" class="text-center">
+            <p>Cargando papelera...</p>
+          </div>
+          <div id="trash-tasks" class="hidden">
+            <!-- Las tareas eliminadas se cargarán aquí -->
+          </div>
+          <div id="trash-empty" class="hidden text-center">
+            <p>La papelera está vacía</p>
+          </div>
+        </div>
+      </div>
+    </div>
   `;
 
-  // === Helpers ===
-  function mapStatus(status) {
-    const map = { todo: "Pendiente", doing: "En progreso", done: "Hecho" };
-    return map[status] || "Desconocido";
-  }
+  // === Task Management ===
+  const reloadTasks = async () => {
+    try {
+      const result = await loadTasks();
+      if (result.success) {
+        const tasks = getAllTasks();
+        renderKanbanBoard(tasks, (task) => {
+          setCurrentTask(task);
+          taskDetailModal.open(task);
+        });
+      } else {
+        showError(result.error || "Error al recargar las tareas");
+      }
+    } catch (err) {
+      console.error("Error recargando tareas:", err);
+      showError("Error de conexión al recargar tareas");
+    }
+  };
 
-  function renderTask(task) {
-    // Mapear estados del backend a los del frontend
-    const statusMap = {
-      "Por hacer": "todo",
-      Haciendo: "doing",
-      Hecho: "done",
-    };
+  // === Event Handlers ===
+  const handleMenuNavigation = (itemId) => {
+    switch (itemId) {
+      case "tasks-btn":
+        console.log("Navegando a Mis Tareas");
+        break;
+      case "trash-btn":
+        console.log("Navegando a Papelera");
+        trashModal.open();
+        break;
+      default:
+        console.log("Navegación no implementada para:", itemId);
+        break;
+    }
+  };
 
-    const frontendStatus = statusMap[task.status] || "todo";
-    const column = document.querySelector(
-      `[data-status="${frontendStatus}"] .task-list`
-    );
+  // === Setup Event Listeners ===
 
-    if (!column) {
-      console.warn(`No se encontró columna para estado: ${frontendStatus}`);
-      return;
+  // Setup modals (after DOM is ready)
+  setupModalListeners();
+
+  // Setup mobile sidebar
+  setupMobileSidebar();
+
+  // Setup menu items
+  setupMenuItems(handleMenuNavigation);
+
+  // Setup modal-specific event listeners after DOM is ready
+  setTimeout(() => {
+    // User Profile Modal
+    const accountBtn = document.getElementById("account-btn");
+    if (accountBtn) {
+      accountBtn.addEventListener("click", () => userProfileModal.open());
     }
 
-    const taskEl = document.createElement("div");
-    taskEl.className = "task-item";
-    taskEl.innerHTML = `
-      <h4>${task.title}</h4>
-      <small>${formatDate(task.date)} ${task.hour || ""}</small>
-    `;
+    // User Profile Modal buttons
+    const editAccountButton = document.getElementById("edit-account-button");
+    if (editAccountButton) {
+      editAccountButton.addEventListener("click", () => userProfileModal.openEditForm());
+    }
 
-    taskEl.addEventListener("click", () => {
-      openTaskDetailModal(task);
+    const returnFromUser = document.getElementById("return");
+    if (returnFromUser) {
+      returnFromUser.addEventListener("click", () => userProfileModal.close());
+    }
+
+    const deleteAccountButton = document.getElementById("delete-account-button");
+    if (deleteAccountButton) {
+      deleteAccountButton.addEventListener("click", () => {
+        // TODO: Implement delete account functionality
+        alert("Funcionalidad de eliminar cuenta no implementada aún");
+      });
+    }
+
+    // About Us Modal
+    const aboutUsBtn = document.getElementById("about-us-btn");
+    if (aboutUsBtn) {
+      aboutUsBtn.addEventListener("click", () => aboutUsModal.open());
+    }
+
+    const closeAboutUsBtn = document.getElementById("close-about-us-btn");
+    if (closeAboutUsBtn) {
+      closeAboutUsBtn.addEventListener("click", () => aboutUsModal.close());
+    }
+
+    // Trash Modal
+    const trashBtn = document.getElementById("trash-btn");
+    if (trashBtn) {
+      trashBtn.addEventListener("click", () => trashModal.open());
+    }
+
+    // Task Detail Modal - setup event listeners
+    taskDetailModal.setupEventListeners();
+
+    // Close buttons for modals
+    const closeButtons = document.querySelectorAll('.close-btn');
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const modal = e.target.closest('.modal');
+        if (modal) {
+          modal.classList.add('hidden');
+        }
+      });
     });
 
-    column.appendChild(taskEl);
-  }
-
-  function formatDate(dateString) {
-    if (!dateString) return "Sin fecha";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    // Modal click outside to close
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+        }
+      });
     });
-  }
+  }, 100);
 
-  // Variables para el modal de detalle
-  let currentTask = null;
-
-  // Función para abrir el modal de detalle de tarea
-  function openTaskDetailModal(task) {
-    currentTask = task;
-
-    // Cerrar sidebar en móvil para que se vea el modal
-    closeMobileSidebar();
-
-    // Llenar los datos en el modo de vista
-    document.getElementById("detail-title").textContent = task.title;
-    document.getElementById("detail-description").textContent = task.details || "Sin descripción";
-
-    const statusBadge = document.getElementById("detail-status");
-    statusBadge.textContent = task.status;
-    statusBadge.setAttribute("data-status", task.status);
-
-    document.getElementById("detail-date").textContent = formatDate(task.date);
-    document.getElementById("detail-time").textContent = task.hour || "Sin hora";
-
-    // Configurar el botón de toggle status
-    updateToggleStatusButton(task.status);
-
-    // Mostrar modo vista y ocultar modo edición
-    document.getElementById("task-view-mode").classList.remove("hidden");
-    document.getElementById("task-edit-mode").classList.add("hidden");
-
-    // Mostrar el modal
-    detailModal.classList.remove("hidden");
-  }
-
-  // Función para actualizar el botón de toggle status
-  function updateToggleStatusButton(currentStatus) {
-    const toggleBtn = document.getElementById("toggle-status-btn");
-    const toggleText = document.getElementById("toggle-status-text");
-
-    if (currentStatus === "Hecho") {
-      toggleBtn.className = "btn btn-warning";
-      toggleText.textContent = "Marcar Pendiente";
-      toggleBtn.querySelector("svg").innerHTML = `
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-      `;
-    } else {
-      toggleBtn.className = "btn btn-success";
-      toggleText.textContent = "Marcar Completada";
-      toggleBtn.querySelector("svg").innerHTML = `
-        <polyline points="20,6 9,17 4,12"></polyline>
-      `;
-    }
-  }
-
-  // Función para cambiar al modo de edición
-  function switchToEditMode() {
-    if (!currentTask) return;
-
-    // Llenar el formulario de edición con los datos actuales
-    document.getElementById("edit-title").value = currentTask.title;
-    document.getElementById("edit-details").value = currentTask.details || "";
-    document.getElementById("edit-date").value = currentTask.date;
-    document.getElementById("edit-hour").value = currentTask.hour || "";
-    document.getElementById("edit-status").value = currentTask.status;
-
-    // Cambiar modos
-    document.getElementById("task-view-mode").classList.add("hidden");
-    document.getElementById("task-edit-mode").classList.remove("hidden");
-  }
-
-  // Función para volver al modo de vista
-  function switchToViewMode() {
-    document.getElementById("task-edit-mode").classList.add("hidden");
-    document.getElementById("task-view-mode").classList.remove("hidden");
-  }
-
-  // Función para toggle del status (placeholder para backend)
-  function toggleTaskStatus() {
-    if (!currentTask) return;
-
-    const newStatus = currentTask.status === "Hecho" ? "Por hacer" : "Hecho";
-
-    // TODO: Aquí irá la llamada al backend
-    console.log(`Cambiando status de "${currentTask.title}" de "${currentTask.status}" a "${newStatus}"`);
-
-    // Simular cambio local (temporal)
-    currentTask.status = newStatus;
-
-    // Actualizar la UI
-    const statusBadge = document.getElementById("detail-status");
-    statusBadge.textContent = newStatus;
-    statusBadge.setAttribute("data-status", newStatus);
-    updateToggleStatusButton(newStatus);
-
-    // Mostrar mensaje temporal
-    showToast(`Tarea marcada como "${newStatus}"`);
-  }
-
-  // Función para guardar edición (placeholder para backend)
-  function saveTaskEdit() {
-    if (!currentTask) return;
-
-    const updatedTask = {
-      ...currentTask,
-      title: document.getElementById("edit-title").value.trim(),
-      details: document.getElementById("edit-details").value.trim(),
-      date: document.getElementById("edit-date").value,
-      hour: document.getElementById("edit-hour").value,
-      status: document.getElementById("edit-status").value
-    };
-
-    // TODO: Aquí irá la llamada al backend
-    console.log("Guardando cambios:", updatedTask);
-
-    // Simular guardado exitoso
-    currentTask = updatedTask;
-
-    // Actualizar la vista
-    openTaskDetailModal(currentTask);
-    showToast("Tarea actualizada exitosamente");
-  }
-
-  // Función para eliminar tarea (placeholder para backend)
-  function deleteTask() {
-    if (!currentTask) return;
-
-    if (confirm(`¿Estás seguro de que quieres eliminar la tarea "${currentTask.title}"?`)) {
-      // TODO: Aquí irá la llamada al backend
-      console.log("Eliminando tarea:", currentTask.title);
-
-      // Cerrar modal
-      detailModal.classList.add("hidden");
-
-      // Mostrar mensaje
-      showToast("Tarea eliminada");
-
-      // TODO: Actualizar la vista del kanban
-    }
-  }
-
-  // Función para mostrar toast messages
-  function showToast(message) {
-    // Crear o usar toast existente
-    let toast = document.getElementById("temp-toast");
-    if (!toast) {
-      toast = document.createElement("div");
-      toast.id = "temp-toast";
-      toast.className = "toast";
-      document.body.appendChild(toast);
-    }
-
-    toast.textContent = message;
-    toast.classList.remove("hidden");
-
-    // Auto-hide después de 3 segundos
-    setTimeout(() => {
-      toast.classList.add("hidden");
-    }, 3000);
-  }
-
-  // === Task modals ===
-  const taskModal = document.getElementById("task-modal");
-  const detailModal = document.getElementById("task-detail-modal");
-
-  const addTaskBtn = document.getElementById("add-task-btn");
-  const formContainer = document.getElementById("task-form-container");
-  const closeDetailBtn = document.getElementById("close-detail");
-
-  // Load and render tasks
-  try {
-    const result = await getTasks();
-    if (result.success && result.data) {
-      result.data.forEach(renderTask);
-    } else {
-      console.error("Error cargando tareas:", result.error);
-      showError("Error al cargar las tareas");
-    }
-  } catch (err) {
-    console.error("Error cargando tareas:", err);
-    showError("Error de conexión al cargar tareas");
-  }
-
-  // Assemble form
+  // Task form
   const taskForm = TaskForm(async (taskData) => {
     try {
-      const result = await createTask(taskData);
+      const result = await createNewTask(taskData);
       if (result.success) {
-        taskModal.classList.add("hidden");
-        // Recargar todas las tareas para mostrar la nueva
-        location.reload();
+        document.getElementById("task-modal").classList.add("hidden");
+        await reloadTasks();
+        showToast("Tarea creada exitosamente");
       } else {
         showError(result.error || "Error al crear la tarea");
       }
@@ -468,171 +557,58 @@ export async function DashboardPage() {
       showError("Error de conexión al crear tarea");
     }
   });
-  formContainer.appendChild(taskForm);
+  document.getElementById("task-form-container").appendChild(taskForm);
 
-  // Modal events
-  addTaskBtn.addEventListener("click", () => {
-    // Cerrar sidebar en móvil para que se vea el modal
-    closeMobileSidebar();
-
-    // Abrir modal de nueva tarea
-    taskModal.classList.remove("hidden");
-  });
-  taskForm
-    .querySelector("#cancel-task")
-    .addEventListener("click", () => taskModal.classList.add("hidden"));
-  closeDetailBtn.addEventListener("click", () =>
-    detailModal.classList.add("hidden")
-  );
-
-  // Event listeners para los botones del modal de detalle
-  document.getElementById("edit-task-btn").addEventListener("click", switchToEditMode);
-  document.getElementById("toggle-status-btn").addEventListener("click", toggleTaskStatus);
-  document.getElementById("delete-task-btn").addEventListener("click", deleteTask);
-
-  // Event listeners para el modo de edición
-  document.getElementById("cancel-edit-btn").addEventListener("click", switchToViewMode);
-  document.getElementById("edit-task-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    saveTaskEdit();
+  // FAB button
+  document.getElementById("add-task-btn").addEventListener("click", () => {
+    document.getElementById("task-modal").classList.remove("hidden");
   });
 
-  // === Sidebar Logic ===
-  const menuToggle = document.getElementById("menu-toggle");
-  const mobileMenuBtn = document.getElementById("mobile-menu-btn");
-  const sidebar = document.getElementById("sidebar");
-  const sidebarMenu = document.getElementById("sidebar-menu");
-  const sidebarOverlay = document.getElementById("sidebar-overlay");
-  const menuItems = document.querySelectorAll(".menu-item:not(#logout-btn)");
+  // Cancel task form
+  taskForm.querySelector("#cancel-task").addEventListener("click", () => {
+    document.getElementById("task-modal").classList.add("hidden");
+  });
 
+  // Task detail modal buttons are now handled by the TaskDetailModal class
 
-  // Toggle sidebar functionality
-  const toggleSidebar = () => {
-    if (isMobile()) {
-      // En móvil: mostrar/ocultar sidebar con overlay
-      sidebar.classList.toggle("mobile-open");
-      sidebarOverlay.classList.toggle("active");
+  // Delete confirmation
+  document.getElementById("confirm-delete").addEventListener("click", async () => {
+    const currentTask = getCurrentTask();
+    if (currentTask) {
+      const result = await deleteExistingTask(currentTask._id || currentTask.id);
+      if (result.success) {
+        document.getElementById("delete-confirmation-modal").classList.add("hidden");
+        taskDetailModal.close();
+        await reloadTasks();
+        showToast("Tarea movida a la papelera");
     } else {
-      // En desktop: colapsar/expandir sidebar
-      sidebarMenu.classList.toggle("hidden");
-    }
-  };
-
-  // Cerrar sidebar en móvil
-  const closeMobileSidebar = () => {
-    if (isMobile()) {
-      sidebar.classList.remove("mobile-open");
-      sidebarOverlay.classList.remove("active");
-    }
-  };
-
-  // Mejorar el overlay para que también cierre cuando hay modales abiertos
-  const isMobile = () => window.innerWidth <= 768;
-
-  // Función para verificar si hay algún modal abierto
-  const hasOpenModal = () => {
-    const modals = document.querySelectorAll('.modal:not(.hidden)');
-    return modals.length > 0;
-  };
-
-  // Event listeners
-  menuToggle.addEventListener("click", toggleSidebar);
-  if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener("click", toggleSidebar);
-  }
-  sidebarOverlay.addEventListener("click", closeMobileSidebar);
-
-  // Manejar items del menú (incluyendo todos los nuevos)
-  const allMenuItems = document.querySelectorAll(".menu-item:not(#logout-btn)");
-
-  allMenuItems.forEach((item) => {
-    item.addEventListener("click", (e) => {
-      // Remover clase active de todos los items
-      allMenuItems.forEach((i) => i.classList.remove("active"));
-      // Añadir clase active al item clickeado
-      e.currentTarget.classList.add("active");
-
-      // Cerrar sidebar en móvil después de seleccionar
-      closeMobileSidebar();
-
-      // Aquí puedes añadir la lógica para cambiar de vista
-      const itemId = e.currentTarget.id;
-      handleMenuNavigation(itemId);
-    });
-
-    // Añadir soporte para navegación con teclado
-    item.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        item.click();
+        showError(result.error || "Error al eliminar la tarea");
       }
-    });
-  });
-
-  // Función para manejar navegación del menú
-  const handleMenuNavigation = (itemId) => {
-    switch (itemId) {
-      case "tasks-btn":
-        console.log("Navegando a Mis Tareas");
-        // Ya estamos en tareas, no hacer nada
-        break;
-      default:
-        console.log("Navegación no implementada para:", itemId);
-        break;
-    }
-  };
-
-
-  // Manejar redimensionamiento de ventana
-  window.addEventListener("resize", () => {
-    if (!isMobile()) {
-      // Si cambiamos a desktop, remover clases de móvil
-      sidebar.classList.remove("mobile-open");
-      sidebarOverlay.classList.remove("active");
     }
   });
 
-  // === Logout ===
-  const logoutBtn = document.getElementById("logout-btn");
-  const logoutModal = document.getElementById("logout-modal");
-  const confirmLogout = document.getElementById("confirm-logout");
-  const cancelLogout = document.getElementById("cancel-logout");
-
-  logoutBtn.addEventListener("click", () => {
-    // Cerrar sidebar en móvil para que se vea el modal
-    closeMobileSidebar();
-
-    // Abrir modal de logout
-    logoutModal.classList.remove("hidden");
+  document.getElementById("cancel-delete").addEventListener("click", () => {
+    document.getElementById("delete-confirmation-modal").classList.add("hidden");
   });
-  cancelLogout.addEventListener("click", () =>
-    logoutModal.classList.add("hidden")
-  );
 
-  confirmLogout.addEventListener("click", async () => {
-    // Usar la función handleLogout que maneja todo el proceso
+  // Logout
+  document.getElementById("logout-btn").addEventListener("click", () => {
+    document.getElementById("logout-modal").classList.remove("hidden");
+  });
+
+  document.getElementById("cancel-logout").addEventListener("click", () => {
+    document.getElementById("logout-modal").classList.add("hidden");
+  });
+
+  document.getElementById("confirm-logout").addEventListener("click", async () => {
     await handleLogout(logout);
   });
 
-  // Helper function to show errors
-  function showError(message) {
-    // Crear o actualizar elemento de error
-    let errorEl = document.getElementById("dashboard-error");
-    if (!errorEl) {
-      errorEl = document.createElement("div");
-      errorEl.id = "dashboard-error";
-      errorEl.className = "error-message";
-      document.body.appendChild(errorEl);
-    }
+  // Listen for task reload events from trash modal
+  window.addEventListener('tasksReloaded', () => {
+    reloadTasks();
+  });
 
-    errorEl.textContent = message;
-    errorEl.classList.remove("hidden");
-
-    // Auto-hide después de 5 segundos
-    setTimeout(() => {
-      if (errorEl) {
-        errorEl.classList.add("hidden");
-      }
-    }, 5000);
-  }
+  // Load initial tasks
+  await reloadTasks();
 }

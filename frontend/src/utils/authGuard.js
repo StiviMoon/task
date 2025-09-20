@@ -1,12 +1,12 @@
 import { isAuthenticated } from '../services/authService.js';
 
 /**
- * Guard de autenticación para proteger rutas
- * Verifica si el usuario está autenticado antes de permitir el acceso
- * @param {Function} callback - Función a ejecutar si el usuario está autenticado
- * @param {Function} redirectCallback - Función a ejecutar si el usuario no está autenticado
- * @returns {Promise<void>}
- */
+* Authentication guard to protect routes
+* Checks if the user is authenticated before allowing access
+* @param {Function} callback - Function to execute if the user is authenticated
+* @param {Function} redirectCallback - Function to execute if the user is not authenticated
+* @returns {Promise<void>}
+*/
 export const requireAuth = async (callback, redirectCallback = null) => {
   try {
     console.log('🔒 Verificando autenticación...');
@@ -14,24 +14,24 @@ export const requireAuth = async (callback, redirectCallback = null) => {
     console.log('🔑 Estado de autenticación:', authenticated);
 
     if (authenticated) {
-      // Usuario autenticado, ejecutar callback
+      // Authenticated user, execute callback
       console.log('✅ Usuario autenticado, acceso permitido');
       if (callback) {
         callback();
       }
     } else {
-      // Usuario no autenticado, redirigir o ejecutar callback de redirección
+      // Unauthenticated user, redirect or execute redirect callback
       console.log('❌ Usuario no autenticado, redirigiendo...');
       if (redirectCallback) {
         redirectCallback();
       } else {
-        // Redirección por defecto a login
+        // Default redirect to login
         window.location.href = '/';
       }
     }
   } catch (error) {
     console.error('❌ Error verificando autenticación:', error);
-    // En caso de error, redirigir a login
+    // In case of error, redirect to login
     if (redirectCallback) {
       redirectCallback();
     } else {
@@ -41,33 +41,33 @@ export const requireAuth = async (callback, redirectCallback = null) => {
 };
 
 /**
- * Guard para rutas públicas (solo accesibles si NO estás autenticado)
- * Redirige a dashboard si ya estás logueado
- * @param {Function} callback - Función a ejecutar si el usuario NO está autenticado
- * @param {Function} redirectCallback - Función a ejecutar si el usuario SÍ está autenticado
- * @returns {Promise<void>}
- */
+* Guard for public routes (only accessible if you are NOT authenticated)
+* Redirects to the dashboard if you are already logged in
+* @param {Function} callback - Function to execute if the user is NOT authenticated
+* @param {Function} redirectCallback - Function to execute if the user IS authenticated
+* @returns {Promise<void>}
+*/
 export const requireGuest = async (callback, redirectCallback = null) => {
   try {
     const authenticated = await isAuthenticated();
 
     if (!authenticated) {
-      // Usuario no autenticado, ejecutar callback
+      // Unauthenticated user, execute callback
       if (callback) {
         callback();
       }
     } else {
-      // Usuario ya autenticado, redirigir
+      // User already authenticated, redirect
       if (redirectCallback) {
         redirectCallback();
       } else {
-        // Redirección por defecto a dashboard
+        // Default redirect to dashboard
         window.location.href = '/tasks';
       }
     }
   } catch (error) {
     console.error('Error verificando autenticación:', error);
-    // En caso de error, permitir acceso (asumir no autenticado)
+    // On error, allow access (assume unauthenticated)
     if (callback) {
       callback();
     }
@@ -75,14 +75,14 @@ export const requireGuest = async (callback, redirectCallback = null) => {
 };
 
 /**
- * Middleware para verificar autenticación con loading state
- * @param {Function} callback - Función a ejecutar si el usuario está autenticado
- * @param {Function} loadingCallback - Función a ejecutar mientras se verifica la autenticación
- * @param {Function} redirectCallback - Función a ejecutar si el usuario no está autenticado
- * @returns {Promise<void>}
- */
+* Middleware to verify authentication with loading state
+* @param {Function} callback - Function to execute if the user is authenticated
+* @param {Function} loadingCallback - Function to execute while verifying authentication
+* @param {Function} redirectCallback - Function to execute if the user is not authenticated
+* @returns {Promise<void>}
+*/
 export const requireAuthWithLoading = async (callback, loadingCallback = null, redirectCallback = null) => {
-  // Mostrar loading si se proporciona callback
+  // Show loading if callback is provided
   if (loadingCallback) {
     loadingCallback();
   }
@@ -91,12 +91,12 @@ export const requireAuthWithLoading = async (callback, loadingCallback = null, r
     const authenticated = await isAuthenticated();
 
     if (authenticated) {
-      // Usuario autenticado, ejecutar callback
+      // Authenticated user, execute callback
       if (callback) {
         callback();
       }
     } else {
-      // Usuario no autenticado, redirigir
+      // Unauthenticated user, redirect
       if (redirectCallback) {
         redirectCallback();
       } else {
@@ -114,32 +114,32 @@ export const requireAuthWithLoading = async (callback, loadingCallback = null, r
 };
 
 /**
- * Función para manejar el logout y limpiar el estado de autenticación
- * @param {Function} logoutFunction - Función de logout del servicio
- * @returns {Promise<void>}
- */
+* Function to handle logout and clear authentication state
+* @param {Function} logoutFunction - Service logout function
+* @returns {Promise<void>}
+*/
 export const handleLogout = async (logoutFunction) => {
   try {
-    // Ejecutar la función de logout
+    // Execute the logout function
     const result = await logoutFunction();
 
     if (result.success) {
-      // Limpiar todos los datos de autenticación del localStorage
+      // Clear all authentication data from localStorage
       localStorage.removeItem("user");
       localStorage.removeItem("access_token");
 
-      // Redirigir al login con recarga completa de la página
+      // Redirect to login on full page reload
       window.location.href = '/';
     } else {
       console.error('Error en logout:', result.error);
-      // Aún así, limpiar localStorage y redirigir
+      // Still clear localStorage and redirect
       localStorage.removeItem("user");
       localStorage.removeItem("access_token");
       window.location.href = '/';
     }
   } catch (error) {
     console.error('Error en logout:', error);
-    // En caso de error, limpiar localStorage y redirigir
+    // On error, clear localStorage and redirect
     localStorage.removeItem("user");
     localStorage.removeItem("access_token");
     window.location.href = '/';

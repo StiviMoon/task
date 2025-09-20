@@ -1,15 +1,15 @@
 import { getApiUrl, getAuthHeaders } from "../config/api.js";
 
 /**
- * Obtiene todas las tareas del usuario autenticado
- * @returns {Promise<Object>} Lista de tareas
- */
+* Gets all tasks for the authenticated user
+* @returns {Promise<Object>} List of tasks
+*/
 export const getTasks = async () => {
   try {
     const response = await fetch(getApiUrl("/tasks"), {
       method: "GET",
       headers: getAuthHeaders(),
-      credentials: "include", // Importante para las cookies de autenticación
+      credentials: "include", // Important for authentication cookies
     });
 
     const data = await response.json();
@@ -34,22 +34,22 @@ export const getTasks = async () => {
 };
 
 /**
- * Crea una nueva tarea
- * @param {Object} taskData - Datos de la tarea
- * @param {string} taskData.title - Título de la tarea
- * @param {string} taskData.details - Detalles de la tarea
- * @param {string} taskData.date - Fecha de la tarea (formato YYYY-MM-DD)
- * @param {string} taskData.hour - Hora de la tarea (formato HH:mm)
- * @param {string} taskData.status - Estado de la tarea
- * @returns {Promise<Object>} Respuesta del servidor
- */
+* Create a new task
+* @param {Object} taskData - Task data
+* @param {string} taskData.title - Task title
+* @param {string} taskData.details - Task details
+* @param {string} taskData.date - Task date (YYYY-MM-DD format)
+* @param {string} taskData.hour - Task time (HH:mm format)
+* @param {string} taskData.status - Task status
+* @returns {Promise<Object>} Server response
+*/
 export const createTask = async (taskData) => {
   try {
     const response = await fetch(getApiUrl("/tasks"), {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(taskData),
-      credentials: "include", // Importante para las cookies de autenticación
+      credentials: "include", // Important for authentication cookies
     });
 
     const data = await response.json();
@@ -73,13 +73,15 @@ export const createTask = async (taskData) => {
 };
 
 /**
- * Actualiza una tarea existente
- * @param {string} taskId - ID de la tarea
- * @param {Object} taskData - Datos actualizados de la tarea
- * @returns {Promise<Object>} Respuesta del servidor
- */
+* Updates an existing task
+* @param {string} taskId - Task ID
+* @param {Object} taskData - Updated task data
+* @returns {Promise<Object>} Server response
+*/
 export const updateTask = async (taskId, taskData) => {
   try {
+    console.log(`Updating task ${taskId} with data:`, taskData);
+
     const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
       method: "PUT",
       headers: getAuthHeaders(),
@@ -87,7 +89,9 @@ export const updateTask = async (taskId, taskData) => {
       credentials: "include",
     });
 
+    console.log('Response status:', response.status);
     const data = await response.json();
+    console.log('Response data:', data);
 
     if (!response.ok) {
       throw new Error(data.message || "Error al actualizar tarea");
@@ -108,10 +112,10 @@ export const updateTask = async (taskId, taskData) => {
 };
 
 /**
- * Elimina una tarea
- * @param {string} taskId - ID de la tarea
- * @returns {Promise<Object>} Respuesta del servidor
- */
+* Deletes a task
+* @param {string} taskId - Task ID
+* @returns {Promise<Object>} Server response
+*/
 export const deleteTask = async (taskId) => {
   try {
     const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
@@ -141,10 +145,10 @@ export const deleteTask = async (taskId) => {
 };
 
 /**
- * Obtiene una tarea específica por ID
- * @param {string} taskId - ID de la tarea
- * @returns {Promise<Object>} Datos de la tarea
- */
+* Gets a specific task by ID
+* @param {string} taskId - Task ID
+* @returns {Promise<Object>} Task data
+*/
 export const getTaskById = async (taskId) => {
   try {
     const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
@@ -166,6 +170,105 @@ export const getTaskById = async (taskId) => {
     };
   } catch (error) {
     console.error("Error en getTaskById:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+};
+
+/**
+ * Gets all deleted tasks for the authenticated user (trash)
+ * @returns {Promise<Object>} List of deleted tasks
+ */
+export const getDeletedTasks = async () => {
+  try {
+    const response = await fetch(getApiUrl("/tasks/deleted"), {
+      method: "GET",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al obtener tareas eliminadas");
+    }
+
+    return {
+      success: true,
+      data: data.tasks || [],
+      message: "Tareas eliminadas obtenidas exitosamente",
+    };
+  } catch (error) {
+    console.error("Error en getDeletedTasks:", error);
+    return {
+      success: false,
+      error: error.message,
+      data: [],
+    };
+  }
+};
+
+/**
+ * Restores a deleted task from trash
+ * @param {string} taskId - Task ID
+ * @returns {Promise<Object>} Server response
+ */
+export const restoreTask = async (taskId) => {
+  try {
+    const response = await fetch(getApiUrl(`/tasks/${taskId}/restore`), {
+      method: "POST",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al restaurar tarea");
+    }
+
+    return {
+      success: true,
+      data: data,
+      message: "Tarea restaurada exitosamente",
+    };
+  } catch (error) {
+    console.error("Error en restoreTask:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+};
+
+/**
+ * Permanently deletes a task from trash
+ * @param {string} taskId - Task ID
+ * @returns {Promise<Object>} Server response
+ */
+export const permanentlyDeleteTask = async (taskId) => {
+  try {
+    const response = await fetch(getApiUrl(`/tasks/${taskId}/permanent`), {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al eliminar permanentemente");
+    }
+
+    return {
+      success: true,
+      data: data,
+      message: "Tarea eliminada permanentemente",
+    };
+  } catch (error) {
+    console.error("Error en permanentlyDeleteTask:", error);
     return {
       success: false,
       error: error.message,
