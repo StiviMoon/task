@@ -80,6 +80,8 @@ export const createTask = async (taskData) => {
 */
 export const updateTask = async (taskId, taskData) => {
   try {
+    console.log(`Updating task ${taskId} with data:`, taskData);
+
     const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
       method: "PUT",
       headers: getAuthHeaders(),
@@ -87,7 +89,9 @@ export const updateTask = async (taskId, taskData) => {
       credentials: "include",
     });
 
+    console.log('Response status:', response.status);
     const data = await response.json();
+    console.log('Response data:', data);
 
     if (!response.ok) {
       throw new Error(data.message || "Error al actualizar tarea");
@@ -166,6 +170,105 @@ export const getTaskById = async (taskId) => {
     };
   } catch (error) {
     console.error("Error en getTaskById:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+};
+
+/**
+ * Gets all deleted tasks for the authenticated user (trash)
+ * @returns {Promise<Object>} List of deleted tasks
+ */
+export const getDeletedTasks = async () => {
+  try {
+    const response = await fetch(getApiUrl("/tasks/deleted"), {
+      method: "GET",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al obtener tareas eliminadas");
+    }
+
+    return {
+      success: true,
+      data: data.tasks || [],
+      message: "Tareas eliminadas obtenidas exitosamente",
+    };
+  } catch (error) {
+    console.error("Error en getDeletedTasks:", error);
+    return {
+      success: false,
+      error: error.message,
+      data: [],
+    };
+  }
+};
+
+/**
+ * Restores a deleted task from trash
+ * @param {string} taskId - Task ID
+ * @returns {Promise<Object>} Server response
+ */
+export const restoreTask = async (taskId) => {
+  try {
+    const response = await fetch(getApiUrl(`/tasks/${taskId}/restore`), {
+      method: "POST",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al restaurar tarea");
+    }
+
+    return {
+      success: true,
+      data: data,
+      message: "Tarea restaurada exitosamente",
+    };
+  } catch (error) {
+    console.error("Error en restoreTask:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+};
+
+/**
+ * Permanently deletes a task from trash
+ * @param {string} taskId - Task ID
+ * @returns {Promise<Object>} Server response
+ */
+export const permanentlyDeleteTask = async (taskId) => {
+  try {
+    const response = await fetch(getApiUrl(`/tasks/${taskId}/permanent`), {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al eliminar permanentemente");
+    }
+
+    return {
+      success: true,
+      data: data,
+      message: "Tarea eliminada permanentemente",
+    };
+  } catch (error) {
+    console.error("Error en permanentlyDeleteTask:", error);
     return {
       success: false,
       error: error.message,

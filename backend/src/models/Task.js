@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 /**
- *  
+ *
  * Esquema de Mongoose para el modelo Task.
  * Define la estructura y validaciones para los documentos de tarea en la base de datos.
  * Campos:
@@ -13,7 +13,7 @@ const mongoose = require("mongoose");
  * - userId: ID del usuario que creó la tarea (ObjectId, referencia al modelo User, requerido).
  * - createdAt: Fecha de creación de la tarea (Date, por defecto la fecha actual). -> Con el timestamp
  * - updatedAt: Fecha de última actualización de la tarea (Date, por defecto la fecha actual). -> Con el timestamp
- * 
+ *
 */
 
 const taskSchema = new mongoose.Schema(
@@ -37,10 +37,10 @@ const taskSchema = new mongoose.Schema(
                 return !value || value >= new Date().setHours(0, 0, 0, 0);
             },
             message: "La fecha no puede ser en el pasado."
-        }   
+        }
     },
     hour: {
-        type: String,       
+        type: String,
         validate: {
             validator: function(value) {
                 return !value || /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
@@ -61,7 +61,11 @@ const taskSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: [true, "El ID de usuario es obligatorio."]
-    }   
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
     },
     { timestamps: true ,
         versionKey: false }

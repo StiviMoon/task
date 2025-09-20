@@ -105,7 +105,78 @@ exports.deleteTask = async (req, res) => {
             return res.status(404).json({ success: false, message: "Tarea no encontrada." });
         }
 
-        res.status(200).json({ success: true, message: "Tarea eliminada exitosamente." });
+        res.status(200).json({ success: true, message: "Tarea movida a la papelera." });
+    } catch (error) {
+        if (config.NODE_ENV === "development") {
+            console.error(error);
+        }
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+/**
+ * Obtiene las tareas eliminadas (papelera) del usuario autenticado
+ * @param {*} req
+ * @param {*} res
+ * @return {void}
+ * Si la operación es exitosa, responde con un estado 200 y un json con las tareas eliminadas.
+ */
+exports.getDeletedTasks = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const tasks = await TaskDAO.getDeletedTasks(userId);
+        res.status(200).json({ tasks });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+/**
+ * Restaura una tarea de la papelera
+ * @param {*} req
+ * @param {*} res
+ * @return {void}
+ * Si la restauración es exitosa, responde con un estado 200 y un mensaje de confirmación.
+ */
+exports.restoreTask = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.userId;
+
+        const restoredTask = await TaskDAO.restoreUserTask(id, userId);
+
+        if (!restoredTask) {
+            return res.status(404).json({ success: false, message: "Tarea no encontrada en la papelera." });
+        }
+
+        res.status(200).json({ success: true, message: "Tarea restaurada exitosamente." });
+    } catch (error) {
+        if (config.NODE_ENV === "development") {
+            console.error(error);
+        }
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+/**
+ * Elimina permanentemente una tarea de la papelera
+ * @param {*} req
+ * @param {*} res
+ * @return {void}
+ * Si la eliminación es exitosa, responde con un estado 200 y un mensaje de confirmación.
+ */
+exports.permanentlyDeleteTask = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.userId;
+
+        const deletedTask = await TaskDAO.permanentlyDeleteUserTask(id, userId);
+
+        if (!deletedTask) {
+            return res.status(404).json({ success: false, message: "Tarea no encontrada en la papelera." });
+        }
+
+        res.status(200).json({ success: true, message: "Tarea eliminada permanentemente." });
     } catch (error) {
         if (config.NODE_ENV === "development") {
             console.error(error);

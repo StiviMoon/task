@@ -233,3 +233,115 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: "Inténtalo de nuevo más tarde." , err: err.message});
   }
 };
+
+/**
+ * Obtiene el perfil del usuario autenticado.
+ *
+ * @async
+ * @function getUserProfile
+ * @param {Request} req - Request object con userId en req.user
+ * @param {Response} res - Response object
+ * @returns {Promise<void>} Devuelve un objeto JSON con:
+ *  - 200: `{ success: true, user: userProfile }` si se obtiene exitosamente.
+ *  - 404: `{ success: false, message: "Usuario no encontrado." }` si el usuario no existe.
+ *  - 500: `{ success: false, message: error.message }` si ocurre un error interno.
+ */
+exports.getUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const userProfile = await UserDAO.getUserProfile(userId);
+
+    if (!userProfile) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado."
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user: userProfile
+    });
+  } catch (err) {
+    if (config.NODE_ENV === "development") {
+      console.error(err);
+    }
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor."
+    });
+  }
+};
+
+/**
+ * Actualiza el perfil del usuario autenticado.
+ *
+ * @async
+ * @function updateUserProfile
+ * @param {Request} req - Request object con userId en req.user
+ * @param {Response} res - Response object
+ * @returns {Promise<void>} Devuelve un objeto JSON con:
+ *  - 200: `{ success: true, user: updatedUser }` si se actualiza exitosamente.
+ *  - 400: `{ success: false, message: error.message }` si hay errores de validación.
+ *  - 404: `{ success: false, message: "Usuario no encontrado." }` si el usuario no existe.
+ *  - 500: `{ success: false, message: error.message }` si ocurre un error interno.
+ */
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { name, lastName, age, email } = req.body;
+
+    // Verificar que el usuario existe
+    const existingUser = await UserDAO.findById(userId);
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado."
+      });
+    }
+
+    // Verificar si el email ya existe en otro usuario
+    if (email && email !== existingUser.email) {
+      const emailExists = await UserDAO.emailExists(email);
+      if (emailExists) {
+        return res.status(400).json({
+          success: false,
+          message: "Este correo ya está registrado por otro usuario."
+        });
+      }
+    }
+
+    // Actualizar el usuario
+    const updatedUser = await UserDAO.updateById(userId, {
+      name,
+      lastName,
+      age,
+      email
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado."
+      });
+    }
+
+    // Obtener el perfil actualizado (sin datos sensibles)
+    const userProfile = await UserDAO.getUserProfile(userId);
+
+    res.status(200).json({
+      success: true,
+      user: userProfile,
+      message: "Perfil actualizado exitosamente."
+    });
+  } catch (err) {
+    if (config.NODE_ENV === "development") {
+      console.error(err);
+    }
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor."
+    });
+  }
+};

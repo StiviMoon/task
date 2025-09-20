@@ -37,25 +37,25 @@ export function renderEditAccountForm(user = {}) {
   const html = `
     <form id="editAccountForm" novalidate>
       <div class="input-group">
-        <input type="text" id="names" placeholder="Nombres"  required />
+        <input type="text" id="names" placeholder="Nombres" value="${user.name || ''}" required />
         <div class="error" id="error-names" aria-live="polite"></div>
       </div>
 
       <div class="input-group">
-        <input type="text" id="surnames" placeholder="Apellidos" required />
+        <input type="text" id="surnames" placeholder="Apellidos" value="${user.lastName || ''}" required />
         <div class="error" id="error-surnames" aria-live="polite"></div>
       </div>
 
       <div class="input-group">
-        <input type="number" id="age" placeholder="Edad"  required min="13" />
+        <input type="number" id="age" placeholder="Edad" value="${user.age || ''}" required min="13" />
         <div class="error" id="error-age" aria-live="polite"></div>
       </div>
 
       <div class="input-group">
-        <input type="email" id="email" placeholder="Correo electrónico" required />
+        <input type="email" id="email" placeholder="Correo electrónico" value="${user.email || ''}" required />
         <div class="error" id="error-email" aria-live="polite"></div>
       </div>
-      
+
       <button type="submit" id="saveBtn" class="btn btn-primary" disabled>Guardar</button>
       <button type="button" id="cancel-edit" class="btn btn-secondary">Cancelar</button>
     </form>
@@ -132,21 +132,60 @@ export function renderEditAccountForm(user = {}) {
     );
 
     // Submit
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!validate()) return;
 
       spinner.classList.remove("hidden");
       saveBtn.disabled = true;
 
-      // Simulate processing
-      setTimeout(() => {
-        spinner.classList.add("hidden");
-        saveBtn.disabled = false;
+      try {
+        // Prepare user data
+        const userData = {
+          name: names.value.trim(),
+          lastName: surnames.value.trim(),
+          age: parseInt(age.value, 10),
+          email: email.value.trim()
+        };
 
+        // Import the service function dynamically to avoid circular imports
+        const { updateUserProfile } = await import("../services/authService.js");
+
+        const result = await updateUserProfile(userData);
+
+        if (result.success) {
+          // Show success message
+          toast.textContent = "✅ " + result.message;
+          toast.classList.remove("hidden");
+          setTimeout(() => toast.classList.add("hidden"), 3000);
+
+          // Update the profile modal with new data using global function
+          if (window.updateProfileDisplay) {
+            window.updateProfileDisplay(result.data);
+          }
+
+          // Close modal after successful update
+          setTimeout(() => {
+            const editModal = document.getElementById("edit-account-modal");
+            if (editModal) {
+              editModal.classList.add("hidden");
+            }
+          }, 1500);
+        } else {
+          // Show error message
+          toast.textContent = "❌ " + (result.error || "Error al actualizar perfil");
+          toast.classList.remove("hidden");
+          setTimeout(() => toast.classList.add("hidden"), 3000);
+        }
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        toast.textContent = "❌ Error de conexión al actualizar perfil";
         toast.classList.remove("hidden");
         setTimeout(() => toast.classList.add("hidden"), 3000);
-      }, 2000);
+      } finally {
+        spinner.classList.add("hidden");
+        saveBtn.disabled = false;
+      }
     });
   });
 
