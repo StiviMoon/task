@@ -20,7 +20,19 @@ configureServer(app);
 app.use(cookieParser());
 
 // Connect to MongoDB
-connectDB();
+if (config.MONGODB_URI && config.MONGODB_URI !== 'mongodb://localhost:27017/task-manager') {
+    connectDB().catch(err => {
+        console.error('❌ Error conectando a MongoDB:', err.message);
+        if (config.NODE_ENV === 'production') {
+            console.log('🔄 Reintentando conexión en 5 segundos...');
+            setTimeout(() => {
+                connectDB().catch(console.error);
+            }, 5000);
+        }
+    });
+} else {
+    console.log('⚠️  MongoDB no configurado, continuando sin base de datos...');
+}
 
 // Routes
 app.use(`${config.API_PREFIX}`, indexRoutes);
@@ -36,4 +48,6 @@ app.listen(PORT, () => {
     console.log(`📱 API disponible en: http://localhost:${PORT}`);
     console.log(`🌍 Entorno: ${config.NODE_ENV}`);
     console.log(`📚 API Base: http://localhost:${PORT}${config.API_PREFIX}`);
+    console.log(`🔧 API_PREFIX configurado como: "${config.API_PREFIX}"`);
+    console.log(`🔧 NODE_ENV: ${config.NODE_ENV}`);
 });
