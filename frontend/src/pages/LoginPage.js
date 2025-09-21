@@ -14,7 +14,15 @@ export function renderLogin() {
         <h2>Inicia sesión</h2>
         <form id="loginForm">
           <input type="email" id="email" placeholder="Correo electrónico" required />
-          <input type="password" id="password" placeholder="Contraseña" required />
+          <div class="password-input-wrapper">
+            <input type="password" id="password" placeholder="Contraseña" required />
+            <button type="button" class="password-toggle" id="passwordToggle" aria-label="Mostrar contraseña">
+              <svg viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
           <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
         </form>
         <p>
@@ -77,6 +85,33 @@ export function addLoginLogic() {
   document.getElementById("forgotPassword").addEventListener("click", (e) => {
     e.preventDefault();
     page("/forgot-password");
+  });
+
+  // Password visibility toggle
+  const passwordToggle = document.getElementById("passwordToggle");
+  const passwordInput = document.getElementById("password");
+
+  passwordToggle.addEventListener("click", () => {
+    const isPassword = passwordInput.type === "password";
+    passwordInput.type = isPassword ? "text" : "password";
+
+    // Update icon and aria-label
+    const svg = passwordToggle.querySelector("svg");
+    if (isPassword) {
+      // Show "hide" icon
+      svg.innerHTML = `
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+      `;
+      passwordToggle.setAttribute("aria-label", "Ocultar contraseña");
+    } else {
+      // Show "show" icon
+      svg.innerHTML = `
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      `;
+      passwordToggle.setAttribute("aria-label", "Mostrar contraseña");
+    }
   });
 }
 
