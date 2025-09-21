@@ -34,7 +34,19 @@ if (config.MONGODB_URI && config.MONGODB_URI !== 'mongodb://localhost:27017/task
     console.log('⚠️  MongoDB no configurado, continuando sin base de datos...');
 }
 
-// Routes
+// Root route for Render health checks
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'Task Manager API - Servidor funcionando correctamente',
+        timestamp: new Date().toISOString(),
+        environment: config.NODE_ENV,
+        apiBase: `${req.protocol}://${req.get('host')}${config.API_PREFIX}`,
+        version: config.API_VERSION || 'v1'
+    });
+});
+
+// API Routes
 app.use(`${config.API_PREFIX}`, indexRoutes);
 
 // Error handling middleware (must be last)
