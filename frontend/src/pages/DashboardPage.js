@@ -79,7 +79,7 @@ export async function DashboardPage() {
               <span class="menu-item-text">Mis Tareas</span>
             </button>
 
-            <!--
+
             <button class="menu-item" id="trash-btn" title="Papelera" tabindex="0" aria-label="Papelera">
               <span class="menu-item-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -89,7 +89,7 @@ export async function DashboardPage() {
               </span>
               <span class="menu-item-text">Papelera</span>
             </button>
-            -->
+
 
           </div>
 
@@ -216,7 +216,7 @@ export async function DashboardPage() {
               </svg>
               <span id="toggle-status-text">Marcar Completada</span>
             </button>
-            <!--
+
             <button id="delete-task-btn" class="btn btn-danger">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3,6 5,6 21,6"></polyline>
@@ -224,7 +224,7 @@ export async function DashboardPage() {
               </svg>
               Eliminar
             </button>
-            -->
+
           </div>
         </div>
 
