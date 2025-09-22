@@ -2,8 +2,13 @@ const BaseDAO = require('./BaseDAO');
 const User = require('../models/User');
 
 /**
- * UserDAO - Data Access Object para operaciones de Usuario
- * Extiende BaseDAO con métodos específicos para User
+ * UserDAO - Data Access Object for user-related operations.
+ * 
+ * Extends `BaseDAO` to provide custom methods specific to the User model.
+ * Handles creation, updates, and queries with additional validations.
+ *
+ * @class
+ * @extends BaseDAO
  */
 class UserDAO extends BaseDAO {
     constructor() {
@@ -11,9 +16,12 @@ class UserDAO extends BaseDAO {
     }
 
     /**
-     * Buscar usuario por email
-     * @param {String} email - Email del usuario
-     * @returns {Promise<Object|null>} - Usuario encontrado o null
+     * Find a user by email.
+     *
+     * @async
+     * @param {string} email - User's email address.
+     * @returns {Promise<Object|null>} - Found user object or null if not found.
+     * @throws {Error} - If a database error occurs.
      */
     async findByEmail(email) {
         try {
@@ -24,13 +32,18 @@ class UserDAO extends BaseDAO {
     }
 
     /**
-     * Crear nuevo usuario
-     * @param {Object} userData - Datos del usuario
-     * @returns {Promise<Object>} - Usuario creado
+     * Create a new user.
+     *
+     * - Validates if the email already exists.
+     *
+     * @async
+     * @param {Object} userData - Data for the new user.
+     * @returns {Promise<Object>} - Created user object.
+     * @throws {Error} - If email already exists or a database error occurs.
      */
     async createUser(userData) {
         try {
-            // Validar que el email no exista
+            // Validate that the email does not exist
             const existingUser = await this.findByEmail(userData.email);
             if (existingUser) {
                 throw new Error('Este correo ya está registrado');
@@ -43,9 +56,12 @@ class UserDAO extends BaseDAO {
     }
 
     /**
-     * Verificar si un email existe
-     * @param {String} email - Email a verificar
-     * @returns {Promise<Boolean>} - true si existe, false si no
+     * Check if an email already exists.
+     *
+     * @async
+     * @param {string} email - Email to check.
+     * @returns {Promise<boolean>} - True if exists, false otherwise.
+     * @throws {Error} - If a database error occurs.
      */
     async emailExists(email) {
         try {
@@ -56,10 +72,13 @@ class UserDAO extends BaseDAO {
     }
 
     /**
-     * Actualizar contraseña del usuario
-     * @param {String} userId - ID del usuario
-     * @param {String} newPassword - Nueva contraseña
-     * @returns {Promise<Object|null>} - Usuario actualizado
+     * Update a user's password.
+     *
+     * @async
+     * @param {string} userId - User ID.
+     * @param {string} newPassword - New password.
+     * @returns {Promise<Object|null>} - Updated user object or null if not found.
+     * @throws {Error} - If update fails.
      */
     async updatePassword(userId, newPassword) {
         try {
@@ -70,10 +89,13 @@ class UserDAO extends BaseDAO {
     }
 
     /**
-     * Actualizar JTI de reset de contraseña
-     * @param {String} userId - ID del usuario
-     * @param {String|null} jti - JTI del token de reset (null para invalidar)
-     * @returns {Promise<Object|null>} - Usuario actualizado
+     * Update the reset password JTI (JWT ID).
+     *
+     * @async
+     * @param {string} userId - User ID.
+     * @param {string|null} jti - JTI value, or null to invalidate.
+     * @returns {Promise<Object|null>} - Updated user object or null if not found.
+     * @throws {Error} - If update fails.
      */
     async updateResetPasswordJti(userId, jti) {
         try {
@@ -84,16 +106,19 @@ class UserDAO extends BaseDAO {
     }
 
     /**
-     * Obtener perfil básico del usuario (sin datos sensibles)
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Object|null>} - Perfil del usuario
-     */
+     * Get a user's basic profile without sensitive data.
+     *
+     * @async
+     * @param {string} userId - User ID.
+     * @returns {Promise<Object|null>} - User profile or null if not found.
+     * @throws {Error} - If retrieval fails.
+     */ 
     async getUserProfile(userId) {
         try {
             const user = await this.findById(userId);
             if (!user) return null;
 
-            // Retornar solo datos no sensibles
+            // Return only non-sensitive data
             return {
                 id: user._id,
                 name: user.name,
@@ -109,9 +134,21 @@ class UserDAO extends BaseDAO {
     }
 
     /**
-     * Buscar usuarios por criterios múltiples
-     * @param {Object} searchCriteria - Criterios de búsqueda
-     * @returns {Promise<Array>} - Array de usuarios
+     * Search for users using multiple criteria.
+     *
+     * Supports filtering by name, email, and age range.
+     * Results can be paginated with `limit` and `skip`.
+     *
+     * @async
+     * @param {Object} searchCriteria - Search filters.
+     * @param {string} [searchCriteria.name] - Name (partial match, case-insensitive).
+     * @param {string} [searchCriteria.email] - Email (partial match, case-insensitive).
+     * @param {number} [searchCriteria.ageMin] - Minimum age.
+     * @param {number} [searchCriteria.ageMax] - Maximum age.
+     * @param {number} [searchCriteria.limit=50] - Max results.
+     * @param {number} [searchCriteria.skip=0] - Results to skip.
+     * @returns {Promise<Array>} - Array of users matching criteria.
+     * @throws {Error} - If search fails.
      */
     async searchUsers(searchCriteria) {
         try {

@@ -261,16 +261,19 @@ exports.resetPassword = async (req, res) => {
 };
 
 /**
- * Obtiene el perfil del usuario autenticado.
+ * Retrieves the profile of the authenticated user.
  *
  * @async
  * @function getUserProfile
- * @param {Request} req - Request object con userId en req.user
- * @param {Response} res - Response object
- * @returns {Promise<void>} Devuelve un objeto JSON con:
- *  - 200: `{ success: true, user: userProfile }` si se obtiene exitosamente.
- *  - 404: `{ success: false, message: "Usuario no encontrado." }` si el usuario no existe.
- *  - 500: `{ success: false, message: error.message }` si ocurre un error interno.
+ * @param {Request} req - Express request object containing `userId` in `req.user`.
+ * @param {Response} res - Express response object.
+ * @returns {Promise<void>} Returns a JSON response with:
+ *  - 200: `{ success: true, user: userProfile }` 
+ * if retrieved successfully.
+ *  - 404: `{ success: false, message: "User not found." }` 
+ * if the user does not exist.
+ *  - 500: `{ success: false, message: error.message }` 
+ * if an internal error occurs.
  */
 exports.getUserProfile = async (req, res) => {
   try {
@@ -301,7 +304,7 @@ exports.getUserProfile = async (req, res) => {
 };
 
 /**
- * Actualiza el perfil del usuario autenticado.
+ * Updates the authenticated user's profile.
  *
  * @async
  * @function updateUserProfile

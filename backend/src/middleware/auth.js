@@ -3,10 +3,17 @@ const rateLimit = require("express-rate-limit");
 
 
 /**
- * Middleware para autenticar solicitudes usando JWT.
- * @param {Request} req  objeto de solicitud HTTP.
- * @param {Response} res objeto de respuesta HTTP.
- * @param {Next} next   función para pasar al siguiente middleware.
+ * Middleware for authenticating requests using JWT.
+ *
+ * - Extracts the token from cookies (`access_token`) or `Authorization` header.
+ * - Verifies the token using the secret key.
+ * - If valid, attaches the decoded user info to `req.user`.
+ * - If invalid or missing, returns an error in Spanish.
+ * @function authenticateToken
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
+ * @param {import("express").NextFunction} next - Express next middleware callback.
+ * @returns {void} Sends a JSON error response if authentication fails.
  */
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -33,19 +40,19 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Limitador de tasa compatible con IPv6 para producción
+// Rate limiter for the login route
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutos
-  max: process.env.NODE_ENV === 'production' ? 50 : 100, // Más restrictivo en producción
+  max: process.env.NODE_ENV === 'production' ? 50 : 100, // More restrictive in production
   message: {
     success: false,
     message: "Demasiados intentos. Espera 5 minutos."
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Usar el generador por defecto que maneja IPv6 correctamente
+  // Use the default generator that handles IPv6 correctly
   skip: (req) => {
-    // Skip rate limiting en desarrollo con variable de entorno
+    // Skip rate limiting in development with environment variable
     return process.env.NODE_ENV === 'development' && process.env.SKIP_RATE_LIMIT === 'true';
   }
 });
