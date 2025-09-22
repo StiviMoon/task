@@ -81,6 +81,7 @@ exports.login = async (req, res) => {
         domain: undefined // No domain restriction
     });
 
+
     res.status(200).json({
         success: true,
         message: "Inicio de sesión exitoso.",

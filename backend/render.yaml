@@ -10,4 +10,8 @@ services:
         value: production
       - key: PORT
         value: 5000
+      - key: API_PREFIX
+        value: /api
+      - key: API_VERSION
+        value: v1
     autoDeploy: true
