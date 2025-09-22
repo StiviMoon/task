@@ -1,16 +1,26 @@
 /**
- * BaseDAO - Clase base para operaciones CRUD comunes
- * Proporciona métodos genéricos que heredan todos los DAOs específicos
+ * BaseDAO - Generic Data Access Object for common CRUD operations.
+ * 
+ * Provides reusable methods for interacting with MongoDB collections
+ * using Mongoose. All specific DAOs should extend this class.
+ *
+ * @class
  */
 class BaseDAO {
+    /**
+     * @constructor
+     * @param {import("mongoose").Model} model - The Mongoose model to operate on.
+     */
     constructor(model) {
         this.model = model;
     }
 
     /**
-     * Crear un nuevo documento
-     * @param {Object} data - Datos para crear el documento
-     * @returns {Promise<Object>} - Documento creado
+     * Create a new document.
+     * @async
+     * @param {Object} data - Data to create the document.
+     * @returns {Promise<Object>} - Created document.
+     * @throws {Error} - If creation fails.
      */
     async create(data) {
         try {
@@ -22,9 +32,11 @@ class BaseDAO {
     }
 
     /**
-     * Buscar un documento por ID
-     * @param {String} id - ID del documento
-     * @returns {Promise<Object|null>} - Documento encontrado o null
+     * Find a document by its ID.
+     * @async
+     * @param {string} id - Document ID.
+     * @returns {Promise<Object|null>} - Found document or null if not found.
+     * @throws {Error} - If query fails.
      */
     async findById(id) {
         try {
@@ -35,9 +47,11 @@ class BaseDAO {
     }
 
     /**
-     * Buscar un documento por criterio
-     * @param {Object} criteria - Criterios de búsqueda
-     * @returns {Promise<Object|null>} - Documento encontrado o null
+     * Find a document by given criteria.
+     * @async
+     * @param {Object} criteria - Search criteria.
+     * @returns {Promise<Object|null>} - Found document or null if not found.
+     * @throws {Error} - If query fails.
      */
     async findOne(criteria) {
         try {
@@ -48,10 +62,12 @@ class BaseDAO {
     }
 
     /**
-     * Buscar múltiples documentos
-     * @param {Object} criteria - Criterios de búsqueda
-     * @param {Object} options - Opciones (sort, limit, etc.)
-     * @returns {Promise<Array>} - Array de documentos
+     * Find multiple documents with optional query options.
+     * @async
+     * @param {Object} [criteria={}] - Search criteria.
+     * @param {Object} [options={}] - Query options (sort, limit, skip, populate).
+     * @returns {Promise<Array>} - Array of documents.
+     * @throws {Error} - If query fails.
      */
     async find(criteria = {}, options = {}) {
         try {
@@ -69,11 +85,13 @@ class BaseDAO {
     }
 
     /**
-     * Actualizar un documento por ID
-     * @param {String} id - ID del documento
-     * @param {Object} data - Datos a actualizar
-     * @param {Object} options - Opciones de actualización
-     * @returns {Promise<Object|null>} - Documento actualizado
+     * Update a document by its ID.
+     * @async
+     * @param {string} id - Document ID.
+     * @param {Object} data - Data to update.
+     * @param {Object} [options={ new: true, runValidators: true }] - Update options.
+     * @returns {Promise<Object|null>} - Updated document or null if not found.
+     * @throws {Error} - If update fails.
      */
     async updateById(id, data, options = { new: true, runValidators: true }) {
         try {
@@ -84,11 +102,13 @@ class BaseDAO {
     }
 
     /**
-     * Actualizar un documento por criterio
-     * @param {Object} criteria - Criterios de búsqueda
-     * @param {Object} data - Datos a actualizar
-     * @param {Object} options - Opciones de actualización
-     * @returns {Promise<Object|null>} - Documento actualizado
+     * Update a document by given criteria.
+     * @async
+     * @param {Object} criteria - Search criteria.
+     * @param {Object} data - Data to update.
+     * @param {Object} [options={ new: true, runValidators: true }] - Update options.
+     * @returns {Promise<Object|null>} - Updated document or null if not found.
+     * @throws {Error} - If update fails.
      */
     async updateOne(criteria, data, options = { new: true, runValidators: true }) {
         try {
@@ -99,9 +119,11 @@ class BaseDAO {
     }
 
     /**
-     * Eliminar un documento por ID
-     * @param {String} id - ID del documento
-     * @returns {Promise<Object|null>} - Documento eliminado
+     * Delete a document by its ID.
+     * @async
+     * @param {string} id - Document ID.
+     * @returns {Promise<Object|null>} - Deleted document or null if not found.
+     * @throws {Error} - If deletion fails.
      */
     async deleteById(id) {
         try {
@@ -112,9 +134,11 @@ class BaseDAO {
     }
 
     /**
-     * Eliminar un documento por criterio
-     * @param {Object} criteria - Criterios de búsqueda
-     * @returns {Promise<Object|null>} - Documento eliminado
+     * Delete a document by given criteria.
+     * @async
+     * @param {Object} criteria - Search criteria.
+     * @returns {Promise<Object|null>} - Deleted document or null if not found.
+     * @throws {Error} - If deletion fails.
      */
     async deleteOne(criteria) {
         try {
@@ -125,9 +149,11 @@ class BaseDAO {
     }
 
     /**
-     * Contar documentos
-     * @param {Object} criteria - Criterios de búsqueda
-     * @returns {Promise<Number>} - Número de documentos
+     * Count documents matching the given criteria.
+     * @async
+     * @param {Object} [criteria={}] - Search criteria.
+     * @returns {Promise<number>} - Number of matching documents.
+     * @throws {Error} - If count fails.
      */
     async count(criteria = {}) {
         try {
@@ -138,9 +164,11 @@ class BaseDAO {
     }
 
     /**
-     * Verificar si existe un documento
-     * @param {Object} criteria - Criterios de búsqueda
-     * @returns {Promise<Boolean>} - true si existe, false si no
+     * Check if at least one document exists matching the criteria.
+     * @async
+     * @param {Object} criteria - Search criteria.
+     * @returns {Promise<boolean>} - True if exists, false otherwise.
+     * @throws {Error} - If query fails.
      */
     async exists(criteria) {
         try {

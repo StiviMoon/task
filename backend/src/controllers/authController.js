@@ -6,17 +6,17 @@ const { sendMail } = require("../service/resendService");
 const config = require("../config/environment");
 
 /**
- * Registra un nuevo usuario en la base de datos.
- *
- * @async
- * @function register
- * @param {Request} req
- * @param {Response} res
- * @returns {Promise<void>} Devuelve un objeto JSON con:
- *  - 201: `{ message: user._id }` si el registro es exitoso.
- *  - 409: `{ message: "Este correo ya está registrado." }` si el email está duplicado.
- *  - 400: `{ message: error.message }` si ocurre un error de validación u otro.
- */
+* Registers a new user in the database.
+*
+* @async
+* @function registration
+* @param {import('express').Request} req Express HTTP request object.
+* @param {import('express').Response} res Express HTTP response object.
+* @returns {Promise<void>} Does not return directly; sends a JSON response.
+*
+* @throws {409} If the email is already registered. Response: `{ message: "This email is already registered." }`
+* @throws {400} If a validation or other error occurs. Response: `{ message: error.message }`
+*/
 exports.register = async (req, res) => {
     try{
         const { name, lastName, age, email, password } = req.body;
@@ -37,16 +37,22 @@ exports.register = async (req, res) => {
 
 
 /**
- * Inicia sesión verificando las credenciales del usuario.
+ * Logs in a user by verifying their credentials.
  *
  * @async
  * @function login
- * @param {Request} req
- * @param {Response} res
- * @returns { Promise<void>} Devuelve un objeto JSON con:
- *  - 200: `{ success: true, ,message: "Inicio de sesión exitoso."" ,token }` si las credenciales son correctas. y también manda el cookie.
- *  - 401: `{ success: false, message: "Correo o contraseña inválidos." }` si no coinciden email/contraseña.
- *  - 500: `{ success: false, message: err.message }` si ocurre un error interno.
+ * @param {Request} req Request object containing `email` and `password` in the body.
+ * @param {Response} res Response object used to return the result.
+ * @returns {Promise<void>} Returns a JSON object with the authentication result:
+ * 
+ * - 200: `{ success: true, message: "Inicio de sesión exitoso.", token }`  
+ *   If the credentials are correct. A cookie with the JWT is also sent.
+ *
+ * - 401: `{ success: false, message: "Correo o contraseña inválidos." }`  
+ *   If the email or password does not match.
+ *
+ * - 500: `{ success: false, message: "Inténtalo de nuevo más tarde." }`  
+ *   If an internal server error occurs.
  */
 
 exports.login = async (req, res) => {
@@ -62,24 +68,25 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' } // Coincide con la duración de la cookie
+      { expiresIn: '24h' } // Matches the cookie lifetime
     );
 
-    // Configuración de cookie adaptativa según entorno
+    // Adaptive cookie configuration according to environment
     const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("access_token", token, {
-        httpOnly: false, // Accesible desde JavaScript para máxima compatibilidad
-        secure: isProduction, // HTTPS en producción, HTTP en desarrollo
-        sameSite: isProduction ? "none" : "lax", // "none" para cross-domain en producción
-        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        httpOnly: false, // Accessible from JavaScript for maximum compatibility
+        secure: false, // HTTP and HTTPS in all environments for universal testing
+        sameSite: "lax", // Maximum cross-browser compatibility
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
         path: "/",
-        domain: undefined // Sin restricción de dominio
+        domain: undefined // No domain restriction
     });
+
 
     res.status(200).json({
         success: true,
         message: "Inicio de sesión exitoso.",
-        // Enviar token también en respuesta para máxima compatibilidad
+        // Send token also in response for maximum compatibility
         token: token
     });
   }
@@ -90,14 +97,17 @@ exports.login = async (req, res) => {
 };
 
 /**
- * Cierra la sesión del usuario eliminando la cookie del token.
+ * Logs out the user by clearing the access token cookie.
+ * 
  * @function logout
- * @param {Request} req
- *
- * @param {Response}  res
- * @returns {void} Devuelve un objeto JSON con:
- *  - 200: `{ message: "Sesión cerrada exitosamente." }` si la cookie se elimina correctamente.
- *  - 400: `{ message: error.message }` si ocurre un error interno.
+ * @param {Request} req Express request object.
+ * @param {Response} res Express response object.
+ * @returns {void} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, message: "Sesión cerrada exitosamente." }`  
+ *   If the cookie was successfully cleared.
+ * - 400: `{ success: false, message: error.message }`  
+ *   If an internal error occurs.
  */
 
 exports.logout = (req, res) => {
@@ -119,17 +129,22 @@ exports.logout = (req, res) => {
 };
 
 /**
- * Verifica si el usuario está autenticado.
+ * Verifies if the user is authenticated.
+ *
  * @function verifyAuth
- * @param {Request} req - Request object (debe tener req.user del middleware authenticateToken)
- * @param {Response} res
- * @returns {void} Devuelve un objeto JSON con:
- *  - 200: `{ success: true, user: { id, email, name } }` si está autenticado.
- *  - 401: Si no está autenticado (manejado por el middleware authenticateToken).
+ * @param {Request} req Express request object (must include `req.user` from the `authenticateToken` middleware).
+ * @param {Response} res Express response object.
+ * @returns {void} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, user: { id, email } }`  
+ *   If the user is authenticated.
+ * - 401: Unauthorized (handled by `authenticateToken` middleware).  
+ * - 500: `{ success: false, message: error.message }`  
+ *   If an internal error occurs.
  */
 exports.verifyAuth = (req, res) => {
     try {
-        // Si llegamos aquí, el middleware authenticateToken ya verificó que el token es válido
+        // If we get here, the authenticateToken middleware has already verified that the token is valid
         res.status(200).json({
             success: true,
             user: {
@@ -144,17 +159,22 @@ exports.verifyAuth = (req, res) => {
 
 
 
-/** * Envía un correo electrónico con un enlace para restablecer la contraseña.
+/**
+ * Sends an email with a password reset link.
  *
  * @async
  * @function forgotPassword
- * @param {Request} req
- * @param {Response} res
- * @returns {Promise<void>} Devuelve un objeto JSON con:
- *  - 200: `{ success: true, message: "Si el correo existe, se ha enviado un enlace de restablecimiento." }` si el proceso es exitoso.
- * - 500: `{ success: false, message: err.message }` si ocurre un error interno.
- * /
-**/
+ * @param {Request} req Express request object containing the user email.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, message: "Si el correo existe, se ha enviado un enlace de restablecimiento." }`  
+ *   If the process completes successfully.
+ * - 202: `{ success: false, message: "Correo no registrado." }`  
+ *   If the email is not registered.
+ * - 500: `{ success: false, message: err.message }`  
+ *   If an internal error occurs.
+ */
 
 
 exports.forgotPassword = async (req, res) => {
@@ -176,7 +196,7 @@ exports.forgotPassword = async (req, res) => {
 
     const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
-    // En desarrollo, enviar a email verificado de Resend
+    // In development, send to verified Resend email
     const emailToSend = process.env.NODE_ENV === 'production'
         ? 'johan.steven.rodriguez@correounivalle.edu.co'
         : email;
@@ -200,16 +220,22 @@ exports.forgotPassword = async (req, res) => {
 };
 
 /**
- * Restablece la contraseña del usuario utilizando un token JWT.
+ * Resets the user’s password using a JWT reset token.
+ *
  * @async
  * @function resetPassword
- * @param {Request} req
- * @param {Response} res
- * @return {Promise<void>}  Devuelve un objeto JSON con:
- *  - 200: `{ success: true, message: "Contraseña actualizada." }` si la contraseña se actualiza correctamente.
- * - 400: `{ success: false, message: "Enlace inválido o ya utilizado." }` si el token es inválido o ya fue usado.
- * - 500: `{ success: false, message: err.message }` si ocurre un error interno.
- *
+ * @param {Request} req Express request object containing `token` and `newPassword`.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, message: "Contraseña actualizada." }`  
+ *   If the password was updated successfully.
+ * - 400: `{ success: false, message: "Enlace inválido o ya utilizado." }`  
+ *   If the token is invalid, expired, or already used.
+ * - 400: `{ success: false, message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial" }`  
+ *   If the new password does not meet security requirements.
+ * - 500: `{ success: false, message: "Inténtalo de nuevo más tarde.", err: err.message }`  
+ *   If an internal error occurs.
  */
 exports.resetPassword = async (req, res) => {
   try {
@@ -224,7 +250,7 @@ exports.resetPassword = async (req, res) => {
         return res.status(400).json({ success: false, message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial" });
     }
 
-    // Invalida el token y actualiza la contraseña
+    // Invalidate the token and update the password
     await UserDAO.updateResetPasswordJti(user._id, null);
     await UserDAO.updatePassword(user._id, newPassword);
     console.log(user.password)
@@ -281,18 +307,18 @@ exports.getUserProfile = async (req, res) => {
  * @function updateUserProfile
  * @param {Request} req - Request object con userId en req.user
  * @param {Response} res - Response object
- * @returns {Promise<void>} Devuelve un objeto JSON con:
- *  - 200: `{ success: true, user: updatedUser }` si se actualiza exitosamente.
- *  - 400: `{ success: false, message: error.message }` si hay errores de validación.
- *  - 404: `{ success: false, message: "Usuario no encontrado." }` si el usuario no existe.
- *  - 500: `{ success: false, message: error.message }` si ocurre un error interno.
+ * @returns {Promise<void>} Returns a JSON object with:
+ *  - 200: `{ success: true, user: updatedUser }` if updated successfully.
+ *  - 400: `{ success: false, message: error.message }` if there are validation errors.
+ *  - 404: `{ success: false, message: "Usuario no encontrado." }` if the user does not exist.
+ *  - 500: `{ success: false, message: error.message }`if an internal error occurs.
  */
 exports.updateUserProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
     const { name, lastName, age, email } = req.body;
 
-    // Verificar que el usuario existe
+    // Verify that the user exists
     const existingUser = await UserDAO.findById(userId);
     if (!existingUser) {
       return res.status(404).json({
@@ -301,7 +327,7 @@ exports.updateUserProfile = async (req, res) => {
       });
     }
 
-    // Verificar si el email ya existe en otro usuario
+    // Check if the email already exists for another user
     if (email && email !== existingUser.email) {
       const emailExists = await UserDAO.emailExists(email);
       if (emailExists) {
@@ -312,7 +338,7 @@ exports.updateUserProfile = async (req, res) => {
       }
     }
 
-    // Actualizar el usuario
+    // Update the user
     const updatedUser = await UserDAO.updateById(userId, {
       name,
       lastName,
@@ -327,7 +353,7 @@ exports.updateUserProfile = async (req, res) => {
       });
     }
 
-    // Obtener el perfil actualizado (sin datos sensibles)
+    // Get the updated profile (without sensitive data)
     const userProfile = await UserDAO.getUserProfile(userId);
 
     res.status(200).json({
