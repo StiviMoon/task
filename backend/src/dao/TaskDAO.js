@@ -2,8 +2,13 @@ const BaseDAO = require('./BaseDAO');
 const Task = require('../models/Task');
 
 /**
- * TaskDAO - Data Access Object para operaciones de Tareas
- * Extiende BaseDAO con métodos específicos para Task
+ * TaskDAO - Data Access Object for task-related operations.
+ * 
+ * Extends `BaseDAO` to provide custom methods specific to the Task model.
+ * Handles CRUD operations for tasks associated with a specific user.
+ *
+ * @class
+ * @extends BaseDAO
  */
 class TaskDAO extends BaseDAO {
     constructor() {
@@ -11,10 +16,13 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Crear nueva tarea asociada a un usuario
-     * @param {Object} taskData - Datos de la tarea
-     * @param {String} userId - ID del usuario propietario
-     * @returns {Promise<Object>} - Tarea creada
+     * Create a new task associated with a user.
+     *
+     * @async
+     * @param {Object} taskData - Data for the new task.
+     * @param {string} userId - Owner user's ID.
+     * @returns {Promise<Object>} - Created task object.
+     * @throws {Error} - If task creation fails.
      */
     async createTask(taskData, userId) {
         try {
@@ -26,9 +34,12 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Obtener todas las tareas de un usuario (no eliminadas)
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Array>} - Array de tareas
+     * Retrieve all tasks belonging to a user.
+     *
+     * @async
+     * @param {string} userId - Owner user's ID.
+     * @returns {Promise<Array>} - Array of tasks.
+     * @throws {Error} - If retrieval fails.
      */
     async getUserTasks(userId) {
         try {
@@ -39,9 +50,13 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Obtener tareas eliminadas de un usuario (papelera)
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Array>} - Array de tareas eliminadas
+     * Retrieve a specific task by user.
+     *
+     * @async
+     * @param {string} taskId - Task ID.
+     * @param {string} userId - Owner user's ID.
+     * @returns {Promise<Object|null>} - Task object if found, otherwise null.
+     * @throws {Error} - If retrieval fails.
      */
     async getDeletedTasks(userId) {
         try {
@@ -52,10 +67,13 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Buscar una tarea específica del usuario
-     * @param {String} taskId - ID de la tarea
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Object|null>} - Tarea encontrada o null
+     * Retrieve a specific task by user.
+     *
+     * @async
+     * @param {string} taskId - Task ID.
+     * @param {string} userId - Owner user's ID.
+     * @returns {Promise<Object|null>} - Task object if found, otherwise null.
+     * @throws {Error} - If retrieval fails.
      */
     async getUserTask(taskId, userId) {
         try {
@@ -66,15 +84,18 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Actualizar una tarea del usuario
-     * @param {String} taskId - ID de la tarea
-     * @param {String} userId - ID del usuario
-     * @param {Object} updateData - Datos a actualizar
-     * @returns {Promise<Object|null>} - Tarea actualizada o null
+     * Update a user's task.
+     * - Verifies that the task belongs to the user before updating.
+     * @async
+     * @param {string} taskId - Task ID.
+     * @param {string} userId - Owner user's ID.
+     * @param {Object} updateData - Data to update.
+     * @returns {Promise<Object|null>} - Updated task object or null if not found.
+     * @throws {Error} - If update fails.
      */
     async updateUserTask(taskId, userId, updateData) {
         try {
-            // Verificar que la tarea pertenece al usuario
+            // Verify that the task belongs to the user
             const task = await this.getUserTask(taskId, userId);
             if (!task) {
                 return null;
@@ -87,20 +108,23 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Eliminar una tarea del usuario (eliminación lógica)
-     * @param {String} taskId - ID de la tarea
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Object|null>} - Tarea marcada como eliminada o null
+     * Delete a user's task.
+     * - Verifies that the task belongs to the user before deleting.
+     * @async
+     * @param {string} taskId - Task ID.
+     * @param {string} userId - Owner user's ID.
+     * @returns {Promise<Object|null>} - Deleted task object or null if not found.
+     * @throws {Error} - If deletion fails.
      */
     async deleteUserTask(taskId, userId) {
         try {
-            // Verificar que la tarea pertenece al usuario
+            // Verify that the task belongs to the user
             const task = await this.findOne({ _id: taskId, userId });
             if (!task) {
                 return null;
             }
 
-            // Marcar como eliminada en lugar de eliminar físicamente
+            // Mark as deleted instead of physically deleting
             return await this.updateById(taskId, { isDeleted: true });
         } catch (error) {
             throw new Error(`Error al eliminar tarea: ${error.message}`);
@@ -108,20 +132,20 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Restaurar una tarea de la papelera
-     * @param {String} taskId - ID de la tarea
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Object|null>} - Tarea restaurada o null
-     */
+    * Restore a task from the trash
+    * @param {String} taskId - Task ID
+    * @param {String} userId - User ID
+    * @returns {Promise<Object|null>} - Restored task or null
+    */
     async restoreUserTask(taskId, userId) {
         try {
-            // Verificar que la tarea eliminada pertenece al usuario
+            // Verify that the deleted task belongs to the user
             const task = await this.findOne({ _id: taskId, userId, isDeleted: true });
             if (!task) {
                 return null;
             }
 
-            // Restaurar la tarea
+            // Restore the task
             return await this.updateById(taskId, { isDeleted: false });
         } catch (error) {
             throw new Error(`Error al restaurar tarea: ${error.message}`);
@@ -129,20 +153,20 @@ class TaskDAO extends BaseDAO {
     }
 
     /**
-     * Eliminar permanentemente una tarea de la papelera
-     * @param {String} taskId - ID de la tarea
-     * @param {String} userId - ID del usuario
-     * @returns {Promise<Object|null>} - Tarea eliminada permanentemente o null
-     */
+    * Permanently delete a task from the trash
+    * @param {String} taskId - Task ID
+    * @param {String} userId - User ID
+    * @returns {Promise<Object|null>} - Permanently deleted task or null
+    */
     async permanentlyDeleteUserTask(taskId, userId) {
         try {
-            // Verificar que la tarea eliminada pertenece al usuario
+            // Verify that the deleted task belongs to the user
             const task = await this.findOne({ _id: taskId, userId, isDeleted: true });
             if (!task) {
                 return null;
             }
 
-            // Eliminar permanentemente
+            // Delete permanently
             return await this.deleteById(taskId);
         } catch (error) {
             throw new Error(`Error al eliminar permanentemente: ${error.message}`);

@@ -2,15 +2,15 @@ const express = require("express");
 const router = express.Router();
 const taskController = require("../controllers/taskController");
 
-// CRUD básico de tareas
+// Basic CRUD of tasks
 router.post("/", taskController.createTask);           // CREATE
-router.get("/", taskController.getTasks);              // READ (todas)
+router.get("/", taskController.getTasks);              // READ (all)
 router.put("/:id", taskController.updateTask);         // UPDATE
-router.delete("/:id", taskController.deleteTask);      // DELETE (mover a papelera)
+router.delete("/:id", taskController.deleteTask);      // DELETE (move to trash)
 
-// Rutas de papelera
-router.get("/deleted", taskController.getDeletedTasks);        // READ (papelera)
+// Trash routes
+router.get("/deleted", taskController.getDeletedTasks);        // READ (bin)
 router.post("/:id/restore", taskController.restoreTask);       // RESTORE
-router.delete("/:id/permanent", taskController.permanentlyDeleteTask); // DELETE permanente
+router.delete("/:id/permanent", taskController.permanentlyDeleteTask); // DELETE permanent
 
 module.exports = router;

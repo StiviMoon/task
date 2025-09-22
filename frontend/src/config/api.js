@@ -1,6 +1,6 @@
 // API Configuration
 const API_CONFIG = {
-  // Base URL del backend (configurado por variables de entorno)
+  // Base URL of the backend (configured by environment variables)
   BASE_URL: import.meta.env.VITE_API_BASE_URL ||
     (import.meta.env.MODE === 'production'
       ? 'https://backend-task-6ub4.onrender.com/api'
