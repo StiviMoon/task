@@ -179,7 +179,9 @@ export const toggleSidebar = () => {
 export const setupMobileSidebar = () => {
   const menuToggle = document.getElementById("menu-toggle");
   const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+  const closeSidebarMobile = document.getElementById("close-sidebar-mobile");
   const sidebarOverlay = document.getElementById("sidebar-overlay");
+
 
   if (menuToggle) {
     menuToggle.addEventListener("click", toggleSidebar);
@@ -187,6 +189,10 @@ export const setupMobileSidebar = () => {
 
   if (mobileMenuBtn) {
     mobileMenuBtn.addEventListener("click", toggleSidebar);
+  }
+
+  if(closeMobileSidebar){
+    closeSidebarMobile.addEventListener("click", closeMobileSidebar);
   }
 
   if (sidebarOverlay) {

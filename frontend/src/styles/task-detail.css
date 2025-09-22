@@ -138,7 +138,7 @@
   display: flex;
   gap: var(--spacing-md);
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: var(--spacing-xl);
   padding-top: var(--spacing-lg);
   border-top: 1px solid var(--border-primary);

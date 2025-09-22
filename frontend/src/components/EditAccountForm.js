@@ -56,9 +56,11 @@ export function renderEditAccountForm(user = {}) {
         <div class="error" id="error-email" aria-live="polite"></div>
       </div>
 
-      <button type="submit" id="saveBtn" class="btn btn-primary" disabled>Guardar</button>
-      <button type="button" id="cancel-edit" class="btn btn-secondary">Cancelar</button>
-    </form>
+      <div class="modal-actions"> 
+        <button type="submit" id="saveBtn" class="btn btn-primary" disabled>Guardar</button>
+        <button type="button" id="cancel-edit" class="btn btn-secondary">Cancelar</button>
+      </div>
+      </form>
 
     <!-- Spinner -->
     <div id="spinner" class="hidden">

@@ -127,7 +127,7 @@
   display: flex;
   gap: var(--spacing-lg);
   margin-top: var(--spacing-2xl);
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .modal-actions.centered {
@@ -239,6 +239,8 @@
   background: var(--color-primary);
   border-left-color: rgba(255, 255, 255, 0.3);
 }
+
+
 
 @keyframes toastSlideIn {
   from {

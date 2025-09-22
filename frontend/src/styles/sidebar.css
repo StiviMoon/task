@@ -100,9 +100,9 @@
   min-height: 48px;
   border-radius: var(--radius-lg);
   backdrop-filter: blur(10px);
-  width: 95%;
+  width: 25%;
   margin-left: var(--spacing-sm);
-  margin-right: var(--spacing-sm);
+  margin-right: var(--spacing-lg);
 }
 
 .sidebar-btn svg {
@@ -246,7 +246,9 @@
 /* Mobile */
 @media (max-width: 768px) {
   .sidebar {
-    transform: translateX(-100%);
+    right: 0;
+    left: auto;
+    transform: translateX(100%);
     z-index: 1001;
     width: 280px;
   }
@@ -261,9 +263,10 @@
   }
 
   .sidebar-btn {
+    display: none;
     padding: var(--spacing-md);
     margin: var(--spacing-sm);
-    min-height: 48px;
+    min-height: 50px;
   }
 
   .menu-item {
