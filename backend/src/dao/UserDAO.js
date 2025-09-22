@@ -1,9 +1,10 @@
 const BaseDAO = require('./BaseDAO');
 const User = require('../models/User');
+const bcrypt = require('bcrypt');
 
 /**
  * UserDAO - Data Access Object for user-related operations.
- * 
+ *
  * Extends `BaseDAO` to provide custom methods specific to the User model.
  * Handles creation, updates, and queries with additional validations.
  *
@@ -85,7 +86,11 @@ class UserDAO extends BaseDAO {
      */
     async updatePassword(userId, newPassword) {
         try {
-            return await this.updateById(userId, { password: newPassword });
+            // Encriptar la contraseña antes de actualizar
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+            return await this.updateById(userId, { password: hashedPassword });
         } catch (error) {
             throw new Error(`Error al actualizar contraseña: ${error.message}`);
         }
@@ -115,7 +120,7 @@ class UserDAO extends BaseDAO {
      * @param {string} userId - User ID.
      * @returns {Promise<Object|null>} - User profile or null if not found.
      * @throws {Error} - If retrieval fails.
-     */ 
+     */
     async getUserProfile(userId) {
         try {
             const user = await this.findById(userId);
