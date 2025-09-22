@@ -1,18 +1,18 @@
 const config = require('../config/environment');
 
 /**
- * Global error-handling middleware for Express.
+ * Global error handling middleware for Express.
  *
- * Handles various error types (Mongoose, JWT, SyntaxError, rate limiting)
- * and ensures a consistent JSON response. In development mode, it provides
- * detailed error logs and stack traces.
- *
+ * Handles common error types (Mongoose, JWT, Syntax, Rate limiting) 
+ * and ensures consistent JSON responses.
+ * - In production: hides internal details, returns only user-friendly messages in Spanish.
+ * - In development: logs full error details to console and includes stack trace in response.
  * @function errorHandler
  * @param {Error} err - The error object thrown.
  * @param {import("express").Request} req - Express request object.
  * @param {import("express").Response} res - Express response object.
- * @param {import("express").NextFunction} next - Express next middleware function.
- * @returns {void}
+ * @param {import("express").NextFunction} next - Express next middleware callback.
+ * @returns {void} Sends a JSON response with error details.
  */
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };

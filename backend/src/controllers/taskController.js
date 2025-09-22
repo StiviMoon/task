@@ -3,21 +3,26 @@ const config = require("../config/environment");
 
 
 /**
- * Controller for handling task-related operations.
- */
+* Controller to handle task-related operations.
+*/
+
 
 /**
- * Create a new task.
- * The task is associated with the authenticated user via the userId extracted from the JWT token.
+ * Creates a new task.
+ * The task is associated with the authenticated user via the `userId` extracted from the JWT.
  *
  * @async
  * @function createTask
- * @param {import("express").Request} req - Express request object containing task details in the body.
- * @param {import("express").Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response:
- * - 201: `{ success: true, taskId, task }` if the task is created successfully.
- * - 400: `{ success: false, message }` if a validation error occurs.
- * - 500: `{ success: false, message }` if a server error occurs (logs error in development mode).
+ * @param {Request} req Express request object containing `title`, `details`, `date`, `hour`, and `status`.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON object with:
+ * 
+ * - 201: `{ success: true, taskId, task }`  
+ *   If the task is created successfully.
+ * - 400: `{ success: false, message: error.message }`  
+ *   If validation fails.
+ * - 500: `{ success: false, message: error.message }`  
+ *   If a server error occurs. The error is logged in development mode.
  */
 exports.createTask = async (req, res) => {
     try {
@@ -35,15 +40,18 @@ exports.createTask = async (req, res) => {
 };
 
 /**
- * Get all tasks for the authenticated user.
+ * Retrieves all tasks for the authenticated user.
  *
  * @async
  * @function getTasks
- * @param {import("express").Request} req - Express request object with authenticated user.
- * @param {import("express").Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response:
- * - 200: `{ tasks }` if tasks are retrieved successfully.
- * - 400: `{ success: false, message }` if an error occurs.
+ * @param {Request} req Express request object containing the authenticated user.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON object with:
+ * 
+ * - 200: `{ tasks }`  
+ *   If the operation is successful.
+ * - 400: `{ success: false, message: error.message }`  
+ *   If an error occurs.
  */
 exports.getTasks = async (req, res) => {
     try {
@@ -56,17 +64,22 @@ exports.getTasks = async (req, res) => {
 };
 
 /**
- * Update an existing task.
+ * Updates an existing task.
  *
  * @async
  * @function updateTask
- * @param {import("express").Request} req - Express request object containing task ID in params and update data in body.
- * @param {import("express").Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response:
- * - 200: `{ success: true, task }` if the task is updated successfully.
- * - 404: `{ success: false, message: "Task not found." }` if the task does not exist or does not belong to the user.
- * - 400: `{ success: false, message }` if a validation error occurs.
- * - 500: `{ success: false, message }` if a server error occurs (logs error in development mode).
+ * @param {Request} req Express request object containing the task ID in `params` and task data in the body.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, task }`  
+ *   If the task was updated successfully.
+ * - 404: `{ success: false, message: "Tarea no encontrada." }`  
+ *   If the task does not exist or does not belong to the user.
+ * - 400: `{ success: false, message: error.message }`  
+ *   If validation fails.
+ * - 500: `{ success: false, message: error.message }`  
+ *   If a server error occurs. The error is logged in development mode.
  */
 exports.updateTask = async (req, res) => {
     try {
@@ -90,16 +103,20 @@ exports.updateTask = async (req, res) => {
 };
 
 /**
- * Delete an existing task.
+ * Deletes an existing task.
  *
  * @async
  * @function deleteTask
- * @param {import("express").Request} req - Express request object containing task ID in params.
- * @param {import("express").Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response:
- * - 200: `{ success: true, message: "Task deleted successfully." }` if the task is deleted.
- * - 404: `{ success: false, message: "Task not found." }` if the task does not exist or does not belong to the user.
- * - 500: `{ success: false, message }` if a server error occurs (logs error in development mode).
+ * @param {Request} req Express request object containing the task ID in `params`.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, message: "Tarea eliminada exitosamente." }`  
+ *   If the task was deleted successfully.
+ * - 404: `{ success: false, message: "Tarea no encontrada." }`  
+ *   If the task does not exist or does not belong to the user.
+ * - 500: `{ success: false, message: error.message }`  
+ *   If a server error occurs. The error is logged in development mode.
  */
 exports.deleteTask = async (req, res) => {
     try {
@@ -112,7 +129,78 @@ exports.deleteTask = async (req, res) => {
             return res.status(404).json({ success: false, message: "Tarea no encontrada." });
         }
 
-        res.status(200).json({ success: true, message: "Tarea eliminada exitosamente." });
+        res.status(200).json({ success: true, message: "Tarea movida a la papelera." });
+    } catch (error) {
+        if (config.NODE_ENV === "development") {
+            console.error(error);
+        }
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+/**
+* Gets the deleted tasks (trash) of the authenticated user
+* @param {*} req
+* @param {*} res
+* @return {void}
+* If the operation is successful, responds with a 200 status and a JSON with the deleted tasks.
+*/
+exports.getDeletedTasks = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const tasks = await TaskDAO.getDeletedTasks(userId);
+        res.status(200).json({ tasks });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+/**
+* Restores a task from the trash
+* @param {*} req
+* @param {*} res
+* @return {void}
+* If the restore is successful, respond with a 200 status and a confirmation message.
+*/
+exports.restoreTask = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.userId;
+
+        const restoredTask = await TaskDAO.restoreUserTask(id, userId);
+
+        if (!restoredTask) {
+            return res.status(404).json({ success: false, message: "Tarea no encontrada en la papelera." });
+        }
+
+        res.status(200).json({ success: true, message: "Tarea restaurada exitosamente." });
+    } catch (error) {
+        if (config.NODE_ENV === "development") {
+            console.error(error);
+        }
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+/**
+* Permanently deletes a task from the trash
+* @param {*} req
+* @param {*} res
+* @return {void}
+* If the deletion is successful, responds with a 200 status and a confirmation message.
+*/
+exports.permanentlyDeleteTask = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.userId;
+
+        const deletedTask = await TaskDAO.permanentlyDeleteUserTask(id, userId);
+
+        if (!deletedTask) {
+            return res.status(404).json({ success: false, message: "Tarea no encontrada en la papelera." });
+        }
+
+        res.status(200).json({ success: true, message: "Tarea eliminada permanentemente." });
     } catch (error) {
         if (config.NODE_ENV === "development") {
             console.error(error);

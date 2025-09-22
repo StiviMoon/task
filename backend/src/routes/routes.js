@@ -6,7 +6,7 @@ const { authenticateToken } = require("../middleware/auth");
 const router = express.Router();
 
 
-router.use("/auth", userRoutes);
+router.use("/users", userRoutes);
 
 // Then implement the protected routes here. ( by Auth.js )
 

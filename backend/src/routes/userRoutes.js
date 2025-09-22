@@ -6,19 +6,25 @@ const { loginLimiter, authenticateToken } = require("../middleware/auth");
 // Create a new user
 router.post("/register", authController.register);
 
-// Login
+// Log in
 router.post("/login", loginLimiter, authController.login);
 
 // Log out
 router.post("/logout", authController.logout);
 
-// Check authentication
+// Verify authentication
 router.get("/verify", authenticateToken, authController.verifyAuth);
 
-// I forgot my password
+// Forgot password
 router.post("/forgot-password", authController.forgotPassword);
 
 // Reset password
 router.post("/reset-password", authController.resetPassword);
+
+// Get user profile
+router.get("/profile", authenticateToken, authController.getUserProfile);
+
+// Update user profile
+router.put("/profile", authenticateToken, authController.updateUserProfile);
 
 module.exports = router;

@@ -1,12 +1,15 @@
 import page from "page";
 import { register } from "../services/authService.js";
 
-/**
- * Renders the register page HTML structure.
- * @function
- * @returns {string} HTML string for the register page.
- */
+// ====================== REGISTER VIEW ======================
 
+/**
+ * Render the Register screen template.
+ * Provides input fields for names, surnames, age, email,
+ * password and password confirmation, plus error messages.
+ *
+ * @returns {string} HTML markup for the register view
+ */
 export function renderRegister() {
   return `
     <div class="register-container">
@@ -54,12 +57,14 @@ export function renderRegister() {
     </div>
   `;
 }
+// ====================== REGISTER LOGIC ======================
 
 /**
- * Adds register form logic: validation, API call, error handling,
- * toast notifications, and navigation to login.
- * @function
- * @returns {void}
+ * Attach logic to the registration form:
+ * - Field validation (real-time + on submit)
+ * - Error handling
+ * - User registration via backend
+ * - Redirect to login on success
  */
 export function addRegisterLogic() {
   const form = document.getElementById("registerForm");
@@ -67,6 +72,7 @@ export function addRegisterLogic() {
   const spinner = document.getElementById("spinner");
   const toast = document.getElementById("toast");
 
+  // Input references
   const inputs = {
     names: form.names,
     surnames: form.surnames,
@@ -76,11 +82,12 @@ export function addRegisterLogic() {
     confirm: form.confirmPassword,
   };
 
-  // validate fields
+  // ---------- Validation Functions ----------
+
   /**
-   * Validates an individual field and shows/hides error messages.
-   * @param {"names"|"surnames"|"age"|"email"|"password"|"confirm"} field - The field to validate.
-   * @returns {boolean} Whether the field is valid.
+   * Validate a single field by its key.
+   * @param {string} field - Input key (names, surnames, age, email, password, confirm)
+   * @returns {boolean} Whether the field is valid
    */
   function validateField(field) {
     if (field === "names") {
@@ -126,8 +133,8 @@ export function addRegisterLogic() {
 
   // Check if the entire form is valid
   /**
-   * Checks if the whole form is valid.
-   * @returns {boolean} Whether the form is valid.
+   * Validate the entire form at once.
+   * @returns {boolean} True if all fields are valid
    */
   function isFormValid() {
     return (
@@ -140,10 +147,11 @@ export function addRegisterLogic() {
       inputs.confirm.value !== ""
     );
   }
+
   /**
-   * Shows an error message for a specific field.
-   * @param {string} field - The field ID.
-   * @param {string} msg - The error message.
+   * Show an error message for a given field.
+   * @param {string} field - Input key
+   * @param {string} msg - Error message
    */
   function showError(field, msg) {
     const errorEl = document.getElementById(`error-${field}`);
@@ -151,9 +159,10 @@ export function addRegisterLogic() {
     errorEl.classList.add("show-tooltip");
 
   }
+
   /**
-   * Hides the error message for a specific field.
-   * @param {string} field - The field ID.
+   * Hide error message for a given field.
+   * @param {string} field - Input key
    */
   function hideError(field) {
     const errorEl = document.getElementById(`error-${field}`);
@@ -161,7 +170,7 @@ export function addRegisterLogic() {
     errorEl.classList.remove("show-tooltip");
   }
 
-  // Real-time validation
+  // ---------- Real-time Validation ----------
   Object.entries(inputs).forEach(([key, input]) => {
     input.addEventListener("input", () => {
       validateField(key);
@@ -169,11 +178,11 @@ export function addRegisterLogic() {
     });
   });
 
-  // Submit form
+   // ---------- Form Submission ----------
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Validar formulario antes de enviar
+    // Final validation before sending
     if (!isFormValid()) {
       showError("Por favor completa todos los campos correctamente");
       return;
@@ -184,7 +193,7 @@ export function addRegisterLogic() {
     btn.textContent = 'Creando cuenta...';
 
     try {
-      // Preparar datos para el backend
+      // Prepare data for backend
       const userData = {
         name: inputs.names.value.trim(),
         lastName: inputs.surnames.value.trim(),
@@ -202,7 +211,7 @@ export function addRegisterLogic() {
         toast.textContent = "Cuenta creada exitosamente";
         toast.classList.remove("hidden");
 
-        // Redirigir al login después de 2 segundos
+        // Redirect to login after 2 seconds
         setTimeout(() => {
           toast.classList.add("hidden");
           page("/");

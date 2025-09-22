@@ -3,16 +3,17 @@ const rateLimit = require("express-rate-limit");
 
 
 /**
- * Middleware to authenticate requests using JWT.
+ * Middleware for authenticating requests using JWT.
  *
- * Extracts the token from cookies or the Authorization header,
- * verifies it, and attaches the decoded user object to `req.user`.
- *
+ * - Extracts the token from cookies (`access_token`) or `Authorization` header.
+ * - Verifies the token using the secret key.
+ * - If valid, attaches the decoded user info to `req.user`.
+ * - If invalid or missing, returns an error in Spanish.
  * @function authenticateToken
- * @param {import("express").Request} req - HTTP request object.
- * @param {import("express").Response} res - HTTP response object.
- * @param {import("express").NextFunction} next - Function to pass control to the next middleware.
- * @returns {void}
+ * @param {import("express").Request} req - Express request object.
+ * @param {import("express").Response} res - Express response object.
+ * @param {import("express").NextFunction} next - Express next middleware callback.
+ * @returns {void} Sends a JSON error response if authentication fails.
  */
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -39,17 +40,10 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-/**
- * Rate limiter for login requests.
- *
- * Restricts the number of login attempts within a given time window.
- * IPv6-compatible and stricter in production mode.
- *
- * @constant
- */
+// Rate limiter for the login route
 const loginLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: process.env.NODE_ENV === 'production' ? 50 : 100, //More restrictive in production
+  windowMs: 5 * 60 * 1000, // 5 minutos
+  max: process.env.NODE_ENV === 'production' ? 50 : 100, // More restrictive in production
   message: {
     success: false,
     message: "Demasiados intentos. Espera 5 minutos."

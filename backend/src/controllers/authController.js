@@ -6,17 +6,17 @@ const { sendMail } = require("../service/resendService");
 const config = require("../config/environment");
 
 /**
- * Registers a new user in the database.
- *
- * @async
- * @function register
- * @param {import("express").Request} req - Express request object.
- * @param {import("express").Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response:
- * - 201: `{ userId }` if registration is successful.
- * - 409: `{ message: "This email is already registered." }` if the email is duplicated.
- * - 400: `{ message: error.message }` if a validation or other error occurs.
- */
+* Registers a new user in the database.
+*
+* @async
+* @function registration
+* @param {import('express').Request} req Express HTTP request object.
+* @param {import('express').Response} res Express HTTP response object.
+* @returns {Promise<void>} Does not return directly; sends a JSON response.
+*
+* @throws {409} If the email is already registered. Response: `{ message: "This email is already registered." }`
+* @throws {400} If a validation or other error occurs. Response: `{ message: error.message }`
+*/
 exports.register = async (req, res) => {
     try{
         const { name, lastName, age, email, password } = req.body;
@@ -41,12 +41,18 @@ exports.register = async (req, res) => {
  *
  * @async
  * @function login
- * @param {import("express").Request} req - Express request object.
- * @param {import("express").Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response:
- * - 200: `{ success: true, message: "Login successful.", token }` if credentials are valid.
- * - 401: `{ success: false, message: "Invalid email or password." }` if authentication fails.
- * - 500: `{ success: false, message: "Try again later." }` if an internal error occurs.
+ * @param {Request} req Request object containing `email` and `password` in the body.
+ * @param {Response} res Response object used to return the result.
+ * @returns {Promise<void>} Returns a JSON object with the authentication result:
+ * 
+ * - 200: `{ success: true, message: "Inicio de sesión exitoso.", token }`  
+ *   If the credentials are correct. A cookie with the JWT is also sent.
+ *
+ * - 401: `{ success: false, message: "Correo o contraseña inválidos." }`  
+ *   If the email or password does not match.
+ *
+ * - 500: `{ success: false, message: "Inténtalo de nuevo más tarde." }`  
+ *   If an internal server error occurs.
  */
 exports.login = async (req, res) => {
   try {
@@ -65,16 +71,16 @@ exports.login = async (req, res) => {
     );
 
     // Adaptive cookie configuration according to environment
-     const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("access_token", token, {
         httpOnly: false, // Accessible from JavaScript for maximum compatibility
-        secure: isProduction, // HTTPS in production, HTTP in development
-        sameSite: isProduction ? "none" : "lax", // "none" for cross-domain in production
+        secure: false, // HTTP and HTTPS in all environments for universal testing
+        sameSite: "lax", // Maximum cross-browser compatibility
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         path: "/",
         domain: undefined // No domain restriction
-});
-//
+    });
+
     res.status(200).json({
         success: true,
         message: "Inicio de sesión exitoso.",
@@ -89,14 +95,17 @@ exports.login = async (req, res) => {
 };
 
 /**
- * Logs out the user by clearing the authentication cookie.
- *
+ * Logs out the user by clearing the access token cookie.
+ * 
  * @function logout
- * @param {import("express").Request} req - Express request object.
- * @param {import("express").Response} res - Express response object.
- * @returns {void} Sends a JSON response:
- * - 200: `{ success: true, message: "Logged out successfully." }`
- * - 400: `{ success: false, message: error.message }` if an error occurs.
+ * @param {Request} req Express request object.
+ * @param {Response} res Express response object.
+ * @returns {void} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, message: "Sesión cerrada exitosamente." }`  
+ *   If the cookie was successfully cleared.
+ * - 400: `{ success: false, message: error.message }`  
+ *   If an internal error occurs.
  */
 
 exports.logout = (req, res) => {
@@ -121,11 +130,15 @@ exports.logout = (req, res) => {
  * Verifies if the user is authenticated.
  *
  * @function verifyAuth
- * @param {import("express").Request} req - Express request object (must include `req.user` from `authenticateToken` middleware).
- * @param {import("express").Response} res - Express response object.
- * @returns {void} Sends a JSON response:
- * - 200: `{ success: true, user: { id, email } }` if authenticated.
- * - 401: Unauthorized (handled by middleware).
+ * @param {Request} req Express request object (must include `req.user` from the `authenticateToken` middleware).
+ * @param {Response} res Express response object.
+ * @returns {void} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, user: { id, email } }`  
+ *   If the user is authenticated.
+ * - 401: Unauthorized (handled by `authenticateToken` middleware).  
+ * - 500: `{ success: false, message: error.message }`  
+ *   If an internal error occurs.
  */
 exports.verifyAuth = (req, res) => {
     try {
@@ -142,18 +155,26 @@ exports.verifyAuth = (req, res) => {
     }
 };
 
+
+
 /**
- * Sends a password reset email with a JWT-based link.
+ * Sends an email with a password reset link.
  *
  * @async
  * @function forgotPassword
- * @param {import("express").Request} req - Express request object.
- * @param {import("express").Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response:
- * - 200: `{ success: true }` if reset link is sent.
- * - 202: `{ success: false, message: "Email not registered." }` if no user is found.
- * - 500: `{ success: false, message: err.message }` if an internal error occurs.
+ * @param {Request} req Express request object containing the user email.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, message: "Si el correo existe, se ha enviado un enlace de restablecimiento." }`  
+ *   If the process completes successfully.
+ * - 202: `{ success: false, message: "Correo no registrado." }`  
+ *   If the email is not registered.
+ * - 500: `{ success: false, message: err.message }`  
+ *   If an internal error occurs.
  */
+
+
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -197,16 +218,22 @@ exports.forgotPassword = async (req, res) => {
 };
 
 /**
- * Resets the user's password using a valid JWT reset token.
+ * Resets the user’s password using a JWT reset token.
  *
  * @async
  * @function resetPassword
- * @param {import("express").Request} req - Express request object containing `token` and `newPassword`.
- * @param {import("express").Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response:
- * - 200: `{ success: true, message: "Password updated." }` if successful.
- * - 400: `{ success: false, message: "Invalid or already used link." }` if token is invalid/expired.
- * - 500: `{ success: false, message: "Try again later." }` if an internal error occurs.
+ * @param {Request} req Express request object containing `token` and `newPassword`.
+ * @param {Response} res Express response object.
+ * @returns {Promise<void>} Returns a JSON object with:
+ * 
+ * - 200: `{ success: true, message: "Contraseña actualizada." }`  
+ *   If the password was updated successfully.
+ * - 400: `{ success: false, message: "Enlace inválido o ya utilizado." }`  
+ *   If the token is invalid, expired, or already used.
+ * - 400: `{ success: false, message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial" }`  
+ *   If the new password does not meet security requirements.
+ * - 500: `{ success: false, message: "Inténtalo de nuevo más tarde.", err: err.message }`  
+ *   If an internal error occurs.
  */
 exports.resetPassword = async (req, res) => {
   try {
@@ -228,5 +255,120 @@ exports.resetPassword = async (req, res) => {
     res.status(200).json({ success: true, message: "Contraseña actualizada." });
   } catch (err) {
     res.status(500).json({ success: false, message: "Inténtalo de nuevo más tarde." , err: err.message});
+  }
+};
+
+/**
+ * Retrieves the profile of the authenticated user.
+ *
+ * @async
+ * @function getUserProfile
+ * @param {Request} req - Express request object containing `userId` in `req.user`.
+ * @param {Response} res - Express response object.
+ * @returns {Promise<void>} Returns a JSON response with:
+ *  - 200: `{ success: true, user: userProfile }` 
+ * if retrieved successfully.
+ *  - 404: `{ success: false, message: "User not found." }` 
+ * if the user does not exist.
+ *  - 500: `{ success: false, message: error.message }` 
+ * if an internal error occurs.
+ */
+exports.getUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const userProfile = await UserDAO.getUserProfile(userId);
+
+    if (!userProfile) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado."
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user: userProfile
+    });
+  } catch (err) {
+    if (config.NODE_ENV === "development") {
+      console.error(err);
+    }
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor."
+    });
+  }
+};
+
+/**
+ * Updates the authenticated user's profile.
+ *
+ * @async
+ * @function updateUserProfile
+ * @param {Request} req - Request object con userId en req.user
+ * @param {Response} res - Response object
+ * @returns {Promise<void>} Returns a JSON object with:
+ *  - 200: `{ success: true, user: updatedUser }` if updated successfully.
+ *  - 400: `{ success: false, message: error.message }` if there are validation errors.
+ *  - 404: `{ success: false, message: "Usuario no encontrado." }` if the user does not exist.
+ *  - 500: `{ success: false, message: error.message }`if an internal error occurs.
+ */
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { name, lastName, age, email } = req.body;
+
+    // Verify that the user exists
+    const existingUser = await UserDAO.findById(userId);
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado."
+      });
+    }
+
+    // Check if the email already exists for another user
+    if (email && email !== existingUser.email) {
+      const emailExists = await UserDAO.emailExists(email);
+      if (emailExists) {
+        return res.status(400).json({
+          success: false,
+          message: "Este correo ya está registrado por otro usuario."
+        });
+      }
+    }
+
+    // Update the user
+    const updatedUser = await UserDAO.updateById(userId, {
+      name,
+      lastName,
+      age,
+      email
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado."
+      });
+    }
+
+    // Get the updated profile (without sensitive data)
+    const userProfile = await UserDAO.getUserProfile(userId);
+
+    res.status(200).json({
+      success: true,
+      user: userProfile,
+      message: "Perfil actualizado exitosamente."
+    });
+  } catch (err) {
+    if (config.NODE_ENV === "development") {
+      console.error(err);
+    }
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor."
+    });
   }
 };

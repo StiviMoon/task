@@ -1,18 +1,21 @@
 const mongoose = require("mongoose");
 
 /**
- * Mongoose schema for the Task model.
- * Defines the structure and validation rules for task documents in the database.
+ * Task Schema definition for MongoDB using Mongoose.
+ *
+ * Defines the structure, constraints, and validations for task documents.
  *
  * Fields:
- * - title: Title of the task (String, required, max 50 characters).
- * - details: Additional details about the task (String, optional, max 500 characters).
- * - date: Deadline date to complete the task (Date, optional, cannot be in the past).
- * - hour: Deadline time to complete the task (String, optional, format HH:mm).
- * - status: Current status of the task (String, required, allowed values: "To Do", "In Progress", "Done").
- * - userId: ID of the user who created the task (ObjectId, reference to User model, required).
- * - createdAt: Task creation date (Date, automatically set by timestamps).
- * - updatedAt: Last update date of the task (Date, automatically set by timestamps).
+ * - title {String} - Task title (required, max length 50).
+ * - details {String} - Additional details (optional, max length 500).
+ * - date {Date} - Deadline for task completion (optional, cannot be in the past).
+ * - hour {String} - Time for task completion (optional, format HH:mm).
+ * - status {String} - Task status (required, allowed: "Por hacer", "Haciendo", "Hecho").
+ * - userId {ObjectId} - Reference to the user who created the task (required).
+ * - createdAt {Date} - Automatically set creation timestamp.
+ * - updatedAt {Date} - Automatically set last update timestamp.
+ *
+ * @module Task
  */
 
 const taskSchema = new mongoose.Schema(
@@ -36,10 +39,10 @@ const taskSchema = new mongoose.Schema(
                 return !value || value >= new Date().setHours(0, 0, 0, 0);
             },
             message: "La fecha no puede ser en el pasado."
-        }   
+        }
     },
     hour: {
-        type: String,       
+        type: String,
         validate: {
             validator: function(value) {
                 return !value || /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
@@ -60,7 +63,11 @@ const taskSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: [true, "El ID de usuario es obligatorio."]
-    }   
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
     },
     { timestamps: true ,
         versionKey: false }

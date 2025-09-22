@@ -4,17 +4,17 @@ const config = require('../config/environment');
 const resend = new Resend(config.RESEND_API_KEY);
 
 /**
- * Sends an email using Resend.
- * 
+ * Sends an email using the Resend API.
+ *
  * @async
  * @function sendMail
- * @param {Object} params - Email parameters
- * @param {string} params.to - Recipient email address
- * @param {string} params.subject - Email subject
- * @param {string} params.text - Plain text body of the email
- * @param {string} params.html - HTML body of the email
- * @returns {Promise<void>} Resolves if the email is sent successfully
- * @throws {Error} If the email fails to send
+ * @param {Object} params Parameters for sending the email.
+ * @param {string} params.to Recipient's email address.
+ * @param {string} params.subject Email subject.
+ * @param {string} params.text Plain text email body.
+ * @param {string} params.html HTML email body.
+ * @returns {Promise<void>} Resolves if the email is sent successfully.
+ * @throws {Error} Throws an error if sending the email fails.
  */
 async function sendMail({ to, subject, text, html }) {
   try {

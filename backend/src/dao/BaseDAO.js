@@ -1,8 +1,16 @@
 /**
- * BaseDAO - Generic base class for common CRUD operations.
- * Provides reusable methods that all specific DAOs inherit from.
+ * BaseDAO - Generic Data Access Object for common CRUD operations.
+ * 
+ * Provides reusable methods for interacting with MongoDB collections
+ * using Mongoose. All specific DAOs should extend this class.
+ *
+ * @class
  */
 class BaseDAO {
+    /**
+     * @constructor
+     * @param {import("mongoose").Model} model - The Mongoose model to operate on.
+     */
     constructor(model) {
          /**
          * The Mongoose model associated with the DAO.
@@ -13,8 +21,10 @@ class BaseDAO {
 
     /**
      * Create a new document.
+     * @async
      * @param {Object} data - Data to create the document.
-     * @returns {Promise<Object>} - The created document.
+     * @returns {Promise<Object>} - Created document.
+     * @throws {Error} - If creation fails.
      */
     async create(data) {
         try {
@@ -26,9 +36,11 @@ class BaseDAO {
     }
 
     /**
-     * Find a document by ID.
+     * Find a document by its ID.
+     * @async
      * @param {string} id - Document ID.
      * @returns {Promise<Object|null>} - Found document or null if not found.
+     * @throws {Error} - If query fails.
      */
     async findById(id) {
         try {
@@ -39,9 +51,11 @@ class BaseDAO {
     }
 
     /**
-     * Find a single document by criteria.
+     * Find a document by given criteria.
+     * @async
      * @param {Object} criteria - Search criteria.
      * @returns {Promise<Object|null>} - Found document or null if not found.
+     * @throws {Error} - If query fails.
      */
     async findOne(criteria) {
         try {
@@ -52,10 +66,12 @@ class BaseDAO {
     }
 
     /**
-     * Find multiple documents with optional filters.
+     * Find multiple documents with optional query options.
+     * @async
      * @param {Object} [criteria={}] - Search criteria.
-     * @param {Object} [options={}] - Options (sort, limit, skip, populate).
-     * @returns {Promise<Array<Object>>} - Array of found documents.
+     * @param {Object} [options={}] - Query options (sort, limit, skip, populate).
+     * @returns {Promise<Array>} - Array of documents.
+     * @throws {Error} - If query fails.
      */
     async find(criteria = {}, options = {}) {
         try {
@@ -73,11 +89,13 @@ class BaseDAO {
     }
 
     /**
-     * Update a document by ID.
+     * Update a document by its ID.
+     * @async
      * @param {string} id - Document ID.
      * @param {Object} data - Data to update.
      * @param {Object} [options={ new: true, runValidators: true }] - Update options.
      * @returns {Promise<Object|null>} - Updated document or null if not found.
+     * @throws {Error} - If update fails.
      */
     async updateById(id, data, options = { new: true, runValidators: true }) {
         try {
@@ -88,11 +106,13 @@ class BaseDAO {
     }
 
     /**
-     * Update a document by criteria.
+     * Update a document by given criteria.
+     * @async
      * @param {Object} criteria - Search criteria.
      * @param {Object} data - Data to update.
      * @param {Object} [options={ new: true, runValidators: true }] - Update options.
      * @returns {Promise<Object|null>} - Updated document or null if not found.
+     * @throws {Error} - If update fails.
      */
     async updateOne(criteria, data, options = { new: true, runValidators: true }) {
         try {
@@ -103,9 +123,11 @@ class BaseDAO {
     }
 
     /**
-     * Delete a document by ID.
+     * Delete a document by its ID.
+     * @async
      * @param {string} id - Document ID.
      * @returns {Promise<Object|null>} - Deleted document or null if not found.
+     * @throws {Error} - If deletion fails.
      */
     async deleteById(id) {
         try {
@@ -116,9 +138,11 @@ class BaseDAO {
     }
 
     /**
-     * Delete a document by criteria.
+     * Delete a document by given criteria.
+     * @async
      * @param {Object} criteria - Search criteria.
      * @returns {Promise<Object|null>} - Deleted document or null if not found.
+     * @throws {Error} - If deletion fails.
      */
     async deleteOne(criteria) {
         try {
@@ -129,9 +153,11 @@ class BaseDAO {
     }
 
     /**
-     * Count documents by criteria.
+     * Count documents matching the given criteria.
+     * @async
      * @param {Object} [criteria={}] - Search criteria.
-     * @returns {Promise<number>} - Number of documents found.
+     * @returns {Promise<number>} - Number of matching documents.
+     * @throws {Error} - If count fails.
      */
     async count(criteria = {}) {
         try {
@@ -142,9 +168,11 @@ class BaseDAO {
     }
 
     /**
-     * Check if a document exists by criteria.
+     * Check if at least one document exists matching the criteria.
+     * @async
      * @param {Object} criteria - Search criteria.
-     * @returns {Promise<boolean>} - True if a document exists, false otherwise.
+     * @returns {Promise<boolean>} - True if exists, false otherwise.
+     * @throws {Error} - If query fails.
      */
     async exists(criteria) {
         try {

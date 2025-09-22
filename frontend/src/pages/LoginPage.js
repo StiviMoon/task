@@ -2,9 +2,8 @@ import page from "page";
 import { login, forgotPassword } from "../services/authService.js";
 // ====================== LOGIN ======================
 /**
- * Renders the login page HTML structure.
- * @function
- * @returns {string} HTML string for the login page.
+ * Render the login page template.
+ * @returns {string} HTML markup for the login screen
  */
 export function renderLogin() {
   return `
@@ -27,20 +26,13 @@ export function renderLogin() {
     </div>
   `;
 }
-
 /**
- * Adds logic to the login form:
- * - Handles form submission.
- * - Performs login with `login()` service.
- * - Redirects to dashboard if successful.
- * - Shows errors if login fails.
- * - Handles navigation to register and forgot password pages.
- *
- * @function
- * @returns {void}
+ * Attach login logic:
+ * - Handles form submission
+ * - Calls backend login API
+ * - Redirects on success or shows error
  */
-
-  export function addLoginLogic() {
+export function addLoginLogic() {
   const form = document.getElementById("loginForm");
   const submitBtn = form.querySelector("button[type='submit']");
   const originalBtnText = submitBtn.textContent;
@@ -55,7 +47,7 @@ export function renderLogin() {
     const email = form.email.value.trim();
     const password = form.password.value.trim();
 
-    // Mostrar loading
+    // Show loading
     submitBtn.disabled = true;
     submitBtn.classList.add('btn-loading');
     submitBtn.textContent = 'Iniciando sesión...';
@@ -65,7 +57,7 @@ export function renderLogin() {
 
       if (result.success) {
         console.log("Login exitoso:", result);
-        // Redirigir al dashboard
+        // Redirect to the dashboard
         page("/tasks");
       } else {
         showError(result.error);
@@ -74,7 +66,7 @@ export function renderLogin() {
       console.error("Error en login:", error);
       showError("Error de conexión. Intenta de nuevo.");
     } finally {
-      // Restaurar botón
+      // Restore button
       submitBtn.disabled = false;
       submitBtn.classList.remove('btn-loading');
       submitBtn.textContent = originalBtnText;
@@ -94,9 +86,8 @@ export function renderLogin() {
 
 // ====================== FORGOT PASSWORD ======================
 /**
- * Renders the forgot password page HTML structure.
- * @function
- * @returns {string} HTML string for the forgot password page.
+ * Render the forgot password page template.
+ * @returns {string} HTML markup for forgot password screen
  */
 export function renderForgotPassword() {
   return `
@@ -118,14 +109,10 @@ export function renderForgotPassword() {
   `;
 }
 /**
- * Adds logic to the forgot password form:
- * - Handles form submission.
- * - Calls `forgotPassword()` service.
- * - Displays toast messages for success or failure.
- * - Handles navigation back to login.
- *
- * @function
- * @returns {void}
+ * Attach forgot password logic:
+ * - Handles form submission
+ * - Calls backend forgotPassword API
+ * - Displays toast messages
  */
 export function addForgotPasswordLogic() {
   const form = document.getElementById("forgotForm");
@@ -147,7 +134,7 @@ export function addForgotPasswordLogic() {
       return;
     }
 
-    // Show loading
+    // show loading
     submitBtn.disabled = true;
     submitBtn.classList.add('btn-loading');
     submitBtn.textContent = "Enviando...";
@@ -180,19 +167,18 @@ export function addForgotPasswordLogic() {
 
 // ====================== HELPER FUNCTIONS ======================
 /**
- * Displays a temporary toast message.
- * @param {string} message - Message to display.
- * @param {HTMLElement} toastEl - Toast element container.
+ * Display a temporary toast message.
+ * @param {string} message - The message to show
+ * @param {HTMLElement} toastEl - The toast element
  */
 function showToast(message, toastEl) {
   toastEl.textContent = message;
   toastEl.classList.remove("hidden");
   setTimeout(() => toastEl.classList.add("hidden"), 3000);
 }
-
 /**
- * Displays an error message inside the login form.
- * @param {string} message - Error message to display.
+ * Display an error message inside the login form.
+ * @param {string} message - The error text
  */
 function showError(message) {
   // Create or update error element

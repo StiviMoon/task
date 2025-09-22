@@ -1,10 +1,14 @@
 import { resetPassword } from "../services/authService.js";
 
+// ====================== RESET PASSWORD VIEW ======================
+
+// ====================== RESET PASSWORD VIEW ======================
+
 /**
- * Renders the reset password page interface.
+ * Render the Reset Password screen template.
+ * Provides input fields for new password and confirmation.
  *
- * @function renderResetPassword
- * @returns {string} HTML markup of the reset password page.
+ * @returns {string} HTML markup for the reset password view
  */
 export function renderResetPassword() {
   return `
@@ -27,17 +31,16 @@ export function renderResetPassword() {
   `;
 }
 
+// ====================== RESET PASSWORD LOGIC ======================
+
+// ====================== RESET PASSWORD LOGIC ======================
+
 /**
- * Adds logic for the reset password page:
- *
- * - Retrieves the token from the URL.
- * - Validates the new password with multiple rules (length, uppercase, number, special character).
- * - Calls the `resetPassword` service to update the password.
- * - Displays feedback messages using `showToast`.
- * - Redirects the user to the login page if successful.
- *
- * @function addResetPasswordLogic
- * @returns {void}
+ * Attach logic for the Reset Password page:
+ * - Extracts token from URL
+ * - Validates new password rules
+ * - Calls backend to reset password
+ * - Handles success, error, and UI state updates
  */
 export function addResetPasswordLogic() {
   const form = document.getElementById("resetForm");
@@ -46,10 +49,10 @@ export function addResetPasswordLogic() {
   const submitBtn = form.querySelector("button[type='submit']");
   const originalBtnText = submitBtn.textContent;
 
-  // Get token from URL
+   // Retrieve token from query parameters
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
-
+  // If token is missing or invalid → redirect to login
   if (!token) {
     showToast("Token de restablecimiento no válido", toast);
     setTimeout(() => {
@@ -57,13 +60,13 @@ export function addResetPasswordLogic() {
     }, 3000);
     return;
   }
-
+  // ---------- Form Submission ----------
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const newPassword = document.getElementById("newPassword").value.trim();
     const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
-    // Validations
+    // ---------- Validation ----------
     if (!newPassword || !confirmPassword) {
       showToast("Por favor completa todos los campos", toast);
       return;
@@ -94,19 +97,20 @@ export function addResetPasswordLogic() {
       return;
     }
 
-    // Show loading state
+    // ---------- UI State: Loading ----------
     submitBtn.disabled = true;
     submitBtn.classList.add('btn-loading');
     submitBtn.textContent = "Restableciendo...";
 
     try {
+      // Call backend to reset password
       const result = await resetPassword({ token, newPassword });
 
       if (result.success) {
         showToast("Contraseña restablecida exitosamente", toast);
         console.log("Contraseña restablecida");
 
-        // Redirect to login after 2 seconds
+        // Redirect to login after 2s
         setTimeout(() => {
           window.location.href = '/';
         }, 2000);
@@ -117,26 +121,28 @@ export function addResetPasswordLogic() {
       console.error("Error en reset password:", error);
       showToast("Error de conexión. Intenta de nuevo.", toast);
     } finally {
-      // Restore UI
+      // Restore UI state
       submitBtn.disabled = false;
       submitBtn.classList.remove('btn-loading');
       submitBtn.textContent = originalBtnText;
     }
   });
-
+  // ---------- Navigation ----------
   document.getElementById("backToLogin").addEventListener("click", (e) => {
     e.preventDefault();
     window.location.href = '/';
   });
 }
 
+// ====================== HELPERS ======================
+
+// ====================== HELPERS ======================
+
 /**
- * Displays a toast message in the UI.
+ * Display a temporary toast message.
  *
- * @function showToast
- * @param {string} message - The message to display.
- * @param {HTMLElement} toastEl - The toast DOM element.
- * @returns {void}
+ * @param {string} message - Message to display
+ * @param {HTMLElement} toastEl - Toast container element
  */
 function showToast(message, toastEl) {
   toastEl.textContent = message;

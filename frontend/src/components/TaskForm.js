@@ -53,13 +53,13 @@ export function TaskForm(onTaskCreated) {
 
   const saveBtn = form.querySelector("#save-task");
   const spinner = form.querySelector("#spinner");
+
 /**
    * `input` event that validates required fields in real time.
    * Enables or disables the save button based on the state of the fields.
-   * 
+   *
    * @event input
-   */
-  form.addEventListener("input", () => {
+   */  form.addEventListener("input", () => {
     const title = form.querySelector("#title").value.trim();
     const date = form.querySelector("#date").value;
     const status = form.querySelector("#status").value;
@@ -67,7 +67,7 @@ export function TaskForm(onTaskCreated) {
     saveBtn.disabled = !(title && date && status);
   });
 
-  // Submit new task
+// Submit new task
   /**
    * `submit` event that creates a new task when the form is submitted.
    *
@@ -78,8 +78,7 @@ export function TaskForm(onTaskCreated) {
    * @property {string} newTask.date - Date in ISO format (yyyy-mm-dd).
    * @property {string} [newTask.hour] - Time in HH:mm format.
    * @property {"Por hacer"|"Haciendo"|"Hecho"} newTask.status - Status of the task.
-   */
-  form.addEventListener("submit", async (e) => {
+   */  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const newTask = {
