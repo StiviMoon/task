@@ -12,6 +12,10 @@ class BaseDAO {
      * @param {import("mongoose").Model} model - The Mongoose model to operate on.
      */
     constructor(model) {
+         /**
+         * The Mongoose model associated with the DAO.
+         * @type {import("mongoose").Model}
+         */
         this.model = model;
     }
 

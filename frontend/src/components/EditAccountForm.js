@@ -37,22 +37,22 @@ export function renderEditAccountForm(user = {}) {
   const html = `
     <form id="editAccountForm" novalidate>
       <div class="input-group">
-        <input type="text" id="names" placeholder="Nombres" value="${user.name || ''}" required />
+        <input type="text" id="names" name="name" placeholder="Nombres" value="${user.name || ''}" required />
         <div class="error" id="error-names" aria-live="polite"></div>
       </div>
 
       <div class="input-group">
-        <input type="text" id="surnames" placeholder="Apellidos" value="${user.lastName || ''}" required />
+        <input type="text" id="surnames" name="lastName" placeholder="Apellidos" value="${user.lastName || ''}" required />
         <div class="error" id="error-surnames" aria-live="polite"></div>
       </div>
 
       <div class="input-group">
-        <input type="number" id="age" placeholder="Edad" value="${user.age || ''}" required min="13" />
+        <input type="number" id="age" name="age" placeholder="Edad" value="${user.age || ''}" required min="13" />
         <div class="error" id="error-age" aria-live="polite"></div>
       </div>
 
       <div class="input-group">
-        <input type="email" id="email" placeholder="Correo electrónico" value="${user.email || ''}" required />
+        <input type="email" id="email" name="email" placeholder="Correo electrónico" value="${user.email || ''}" required />
         <div class="error" id="error-email" aria-live="polite"></div>
       </div>
 

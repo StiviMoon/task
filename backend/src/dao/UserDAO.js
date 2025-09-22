@@ -11,6 +11,9 @@ const User = require('../models/User');
  * @extends BaseDAO
  */
 class UserDAO extends BaseDAO {
+     /**
+     * Creates an instance of UserDAO using the {@link User} model.
+     */
     constructor() {
         super(User);
     }

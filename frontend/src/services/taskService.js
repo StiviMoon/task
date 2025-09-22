@@ -1,9 +1,11 @@
 import { getApiUrl, getAuthHeaders } from "../config/api.js";
 
 /**
-* Gets all tasks for the authenticated user
-* @returns {Promise<Object>} List of tasks
-*/
+ * Fetches all tasks for the authenticated user
+ * @async
+ * @function getTasks
+ * @returns {Promise<Object>} Response object with tasks list
+ */
 export const getTasks = async () => {
   try {
     const response = await fetch(getApiUrl("/tasks"), {
@@ -73,11 +75,13 @@ export const createTask = async (taskData) => {
 };
 
 /**
-* Updates an existing task
-* @param {string} taskId - Task ID
-* @param {Object} taskData - Updated task data
-* @returns {Promise<Object>} Server response
-*/
+ * Updates an existing task
+ * @async
+ * @function updateTask
+ * @param {string} taskId - Task ID
+ * @param {Object} taskData - Updated task data
+ * @returns {Promise<Object>} Server response
+ */
 export const updateTask = async (taskId, taskData) => {
   try {
     console.log(`Updating task ${taskId} with data:`, taskData);
@@ -112,10 +116,12 @@ export const updateTask = async (taskId, taskData) => {
 };
 
 /**
-* Deletes a task
-* @param {string} taskId - Task ID
-* @returns {Promise<Object>} Server response
-*/
+ * Deletes a task
+ * @async
+ * @function deleteTask
+ * @param {string} taskId - Task ID
+ * @returns {Promise<Object>} Server response
+ */
 export const deleteTask = async (taskId) => {
   try {
     const response = await fetch(getApiUrl(`/tasks/${taskId}`), {
@@ -145,10 +151,12 @@ export const deleteTask = async (taskId) => {
 };
 
 /**
-* Gets a specific task by ID
-* @param {string} taskId - Task ID
-* @returns {Promise<Object>} Task data
-*/
+ * Fetches a specific task by ID
+ * @async
+ * @function getTaskById
+ * @param {string} taskId - Task ID
+ * @returns {Promise<Object>} Task data
+ */
 export const getTaskById = async (taskId) => {
   try {
     const response = await fetch(getApiUrl(`/tasks/${taskId}`), {

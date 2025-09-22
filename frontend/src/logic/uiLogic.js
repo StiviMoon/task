@@ -62,11 +62,20 @@ export const showError = (message) => {
 export const formatDate = (dateString) => {
   if (!dateString) return "Sin fecha";
   const date = new Date(dateString);
-  return date.toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  if (isNaN(date.getTime())) return "Sin fecha";
+  
+  // Using getUTCH -> Date, Month, FullYear to avoid problems with timezones
+  
+  const day = date.getUTCDate().toString().padStart(2, '0');
+  const month = date.getUTCMonth();
+  const year = date.getUTCFullYear();
+  
+  const months = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  ];
+  
+  return `${day} ${months[month]} ${year}`;
 };
 
 /**

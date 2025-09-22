@@ -1,3 +1,16 @@
+/**
+ * Creates and returns a task form with real-time validation.
+ *
+ * This form includes fields for title, details, date, time, and status.
+ * Upon submission, attempts to create a new task using `createTask` and executes
+ * the `onTaskCreated` callback if provided.
+ * 
+ * @function TaskForm
+ * @param {function(Task):void} [onTaskCreated] - Optional callback executed
+ * after the task has been successfully created. It receives the created task.
+ *  
+ * @returns {HTMLFormElement} The task creation form ready to be inserted into the DOM.
+ */
 export function TaskForm(onTaskCreated) {
   const form = document.createElement("form");
   form.id = "task-form";
