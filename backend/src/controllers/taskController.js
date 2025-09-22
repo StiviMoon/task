@@ -2,9 +2,9 @@ const TaskDAO = require("../dao/TaskDAO");
 const config = require("../config/environment");
 
 
-//**
- * Controller to handle task-related operations.
- */
+/**
+* Controller to handle task-related operations.
+*/
 
 
 /**
