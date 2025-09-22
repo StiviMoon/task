@@ -53,7 +53,6 @@ exports.createTask = async (req, res) => {
  * - 400: `{ success: false, message: error.message }`  
  *   If an error occurs.
  */
-
 exports.getTasks = async (req, res) => {
     try {
         const userId = req.user.userId;

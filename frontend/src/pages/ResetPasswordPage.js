@@ -2,6 +2,8 @@ import { resetPassword } from "../services/authService.js";
 
 // ====================== RESET PASSWORD VIEW ======================
 
+// ====================== RESET PASSWORD VIEW ======================
+
 /**
  * Render the Reset Password screen template.
  * Provides input fields for new password and confirmation.
@@ -28,6 +30,8 @@ export function renderResetPassword() {
     </div>
   `;
 }
+
+// ====================== RESET PASSWORD LOGIC ======================
 
 // ====================== RESET PASSWORD LOGIC ======================
 
@@ -129,6 +133,8 @@ export function addResetPasswordLogic() {
     window.location.href = '/';
   });
 }
+
+// ====================== HELPERS ======================
 
 // ====================== HELPERS ======================
 

@@ -247,6 +247,10 @@ export function addRegisterLogic() {
   });
 
  // Helper function to show errors
+  /**
+   * Shows a form-level error (not tied to a single field).
+   * @param {string} message - The error message to display.
+   */
   function showErrorForm(message) {
     // Crear o actualizar elemento de error
     let errorEl = document.getElementById("register-error");

@@ -11,6 +11,10 @@ const Task = require('../models/Task');
  * @extends BaseDAO
  */
 class TaskDAO extends BaseDAO {
+    /**
+     * Creates an instance of TaskDAO.
+     * Uses the {@link Task} model as the base.
+     */
     constructor() {
         super(Task);
     }

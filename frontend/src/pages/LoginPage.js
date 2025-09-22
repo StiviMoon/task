@@ -1,6 +1,5 @@
 import page from "page";
 import { login, forgotPassword } from "../services/authService.js";
-
 // ====================== LOGIN ======================
 /**
  * Render the login page template.
@@ -45,7 +44,12 @@ export function addLoginLogic() {
   const form = document.getElementById("loginForm");
   const submitBtn = form.querySelector("button[type='submit']");
   const originalBtnText = submitBtn.textContent;
-
+ /**
+   * Handles login form submission.
+   * @event submit
+   * @property {string} email - User email.
+   * @property {string} password - User password.
+   */
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = form.email.value.trim();
@@ -151,7 +155,11 @@ export function addForgotPasswordLogic() {
   const toast = document.getElementById("toast");
   const submitBtn = form.querySelector("button[type='submit']");
   const originalBtnText = submitBtn.textContent;
-
+/**
+   * Handles forgot password form submission.
+   * @event submit
+   * @property {string} email - User email for password recovery.
+   */
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("forgotEmail").value.trim();

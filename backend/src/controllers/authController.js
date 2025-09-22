@@ -54,7 +54,6 @@ exports.register = async (req, res) => {
  * - 500: `{ success: false, message: "Inténtalo de nuevo más tarde." }`  
  *   If an internal server error occurs.
  */
-
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;

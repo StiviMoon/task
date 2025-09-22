@@ -1,3 +1,5 @@
+const config = require('../config/environment');
+
 /**
  * Global error handling middleware for Express.
  *
@@ -12,9 +14,6 @@
  * @param {import("express").NextFunction} next - Express next middleware callback.
  * @returns {void} Sends a JSON response with error details.
  */
-
-const config = require('../config/environment');
-
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message;

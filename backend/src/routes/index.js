@@ -4,7 +4,11 @@ const router = express.Router();
 // Import main routes
 const routes = require('./routes');
 
-// Health check route
+/**
+ * @route GET /health
+ * @description Health check route to verify if the server is running.
+ * @access Public
+ */
 router.get('/health', (req, res) => {
     res.status(200).json({
         success: true,
