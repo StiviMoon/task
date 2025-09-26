@@ -1,6 +1,7 @@
 import { logout } from "../services/authService.js";
 import { handleLogout } from "../utils/authGuard.js";
 import { TaskForm } from "../components/TaskForm.js";
+import { renderAboutUs } from "./AboutUsPage.js";
 
 // Import logic modules
 import {
@@ -20,7 +21,6 @@ import {
   TaskDetailModal,
   UserProfileModal,
   TrashModal,
-  AboutUsModal,
   renderKanbanBoard
 } from "../logic/index.js";
 
@@ -37,7 +37,7 @@ export async function DashboardPage() {
   const taskDetailModal = new TaskDetailModal();
   const userProfileModal = new UserProfileModal();
   const trashModal = new TrashModal();
-  const aboutUsModal = new AboutUsModal();
+  
 
   // === Main render ===
   root.innerHTML = `
@@ -126,7 +126,7 @@ export async function DashboardPage() {
       <!-- Main content -->
       <main class="main-content">
         <!-- Main Header -->
-        <header class="main-header">
+        <header class="main-header ">
           <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Abrir menú">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -154,6 +154,12 @@ export async function DashboardPage() {
             <div class="task-list"></div>
           </div>
         </div>
+      </main>
+      
+
+      <!-- About us content -->
+      <main class="about-us-content hidden" id="about-us-content">
+        
       </main>
     </div>
 
@@ -362,35 +368,6 @@ export async function DashboardPage() {
       </div>
     </div>
 
-    <!-- About Us Modal -->
-    <div id="about-us-modal" class="modal hidden">
-      <div class="modal-content">
-        <button id="close-about-us" class="close-btn" aria-label="Cerrar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-
-        <div class="modal-header">
-          <h2>Sobre nosotros</h2>
-        </div>
-
-        <div id="about-us-content">
-          <!-- Content will be loaded dynamically from AboutUsPage.js -->
-        </div>
-
-        <div class="modal-actions">
-          <button id="close-about-us-btn" class="btn btn-primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7"></path>
-            </svg>
-            Cerrar
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Delete Confirmation Modal -->
     <div id="delete-confirmation-modal" class="modal hidden">
       <div class="modal-content">
@@ -503,17 +480,6 @@ export async function DashboardPage() {
       });
     }
 
-    // About Us Modal
-    const aboutUsBtn = document.getElementById("about-us-btn");
-    if (aboutUsBtn) {
-      aboutUsBtn.addEventListener("click", () => aboutUsModal.open());
-    }
-
-    const closeAboutUsBtn = document.getElementById("close-about-us-btn");
-    if (closeAboutUsBtn) {
-      closeAboutUsBtn.addEventListener("click", () => aboutUsModal.close());
-    }
-
     // Trash Modal
     const trashBtn = document.getElementById("trash-btn");
     if (trashBtn) {
@@ -616,4 +582,27 @@ export async function DashboardPage() {
 
   // Load initial tasks
   await reloadTasks();
+
+
+  const mainContent = document.querySelector(".main-content");
+  const aboutUsContent = document.querySelector(".about-us-content");
+  const fabbutton = document.querySelector(".fab");
+
+  const showSection = (section) => {
+    if (section === "tasks") {
+      mainContent.classList.remove("hidden");
+      fabbutton.classList.remove("hidden")
+      aboutUsContent.classList.add("hidden");
+    } else if (section === "about") {
+      mainContent.classList.add("hidden");
+      fabbutton.classList.add("hidden")
+      aboutUsContent.classList.remove("hidden");
+      aboutUsContent.innerHTML = renderAboutUs(); 
+      aboutUsContent.scrollTop = 0; 
+    }
+  };
+
+  document.getElementById("tasks-btn")?.addEventListener("click", () => showSection("tasks"));
+  document.getElementById("about-us-btn")?.addEventListener("click", () => showSection("about"));
+
 }

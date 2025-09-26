@@ -86,7 +86,8 @@ export function renderAboutUs() {
         <h3>Nuestra misión</h3>
         <p>Creemos que la productividad no debe ser complicada. Timely está diseñado para ser simple, intuitivo y efectivo, permitiéndote enfocarte en lo que realmente importa: completar tus tareas y alcanzar tus objetivos.</p>
       </div>
-
+    
+      
       <div class="about-us-section">
         <h3>Versión actual</h3>
         <div class="version-info">
@@ -95,5 +96,42 @@ export function renderAboutUs() {
         </div>
       </div>
     </div>
+    <footer class="footer">
+        <div class="footer-top">
+          <h2>Empieza a usar Timely hoy.</h2>
+        </div>
+
+        <div class="footer-bottom">
+          <!-- Bloque izquierdo -->
+          <div class="footer-left">
+            <p>Convierte tus pendientes en logros, un paso a la vez.</p>
+          </div>
+
+          <!-- Links en el centro -->
+          <div class="footer-links">
+            <ul>
+              <li>Mis tareas</li>
+              <li>Mi cuenta</li>
+              <li>Crear nueva tarea</li>
+              <li>Sobre nosotros</li>
+            </ul>
+          </div>
+
+          <!-- Bloque derecho (donde estaba el aguacate) -->
+          <div class="footer-right">
+            <img src="/logo.png" alt="Logo" class="footer-decor" />
+            <div class="footer-social">
+              <div class="social-icons">
+                <div class="social-icons">
+                  <a href="https://github.com/StiviMoon/task.git" target="_blank">
+                    <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub">
+                    GitHub
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </footer>
   `;
 }

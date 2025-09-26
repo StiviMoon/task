@@ -259,6 +259,7 @@
 
   .feature-item {
     flex-direction: column;
+    align-items: center; /* centra todo en columna */
     text-align: center;
     gap: var(--spacing-sm);
   }
@@ -308,3 +309,125 @@
     padding: var(--spacing-md);
   }
 }
+
+
+/* Footer General */
+.footer {
+  background-color: #111; /* Fondo oscuro */
+  color: #fff;
+  padding: 60px 10%;
+  font-family: Arial, sans-serif;
+}
+
+/* ---- Top Section ---- */
+.footer-top {
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.footer-top h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+/* ---- Bottom Section ---- */
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+/* Columna izquierda */
+.footer-left {
+  flex: 1;
+  min-width: 220px;
+}
+
+/* Links del centro */
+.footer-links {
+  display: flex;
+  gap: 50px;
+  flex: 2;
+  min-width: 250px;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links a {
+  color: #aaa;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.footer-links a:hover {
+  color: #fff;
+}
+
+.footer-right {
+  flex: 1;
+  min-width: 220px;
+  text-align: left;
+}
+
+.footer-decor {
+  width: 190px; 
+  margin-bottom: 20px;
+}
+
+/* Social networks */
+.social-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.social-icons img {
+  width: 30px;
+  height: 30px;
+}
+
+.social-icons a {
+  color: #aaa;
+  font-size: 14px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.social-icons a:hover {
+  color: #fff;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .footer-right {
+    text-align: center;
+  }
+
+  .footer-decor {
+    margin: 0 auto 20px auto;
+  }
+  .social-icons {
+    justify-content: center;
+  }
+}
+
+

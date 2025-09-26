@@ -686,23 +686,4 @@ export class TrashModal {
   }
 }
 
-/**
- * About Us Modal Logic
- */
-export class AboutUsModal {
-  constructor() {
-    // Event listeners will be set up externally
-  }
 
-  open() {
-    const content = document.getElementById("about-us-content");
-    if (content) {
-      content.innerHTML = renderAboutUs();
-    }
-    openModal("about-us-modal");
-  }
-
-  close() {
-    closeModal("about-us-modal");
-  }
-}
