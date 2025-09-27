@@ -511,9 +511,19 @@ export async function DashboardPage() {
 
     const deleteAccountButton = document.getElementById("delete-account-button");
     if (deleteAccountButton) {
-      deleteAccountButton.addEventListener("click", () => {
-        // TODO: Implement delete account functionality
-        alert("Funcionalidad de eliminar cuenta no implementada aún");
+      deleteAccountButton.addEventListener("click", async () => {
+        const confirmDelete = confirm("¿Seguro que deseas eliminar tu cuenta?");
+        if (!confirmDelete) return;
+    
+        const { deleteAccount, logout } = await import("../services/authService.js");
+        const result = await deleteAccount();
+    
+        if (result.success) {
+          showToast("Cuenta eliminada.");
+          await handleLogout(logout);
+        } else {
+          showError(result.error || "No se pudo eliminar la cuenta.");
+        }
       });
     }
 

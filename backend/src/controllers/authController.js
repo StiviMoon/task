@@ -1,5 +1,6 @@
 const UserDAO = require("../dao/UserDAO");
 
+const TaskDAO = require("../dao/TaskDAO");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { sendMail } = require("../service/resendService");
@@ -60,6 +61,8 @@ exports.login = async (req, res) => {
 
     const user = await UserDAO.findByEmail(email);
     if(!user) return res.status(401).json({ success: false, message: 'Correo o contraseña inválidos' });
+
+    if(user.isDeleted) return res.status(403).json({success: false, message: 'Tu cuenta está deshabilitada.'})
 
     const isMatch = await bcrypt.compare(password, user.password);
     if(!isMatch) return res.status(401).json({ success: false, message: 'Correo o contraseña inválidos' });
@@ -370,5 +373,46 @@ exports.updateUserProfile = async (req, res) => {
       success: false,
       message: "Error interno del servidor."
     });
+  }
+};
+ 
+/**
+ * Boolean deletes the auth user account
+ * @async
+ * @function deleteAccount
+ * @param {Request} req - Express request object containing `userId` in `req.user`.
+ * @param {Response} res - Express response object.
+ * @returns {Promise<void>} Returns a JSON object with:
+ *  - 200: `{ success: true, message: "Cuenta eliminada." }` if the account was deleted successfully.
+ *  - 404: `{ success: false, message: "Usuario no encontrado o ya eliminado." }` if the user does not exist or is already deleted.
+ *  - 500: `{ success: false, message: "Error interno del servidor." }` if an internal error occurs.
+ */
+exports.deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    // First, soft delete all user's tasks
+    await TaskDAO.softDeleteTasksByUser(userId);
+
+    // Then, soft delete the user account
+    const deleted = await UserDAO.softDeleteUser(userId);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Usuario no encontrado o ya eliminado." });
+    }
+
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.clearCookie("access_token", {
+      httpOnly: false,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
+    });
+
+    return res.status(200).json({ success: true, message: "Cuenta eliminada." });
+  } catch (err) {
+    if (config.NODE_ENV === "development") {
+      console.error(err);
+    }
+    res.status(500).json({ success: false, message: "Error interno del servidor." });
   }
 };

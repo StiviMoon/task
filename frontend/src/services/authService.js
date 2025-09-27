@@ -319,3 +319,34 @@ export const updateUserProfile = async (userData) => {
     };
   }
 };
+/**
+* Delete (soft) the authenticated user
+* @returns {Promise<Object>} Server response
+*/
+export const deleteAccount = async () => {
+  try {
+    const response = await fetch(getApiUrl("/users/profile"), {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Error al eliminar la cuenta");
+    }
+
+    return {
+      success: true,
+      data: data,
+      message: data.message || "Cuenta eliminada",
+    };
+  } catch (error) {
+    console.error("Error en deleteAccount:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+};
