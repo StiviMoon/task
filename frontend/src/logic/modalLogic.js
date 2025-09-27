@@ -116,10 +116,20 @@ export class TaskDetailModal {
       });
     }
 
-    // Toggle status button
-    const toggleStatusBtn = document.getElementById("toggle-status-btn");
-    if (toggleStatusBtn) {
-      toggleStatusBtn.addEventListener("click", () => this.toggleStatus());
+    // Status buttons
+    const markTodoBtn = document.getElementById("mark-todo-btn");
+    if (markTodoBtn) {
+      markTodoBtn.addEventListener("click", () => this.updateTaskStatus("Por hacer"));
+    }
+
+    const markDoingBtn = document.getElementById("mark-doing-btn");
+    if (markDoingBtn) {
+      markDoingBtn.addEventListener("click", () => this.updateTaskStatus("Haciendo"));
+    }
+
+    const markDoneBtn = document.getElementById("mark-done-btn");
+    if (markDoneBtn) {
+      markDoneBtn.addEventListener("click", () => this.updateTaskStatus("Hecho"));
     }
 
     // Delete button
@@ -176,21 +186,25 @@ export class TaskDetailModal {
   }
 
   updateToggleStatusButton(currentStatus) {
-    const toggleBtn = document.getElementById("toggle-status-btn");
-    const toggleText = document.getElementById("toggle-status-text");
+    // Hide all status buttons first
+    document.getElementById("mark-todo-btn").classList.add("hidden");
+    document.getElementById("mark-doing-btn").classList.add("hidden");
+    document.getElementById("mark-done-btn").classList.add("hidden");
 
-    if (currentStatus === "Hecho") {
-      toggleBtn.className = "btn btn-warning";
-      toggleText.textContent = "Marcar Pendiente";
-      toggleBtn.querySelector("svg").innerHTML = `
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-      `;
-    } else {
-      toggleBtn.className = "btn btn-success";
-      toggleText.textContent = "Marcar Completada";
-      toggleBtn.querySelector("svg").innerHTML = `
-        <polyline points="20,6 9,17 4,12"></polyline>
-      `;
+    // Show only the buttons for other statuses
+    switch (currentStatus) {
+      case "Por hacer":
+        document.getElementById("mark-doing-btn").classList.remove("hidden");
+        document.getElementById("mark-done-btn").classList.remove("hidden");
+        break;
+      case "Haciendo":
+        document.getElementById("mark-todo-btn").classList.remove("hidden");
+        document.getElementById("mark-done-btn").classList.remove("hidden");
+        break;
+      case "Hecho":
+        document.getElementById("mark-todo-btn").classList.remove("hidden");
+        document.getElementById("mark-doing-btn").classList.remove("hidden");
+        break;
     }
   }
 
@@ -223,10 +237,8 @@ export class TaskDetailModal {
     this.currentTask = task;
   }
 
-  async toggleStatus() {
+  async updateTaskStatus(newStatus) {
     if (!this.currentTask) return;
-
-    const newStatus = this.currentTask.status === "Hecho" ? "Por hacer" : "Hecho";
 
     try {
       // Import the update function dynamically to avoid circular imports

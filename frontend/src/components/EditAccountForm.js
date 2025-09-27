@@ -6,6 +6,9 @@
  * - Surnames (required)
  * - Age (required, must be at least 13 years old)
  * - Email (required, validated with a simplified RFC 5322 regex)
+ * - Current password (optional, required if changing password)
+ * - New password (optional, required if changing password)
+ * - Confirm new password (optional, required if changing password)
  *
  * Features:
  * - Real-time validation of all fields (`input` events).
@@ -56,6 +59,51 @@ export function renderEditAccountForm(user = {}) {
         <div class="error" id="error-email" aria-live="polite"></div>
       </div>
 
+      <!-- Password Section -->
+      <div class="password-section">
+        <h3>Cambiar Contraseña</h3>
+        <p class="password-help">Deja estos campos vacíos si no quieres cambiar tu contraseña</p>
+
+        <div class="input-group">
+          <div class="password-input-wrapper">
+            <input type="password" id="currentPassword" name="currentPassword" placeholder="Contraseña actual" />
+            <button type="button" class="password-toggle" id="toggle-current-password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+          <div class="error" id="error-current-password" aria-live="polite"></div>
+        </div>
+
+        <div class="input-group">
+          <div class="password-input-wrapper">
+            <input type="password" id="newPassword" name="newPassword" placeholder="Nueva contraseña" />
+            <button type="button" class="password-toggle" id="toggle-new-password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+          <div class="error" id="error-new-password" aria-live="polite"></div>
+        </div>
+
+        <div class="input-group">
+          <div class="password-input-wrapper">
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmar nueva contraseña" />
+            <button type="button" class="password-toggle" id="toggle-confirm-password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+          <div class="error" id="error-confirm-password" aria-live="polite"></div>
+        </div>
+      </div>
+
       <button type="submit" id="saveBtn" class="btn btn-primary" disabled>Guardar</button>
       <button type="button" id="cancel-edit" class="btn btn-secondary">Cancelar</button>
     </form>
@@ -79,8 +127,35 @@ export function renderEditAccountForm(user = {}) {
     const surnames = document.getElementById("surnames");
     const age = document.getElementById("age");
     const email = document.getElementById("email");
+    const currentPassword = document.getElementById("currentPassword");
+    const newPassword = document.getElementById("newPassword");
+    const confirmPassword = document.getElementById("confirmPassword");
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // RFC 5322 simplificado
+
+    // Password toggle functionality
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    passwordToggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const input = toggle.parentElement.querySelector('input');
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+
+        // Update icon
+        const svg = toggle.querySelector('svg');
+        if (type === 'text') {
+          svg.innerHTML = `
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          `;
+        } else {
+          svg.innerHTML = `
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          `;
+        }
+      });
+    });
 
     /**
      * Validates form fields in real time.
@@ -115,7 +190,7 @@ export function renderEditAccountForm(user = {}) {
         document.getElementById("error-age").textContent = "";
       }
 
-      // Mail validation
+      // Email validation
       if (!emailRegex.test(email.value)) {
         document.getElementById("error-email").textContent = "⚠ Correo electrónico inválido";
         valid = false;
@@ -123,11 +198,45 @@ export function renderEditAccountForm(user = {}) {
         document.getElementById("error-email").textContent = "";
       }
 
+      // Password validation
+      const currentPasswordValue = currentPassword.value.trim();
+      const newPasswordValue = newPassword.value.trim();
+      const confirmPasswordValue = confirmPassword.value.trim();
+
+      // Clear previous password errors
+      document.getElementById("error-current-password").textContent = "";
+      document.getElementById("error-new-password").textContent = "";
+      document.getElementById("error-confirm-password").textContent = "";
+
+      // If any password field is filled, all must be filled
+      if (currentPasswordValue || newPasswordValue || confirmPasswordValue) {
+        if (!currentPasswordValue) {
+          document.getElementById("error-current-password").textContent = "⚠ La contraseña actual es obligatoria";
+          valid = false;
+        }
+
+        if (!newPasswordValue) {
+          document.getElementById("error-new-password").textContent = "⚠ La nueva contraseña es obligatoria";
+          valid = false;
+        } else if (newPasswordValue.length < 6) {
+          document.getElementById("error-new-password").textContent = "⚠ La contraseña debe tener al menos 6 caracteres";
+          valid = false;
+        }
+
+        if (!confirmPasswordValue) {
+          document.getElementById("error-confirm-password").textContent = "⚠ Debe confirmar la nueva contraseña";
+          valid = false;
+        } else if (newPasswordValue !== confirmPasswordValue) {
+          document.getElementById("error-confirm-password").textContent = "⚠ Las contraseñas no coinciden";
+          valid = false;
+        }
+      }
+
       saveBtn.disabled = !valid;
       return valid;
     }
 
-    [names, surnames, age, email].forEach(input =>
+    [names, surnames, age, email, currentPassword, newPassword, confirmPassword].forEach(input =>
       input.addEventListener("input", validate)
     );
 
@@ -148,6 +257,15 @@ export function renderEditAccountForm(user = {}) {
           email: email.value.trim()
         };
 
+        // Add password data if provided
+        const currentPasswordValue = currentPassword.value.trim();
+        const newPasswordValue = newPassword.value.trim();
+
+        if (currentPasswordValue && newPasswordValue) {
+          userData.currentPassword = currentPasswordValue;
+          userData.newPassword = newPasswordValue;
+        }
+
         // Import the service function dynamically to avoid circular imports
         const { updateUserProfile } = await import("../services/authService.js");
 
@@ -163,6 +281,11 @@ export function renderEditAccountForm(user = {}) {
           if (window.updateProfileDisplay) {
             window.updateProfileDisplay(result.data);
           }
+
+          // Clear password fields
+          currentPassword.value = "";
+          newPassword.value = "";
+          confirmPassword.value = "";
 
           // Close modal after successful update
           setTimeout(() => {

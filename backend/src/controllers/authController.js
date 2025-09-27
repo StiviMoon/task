@@ -318,7 +318,7 @@ exports.getUserProfile = async (req, res) => {
 exports.updateUserProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { name, lastName, age, email } = req.body;
+    const { name, lastName, age, email, currentPassword, newPassword } = req.body;
 
     // Verify that the user exists
     const existingUser = await UserDAO.findById(userId);
@@ -340,7 +340,56 @@ exports.updateUserProfile = async (req, res) => {
       }
     }
 
-    // Update the user
+    // Handle password change if provided
+    if (currentPassword && newPassword) {
+      // Verify current password
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, existingUser.password);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({
+          success: false,
+          message: "La contraseña actual es incorrecta."
+        });
+      }
+
+      // Validate new password
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: "La nueva contraseña debe tener al menos 6 caracteres."
+        });
+      }
+
+      // Hash new password
+      const saltRounds = 10;
+      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+      // Update user with new password
+      const updatedUser = await UserDAO.updateById(userId, {
+        name,
+        lastName,
+        age,
+        email,
+        password: hashedNewPassword
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({
+          success: false,
+          message: "Usuario no encontrado."
+        });
+      }
+
+      // Get the updated profile (without sensitive data)
+      const userProfile = await UserDAO.getUserProfile(userId);
+
+      return res.status(200).json({
+        success: true,
+        user: userProfile,
+        message: "Perfil y contraseña actualizados exitosamente."
+      });
+    }
+
+    // Update user without password change
     const updatedUser = await UserDAO.updateById(userId, {
       name,
       lastName,
