@@ -407,3 +407,74 @@
     font-size: var(--font-size-xs);
   }
 }
+
+/* ===========================
+   TRASH MODAL STYLES
+=========================== */
+
+/* Trash Task Item */
+.trash-task-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  transition: var(--transition-base);
+}
+
+.trash-task-item:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-secondary);
+}
+
+/* Task Info */
+.trash-task-item .task-info {
+  flex: 1;
+}
+
+.trash-task-item .task-info h4 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+  line-height: var(--line-height-tight);
+}
+
+.trash-task-item .task-info p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-xs) 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.trash-task-item .task-info small {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Responsive Design for Trash Modal */
+@media (max-width: 768px) {
+  .trash-task-item {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .trash-task-item {
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .trash-task-item .task-info h4 {
+    font-size: var(--font-size-base);
+  }
+
+  .trash-task-item .task-info p {
+    font-size: var(--font-size-xs);
+  }
+}

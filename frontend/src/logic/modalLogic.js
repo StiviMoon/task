@@ -611,79 +611,7 @@ export class TrashModal {
           <p>${task.details || "Sin descripción"}</p>
           <small>Eliminada: ${formatDate(task.updatedAt)}</small>
         </div>
-        <div class="task-actions">
-          <button class="btn btn-sm btn-success restore-task" title="Restaurar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 11l19-9-9 19-2-8-8-2z"></path>
-            </svg>
-            Restaurar
-          </button>
-          <button class="btn btn-sm btn-danger permanent-delete" title="Eliminar permanentemente">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3,6 5,6 21,6"></polyline>
-              <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
-            </svg>
-            Eliminar
-          </button>
-        </div>
       </div>
     `).join('');
-
-    // Add event listeners
-    container.querySelectorAll('.restore-task').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const taskId = e.target.closest('.trash-task-item').dataset.taskId;
-        this.restoreTask(taskId);
-      });
-    });
-
-    container.querySelectorAll('.permanent-delete').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const taskId = e.target.closest('.trash-task-item').dataset.taskId;
-        this.permanentlyDeleteTask(taskId);
-      });
-    });
-  }
-
-  async restoreTask(taskId) {
-    try {
-      const result = await restoreTask(taskId);
-      if (result.success) {
-        const { showToast } = await import('./uiLogic.js');
-        showToast("Tarea restaurada exitosamente");
-        await this.loadTrashTasks();
-        // Trigger task reload in parent component
-        window.dispatchEvent(new CustomEvent('tasksReloaded'));
-      } else {
-        const { showError } = await import('./uiLogic.js');
-        showError(result.error || "Error al restaurar tarea");
-      }
-    } catch (error) {
-      console.error("Error restaurando tarea:", error);
-      const { showError } = await import('./uiLogic.js');
-      showError("Error de conexión al restaurar tarea");
-    }
-  }
-
-  async permanentlyDeleteTask(taskId) {
-    if (confirm("¿Estás seguro de que quieres eliminar permanentemente esta tarea? Esta acción no se puede deshacer.")) {
-      try {
-        const result = await permanentlyDeleteTask(taskId);
-        if (result.success) {
-          const { showToast } = await import('./uiLogic.js');
-          showToast("Tarea eliminada permanentemente");
-          await this.loadTrashTasks();
-        } else {
-          const { showError } = await import('./uiLogic.js');
-          showError(result.error || "Error al eliminar permanentemente");
-        }
-      } catch (error) {
-        console.error("Error eliminando permanentemente:", error);
-        const { showError } = await import('./uiLogic.js');
-        showError("Error de conexión al eliminar permanentemente");
-      }
-    }
   }
 }
-
-
