@@ -588,6 +588,17 @@ export async function DashboardPage() {
   const aboutUsContent = document.querySelector(".about-us-content");
   const fabbutton = document.querySelector(".fab");
 
+  /**
+ * Shows a specific section of the application while hiding others.
+ *
+ * - `"tasks"` → Displays the task management view (`.main-content`) and shows the floating action button.
+ * - `"about"` → Displays the About Us section (`.about-us-content`), hides tasks and FAB, 
+ *   and dynamically renders the About Us content.
+ *
+ * @function showSection
+ * @param {"tasks" | "about"} section - The section to display.
+ * @returns {void}
+ */
   const showSection = (section) => {
     if (section === "tasks") {
       mainContent.classList.remove("hidden");

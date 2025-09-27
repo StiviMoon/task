@@ -1,12 +1,18 @@
 /**
-* Renders the "About Us" section view.
-*
-* This function returns HTML markup describing the mission,
-* goals, and features of the **Timely** app.
-*
-* @function renderAboutUs
-* @returns {string} HTML of the "About Us" page
-*/
+ * Renders the "About Us" section view of the **Timely** app.
+ *
+ * This function generates and returns an HTML string containing:
+ * - The Timely logo and subtitle
+ * - An introduction to what Timely is
+ * - Key features (task management, time control, trash, user profile)
+ * - The mission statement
+ * - Current app version
+ * - Footer with links and social media
+ *
+ * @function renderAboutUs
+ * @returns {string} HTML string representing the "About Us" page content.
+ *
+ */
 export function renderAboutUs() {
   return `
     <div class="about-us-logo">
