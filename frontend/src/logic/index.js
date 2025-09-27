@@ -47,7 +47,6 @@ export {
   TaskDetailModal,
   UserProfileModal,
   TrashModal,
-  AboutUsModal
 } from './modalLogic.js';
 
 // Render Logic

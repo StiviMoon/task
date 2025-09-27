@@ -1,6 +1,7 @@
 import { logout } from "../services/authService.js";
 import { handleLogout } from "../utils/authGuard.js";
 import { TaskForm } from "../components/TaskForm.js";
+import { renderAboutUs } from "./AboutUsPage.js";
 
 // Import logic modules
 import {
@@ -20,7 +21,6 @@ import {
   TaskDetailModal,
   UserProfileModal,
   TrashModal,
-  AboutUsModal,
   renderKanbanBoard
 } from "../logic/index.js";
 
@@ -37,7 +37,6 @@ export async function DashboardPage() {
   const taskDetailModal = new TaskDetailModal();
   const userProfileModal = new UserProfileModal();
   const trashModal = new TrashModal();
-  const aboutUsModal = new AboutUsModal();
 
   // === Main render ===
   root.innerHTML = `
@@ -79,7 +78,6 @@ export async function DashboardPage() {
               <span class="menu-item-text">Mis Tareas</span>
             </button>
 
-
             <button class="menu-item" id="trash-btn" title="Papelera" tabindex="0" aria-label="Papelera">
               <span class="menu-item-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -90,11 +88,6 @@ export async function DashboardPage() {
               <span class="menu-item-text">Papelera</span>
             </button>
 
-
-          </div>
-
-          <!-- Bottom Menu Items -->
-          <div class="menu-items-bottom">
             <button class="menu-item" id="account-btn" title="account" tabindex="0" aria-label="Cuenta">
               <span class="menu-item-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -106,9 +99,20 @@ export async function DashboardPage() {
             </button>
 
             <button class="menu-item" id="about-us-btn" title="about-us" tabindex="0" aria-label="about-us">
-                <span>Sobre nosotros</span>
+              <span class="menu-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                  <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                  <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+              </span>
+              <span class="menu-item-text">Sobre nosotros</span>
             </button>
+          </div>
 
+          <!-- Bottom Menu Items -->
+          <div class="menu-items-bottom">
             <button class="menu-item" id="logout-btn" title="Cerrar sesión" tabindex="0" aria-label="Cerrar sesión">
               <span class="menu-item-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -134,7 +138,7 @@ export async function DashboardPage() {
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
-           <h1>Mis Tareas</h1>
+          <h1>Mis Tareas</h1>
           <div class="header-actions">
             <!-- Aquí puedes añadir más acciones del header si necesitas -->
           </div>
@@ -154,6 +158,26 @@ export async function DashboardPage() {
             <div class="task-list"></div>
           </div>
         </div>
+      </main>
+
+      <!-- About us content -->
+      <main class="about-us-content hidden" id="about-us-content">
+        <!-- Main Header -->
+        <header class="main-header">
+          <button id="mobile-menu-btn-about" class="mobile-menu-btn" aria-label="Abrir menú">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h1>Sobre nosotros</h1>
+          <div class="header-actions">
+            <!-- Aquí puedes añadir más acciones del header si necesitas -->
+          </div>
+        </header>
+
+        <!-- About us content will be rendered here -->
       </main>
     </div>
 
@@ -210,11 +234,28 @@ export async function DashboardPage() {
               </svg>
               Editar
             </button>
-            <button id="toggle-status-btn" class="btn btn-success">
+
+            <!-- Botones de estado -->
+            <button id="mark-todo-btn" class="btn btn-warning hidden">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12,6 12,12 16,14"></polyline>
+              </svg>
+              Marcar Pendiente
+            </button>
+
+            <button id="mark-doing-btn" class="btn btn-primary hidden">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18l18-9-18-9z"></path>
+              </svg>
+              En Progreso
+            </button>
+
+            <button id="mark-done-btn" class="btn btn-success hidden">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20,6 9,17 4,12"></polyline>
               </svg>
-              <span id="toggle-status-text">Marcar Completada</span>
+              Marcar Completada
             </button>
 
             <button id="delete-task-btn" class="btn btn-danger">
@@ -224,7 +265,6 @@ export async function DashboardPage() {
               </svg>
               Eliminar
             </button>
-
           </div>
         </div>
 
@@ -362,35 +402,6 @@ export async function DashboardPage() {
       </div>
     </div>
 
-    <!-- About Us Modal -->
-    <div id="about-us-modal" class="modal hidden">
-      <div class="modal-content">
-        <button id="close-about-us" class="close-btn" aria-label="Cerrar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-
-        <div class="modal-header">
-          <h2>Sobre nosotros</h2>
-        </div>
-
-        <div id="about-us-content">
-          <!-- Content will be loaded dynamically from AboutUsPage.js -->
-        </div>
-
-        <div class="modal-actions">
-          <button id="close-about-us-btn" class="btn btn-primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7"></path>
-            </svg>
-            Cerrar
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Delete Confirmation Modal -->
     <div id="delete-confirmation-modal" class="modal hidden">
       <div class="modal-content">
@@ -449,15 +460,40 @@ export async function DashboardPage() {
     }
   };
 
+  // === Section Management ===
+  const mainContent = document.querySelector(".main-content");
+  const aboutUsContent = document.querySelector(".about-us-content");
+  const fabbutton = document.querySelector(".fab");
+
+  const showSection = (section) => {
+    if (section === "tasks") {
+      mainContent.classList.remove("hidden");
+      fabbutton.classList.remove("hidden")
+      aboutUsContent.classList.add("hidden");
+    } else if (section === "about") {
+      mainContent.classList.add("hidden");
+      fabbutton.classList.add("hidden")
+      aboutUsContent.classList.remove("hidden");
+      aboutUsContent.innerHTML = renderAboutUs();
+      aboutUsContent.scrollTop = 0;
+    }
+  };
+
   // === Event Handlers ===
   const handleMenuNavigation = (itemId) => {
+    console.log("Navigation clicked:", itemId); // Debug log
     switch (itemId) {
       case "tasks-btn":
-        console.log("Navegando a Mis Tareas");
+        console.log("Tasks clicked!");
+        showSection("tasks");
         break;
       case "trash-btn":
-        console.log("Navegando a Papelera");
+        console.log("Trash clicked!");
         trashModal.open();
+        break;
+      case "about-us-btn":
+        console.log("About us clicked!");
+        showSection("about");
         break;
       default:
         console.log("Navegación no implementada para:", itemId);
@@ -466,14 +502,8 @@ export async function DashboardPage() {
   };
 
   // === Setup Event Listeners ===
-
-  // Setup modals (after DOM is ready)
   setupModalListeners();
-
-  // Setup mobile sidebar
   setupMobileSidebar();
-
-  // Setup menu items
   setupMenuItems(handleMenuNavigation);
 
   // Setup modal-specific event listeners after DOM is ready
@@ -501,17 +531,6 @@ export async function DashboardPage() {
         // TODO: Implement delete account functionality
         alert("Funcionalidad de eliminar cuenta no implementada aún");
       });
-    }
-
-    // About Us Modal
-    const aboutUsBtn = document.getElementById("about-us-btn");
-    if (aboutUsBtn) {
-      aboutUsBtn.addEventListener("click", () => aboutUsModal.open());
-    }
-
-    const closeAboutUsBtn = document.getElementById("close-about-us-btn");
-    if (closeAboutUsBtn) {
-      closeAboutUsBtn.addEventListener("click", () => aboutUsModal.close());
     }
 
     // Trash Modal
@@ -544,6 +563,21 @@ export async function DashboardPage() {
         }
       });
     });
+
+    // About us content menu toggle
+    const mobileMenuBtnAbout = document.getElementById("mobile-menu-btn-about");
+    if (mobileMenuBtnAbout) {
+      mobileMenuBtnAbout.addEventListener("click", () => {
+        // Abrir el sidebar en lugar de cambiar de sección
+        const sidebar = document.getElementById("sidebar");
+        const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+        if (sidebar && sidebarOverlay) {
+          sidebar.classList.add("mobile-open");
+          sidebarOverlay.classList.add("active");
+        }
+      });
+    }
   }, 100);
 
   // Task form
@@ -574,8 +608,6 @@ export async function DashboardPage() {
     document.getElementById("task-modal").classList.add("hidden");
   });
 
-  // Task detail modal buttons are now handled by the TaskDetailModal class
-
   // Delete confirmation
   document.getElementById("confirm-delete").addEventListener("click", async () => {
     const currentTask = getCurrentTask();
@@ -586,7 +618,7 @@ export async function DashboardPage() {
         taskDetailModal.close();
         await reloadTasks();
         showToast("Tarea movida a la papelera");
-    } else {
+      } else {
         showError(result.error || "Error al eliminar la tarea");
       }
     }
@@ -607,6 +639,20 @@ export async function DashboardPage() {
 
   document.getElementById("confirm-logout").addEventListener("click", async () => {
     await handleLogout(logout);
+  });
+
+  // Listen for task reload events from trash modal
+  window.addEventListener('tasksReloaded', () => {
+    reloadTasks();
+  });
+
+  // Load initial tasks
+  await reloadTasks();
+
+  // Listen for navigation events from sidebar
+  window.addEventListener('navigateToPage', (event) => {
+    const { page } = event.detail;
+    showSection(page);
   });
 
   // Listen for task reload events from trash modal

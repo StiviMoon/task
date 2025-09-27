@@ -4,6 +4,7 @@ import { renderRegister, addRegisterLogic } from "./pages/RegisterPage.js";
 import { renderResetPassword, addResetPasswordLogic } from "./pages/ResetPasswordPage.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
 import { requireAuth, requireGuest } from "./utils/authGuard.js";
+import { app } from "./App.js";
 
 /**
  * Mounts a view inside the #app element.
@@ -13,8 +14,8 @@ import { requireAuth, requireGuest } from "./utils/authGuard.js";
  * @param {Function} logic - Function that attaches event listeners / page logic
  */
 function mount(view, logic) {
-  const app = document.getElementById("app");
-  app.innerHTML = view(); // render the HTML of the page
+  const appElement = document.getElementById("app");
+  appElement.innerHTML = view(); // render the HTML of the page
   logic(); // attach the page-specific logic
 }
 
@@ -23,8 +24,8 @@ function mount(view, logic) {
  * Useful in protected routes before rendering the actual view.
  */
 const showLoading = () => {
-  const app = document.getElementById("app");
-  app.innerHTML = `
+  const appElement = document.getElementById("app");
+  appElement.innerHTML = `
     <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
       <div style="text-align: center;">
         <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin: 0 auto 20px;"></div>
@@ -82,9 +83,8 @@ page("/reset-password", () => {
 page("/tasks", () => {
   requireAuth(
     async () => {
-      const app = document.getElementById("app");
-      app.innerHTML = ""; // Limpiar contenido anterior
-      await DashboardPage();
+      // Initialize the app if not already initialized
+      await app.init();
     },
     () => window.location.href = '/'
   );

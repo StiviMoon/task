@@ -116,10 +116,20 @@ export class TaskDetailModal {
       });
     }
 
-    // Toggle status button
-    const toggleStatusBtn = document.getElementById("toggle-status-btn");
-    if (toggleStatusBtn) {
-      toggleStatusBtn.addEventListener("click", () => this.toggleStatus());
+    // Status buttons
+    const markTodoBtn = document.getElementById("mark-todo-btn");
+    if (markTodoBtn) {
+      markTodoBtn.addEventListener("click", () => this.updateTaskStatus("Por hacer"));
+    }
+
+    const markDoingBtn = document.getElementById("mark-doing-btn");
+    if (markDoingBtn) {
+      markDoingBtn.addEventListener("click", () => this.updateTaskStatus("Haciendo"));
+    }
+
+    const markDoneBtn = document.getElementById("mark-done-btn");
+    if (markDoneBtn) {
+      markDoneBtn.addEventListener("click", () => this.updateTaskStatus("Hecho"));
     }
 
     // Delete button
@@ -176,21 +186,25 @@ export class TaskDetailModal {
   }
 
   updateToggleStatusButton(currentStatus) {
-    const toggleBtn = document.getElementById("toggle-status-btn");
-    const toggleText = document.getElementById("toggle-status-text");
+    // Hide all status buttons first
+    document.getElementById("mark-todo-btn").classList.add("hidden");
+    document.getElementById("mark-doing-btn").classList.add("hidden");
+    document.getElementById("mark-done-btn").classList.add("hidden");
 
-    if (currentStatus === "Hecho") {
-      toggleBtn.className = "btn btn-warning";
-      toggleText.textContent = "Marcar Pendiente";
-      toggleBtn.querySelector("svg").innerHTML = `
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-      `;
-    } else {
-      toggleBtn.className = "btn btn-success";
-      toggleText.textContent = "Marcar Completada";
-      toggleBtn.querySelector("svg").innerHTML = `
-        <polyline points="20,6 9,17 4,12"></polyline>
-      `;
+    // Show only the buttons for other statuses
+    switch (currentStatus) {
+      case "Por hacer":
+        document.getElementById("mark-doing-btn").classList.remove("hidden");
+        document.getElementById("mark-done-btn").classList.remove("hidden");
+        break;
+      case "Haciendo":
+        document.getElementById("mark-todo-btn").classList.remove("hidden");
+        document.getElementById("mark-done-btn").classList.remove("hidden");
+        break;
+      case "Hecho":
+        document.getElementById("mark-todo-btn").classList.remove("hidden");
+        document.getElementById("mark-doing-btn").classList.remove("hidden");
+        break;
     }
   }
 
@@ -223,10 +237,8 @@ export class TaskDetailModal {
     this.currentTask = task;
   }
 
-  async toggleStatus() {
+  async updateTaskStatus(newStatus) {
     if (!this.currentTask) return;
-
-    const newStatus = this.currentTask.status === "Hecho" ? "Por hacer" : "Hecho";
 
     try {
       // Import the update function dynamically to avoid circular imports
@@ -611,98 +623,7 @@ export class TrashModal {
           <p>${task.details || "Sin descripción"}</p>
           <small>Eliminada: ${formatDate(task.updatedAt)}</small>
         </div>
-        <div class="task-actions">
-          <button class="btn btn-sm btn-success restore-task" title="Restaurar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 11l19-9-9 19-2-8-8-2z"></path>
-            </svg>
-            Restaurar
-          </button>
-          <button class="btn btn-sm btn-danger permanent-delete" title="Eliminar permanentemente">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3,6 5,6 21,6"></polyline>
-              <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
-            </svg>
-            Eliminar
-          </button>
-        </div>
       </div>
     `).join('');
-
-    // Add event listeners
-    container.querySelectorAll('.restore-task').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const taskId = e.target.closest('.trash-task-item').dataset.taskId;
-        this.restoreTask(taskId);
-      });
-    });
-
-    container.querySelectorAll('.permanent-delete').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const taskId = e.target.closest('.trash-task-item').dataset.taskId;
-        this.permanentlyDeleteTask(taskId);
-      });
-    });
-  }
-
-  async restoreTask(taskId) {
-    try {
-      const result = await restoreTask(taskId);
-      if (result.success) {
-        const { showToast } = await import('./uiLogic.js');
-        showToast("Tarea restaurada exitosamente");
-        await this.loadTrashTasks();
-        // Trigger task reload in parent component
-        window.dispatchEvent(new CustomEvent('tasksReloaded'));
-      } else {
-        const { showError } = await import('./uiLogic.js');
-        showError(result.error || "Error al restaurar tarea");
-      }
-    } catch (error) {
-      console.error("Error restaurando tarea:", error);
-      const { showError } = await import('./uiLogic.js');
-      showError("Error de conexión al restaurar tarea");
-    }
-  }
-
-  async permanentlyDeleteTask(taskId) {
-    if (confirm("¿Estás seguro de que quieres eliminar permanentemente esta tarea? Esta acción no se puede deshacer.")) {
-      try {
-        const result = await permanentlyDeleteTask(taskId);
-        if (result.success) {
-          const { showToast } = await import('./uiLogic.js');
-          showToast("Tarea eliminada permanentemente");
-          await this.loadTrashTasks();
-        } else {
-          const { showError } = await import('./uiLogic.js');
-          showError(result.error || "Error al eliminar permanentemente");
-        }
-      } catch (error) {
-        console.error("Error eliminando permanentemente:", error);
-        const { showError } = await import('./uiLogic.js');
-        showError("Error de conexión al eliminar permanentemente");
-      }
-    }
-  }
-}
-
-/**
- * About Us Modal Logic
- */
-export class AboutUsModal {
-  constructor() {
-    // Event listeners will be set up externally
-  }
-
-  open() {
-    const content = document.getElementById("about-us-content");
-    if (content) {
-      content.innerHTML = renderAboutUs();
-    }
-    openModal("about-us-modal");
-  }
-
-  close() {
-    closeModal("about-us-modal");
   }
 }

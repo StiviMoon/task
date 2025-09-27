@@ -27,11 +27,12 @@
 /* Dashboard Layout */
 .dashboard-container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   background: var(--bg-secondary);
 }
 
-.main-content {
+.main-content,
+.about-us-content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -39,11 +40,14 @@
   transition: var(--transition-base);
   margin-left: 280px;
   min-width: 0; /* Permite que flexbox funcione correctamente */
+  overflow-y: auto; /* 👈 agrega esto */
+  min-height: 100vh; /* 👈 asegura que el scroll funcione */
 }
 
 /* Mobile Layout */
 @media (max-width: 768px) {
-  .main-content {
+  .main-content,
+  .about-us-content {
     margin-left: 0;
     width: 100%;
   }
