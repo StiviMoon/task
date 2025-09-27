@@ -27,7 +27,7 @@
 /* Dashboard Layout */
 .dashboard-container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   background: var(--bg-secondary);
 }
 
@@ -41,7 +41,7 @@
   margin-left: 280px;
   min-width: 0; /* Permite que flexbox funcione correctamente */
   overflow-y: auto; /* 👈 agrega esto */
-  height: 100vh; /* 👈 asegura que el scroll funcione */
+  min-height: 100vh; /* 👈 asegura que el scroll funcione */
 }
 
 /* Mobile Layout */
