@@ -1,5 +1,4 @@
-import { App } from "./App.js";
+import { initRouter } from "./router.js";
 
-// Initialize the application
-const app = new App();
-await app.init();
+// Initialize the router
+initRouter();

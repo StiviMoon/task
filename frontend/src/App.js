@@ -9,12 +9,15 @@ export class App {
   constructor() {
     this.sidebar = new Sidebar();
     this.currentPage = null;
+    this.initialized = false;
   }
 
   /**
    * Initialize the application
    */
   async init() {
+    if (this.initialized) return;
+
     const root = document.getElementById("app");
 
     // Render sidebar first (persistent)
@@ -25,6 +28,8 @@ export class App {
 
     // Load initial page
     await this.loadPage("tasks");
+
+    this.initialized = true;
   }
 
   /**
@@ -64,13 +69,10 @@ export class App {
   }
 }
 
-// Initialize app when DOM is loaded
-document.addEventListener('DOMContentLoaded', async () => {
-  const app = new App();
-  await app.init();
+// Create a singleton instance
+export const app = new App();
 
-  // Listen for navigation events
-  window.addEventListener('navigateToPage', (event) => {
-    app.navigateToPage(event.detail.page);
-  });
+// Listen for navigation events
+window.addEventListener('navigateToPage', (event) => {
+  app.navigateToPage(event.detail.page);
 });
