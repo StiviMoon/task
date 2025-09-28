@@ -50,16 +50,23 @@ export async function DashboardPage() {
         <div class="sidebar-header">
           <div class="sidebar-logo"></div>
           <h3 class="sidebar-title">Timely</h3>
+          
+         <!-- Menu Toggle -->
+          <button id="menu-toggle" class="sidebar-btn" title="Alternar menú">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button> 
+          <!-- close sidebar Button -->
+          <button id="close-sidebar-mobile" class="mobile-menu-btn" aria-label="Cerrar menú">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
-
-        <!-- Menu Toggle -->
-        <button id="menu-toggle" class="sidebar-btn" title="Alternar menú">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
 
         <!-- Sidebar Menu -->
         <nav id="sidebar-menu" class="sidebar-menu">
@@ -95,7 +102,7 @@ export async function DashboardPage() {
                   <path d="M5.5 21a7.5 7.5 0 0 1 13 0"></path>
                 </svg>
               </span>
-              <span>MI cuenta</span>
+              <span>Mi cuenta</span>
             </button>
 
             <button class="menu-item" id="about-us-btn" title="about-us" tabindex="0" aria-label="about-us">
@@ -162,21 +169,6 @@ export async function DashboardPage() {
 
       <!-- About us content -->
       <main class="about-us-content hidden" id="about-us-content">
-        <!-- Main Header -->
-        <header class="main-header">
-          <button id="mobile-menu-btn-about" class="mobile-menu-btn" aria-label="Abrir menú">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <h1>Sobre nosotros</h1>
-          <div class="header-actions">
-            <!-- Aquí puedes añadir más acciones del header si necesitas -->
-          </div>
-        </header>
-
         <!-- About us content will be rendered here -->
       </main>
     </div>
@@ -476,6 +468,21 @@ export async function DashboardPage() {
       aboutUsContent.classList.remove("hidden");
       aboutUsContent.innerHTML = renderAboutUs();
       aboutUsContent.scrollTop = 0;
+      
+      // Event listener for mobile menu button
+      setTimeout(() => {
+        const mobileMenuBtnAbout = document.getElementById("mobile-menu-btn-about");
+        if (mobileMenuBtnAbout) {
+          mobileMenuBtnAbout.addEventListener("click", () => {
+            const sidebar = document.getElementById("sidebar");
+            const sidebarOverlay = document.getElementById("sidebar-overlay");
+            if (sidebar && sidebarOverlay) {
+              sidebar.classList.add("mobile-open");
+              sidebarOverlay.classList.add("active");
+            }
+          });
+        }
+      }, 0);
     }
   };
 
@@ -562,23 +569,7 @@ export async function DashboardPage() {
           modal.classList.add('hidden');
         }
       });
-    });
-
-    // About us content menu toggle
-    const mobileMenuBtnAbout = document.getElementById("mobile-menu-btn-about");
-    if (mobileMenuBtnAbout) {
-      mobileMenuBtnAbout.addEventListener("click", () => {
-        // Abrir el sidebar en lugar de cambiar de sección
-        const sidebar = document.getElementById("sidebar");
-        const sidebarOverlay = document.getElementById("sidebar-overlay");
-
-        if (sidebar && sidebarOverlay) {
-          sidebar.classList.add("mobile-open");
-          sidebarOverlay.classList.add("active");
-        }
-      });
-    }
-  }, 100);
+    }); }, 100);
 
   // Task form
   const taskForm = TaskForm(async (taskData) => {
