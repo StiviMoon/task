@@ -532,14 +532,6 @@ export async function DashboardPage() {
       returnFromUser.addEventListener("click", () => userProfileModal.close());
     }
 
-    const deleteAccountButton = document.getElementById("delete-account-button");
-    if (deleteAccountButton) {
-      deleteAccountButton.addEventListener("click", () => {
-        // TODO: Implement delete account functionality
-        alert("Funcionalidad de eliminar cuenta no implementada aún");
-      });
-    }
-
     // Trash Modal
     const trashBtn = document.getElementById("trash-btn");
     if (trashBtn) {

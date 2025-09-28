@@ -68,6 +68,9 @@ export function addLoginLogic() {
         // Redirect to the dashboard
         page("/tasks");
       } else {
+        if((result.error || '').toLowerCase().includes('deshabilitada')){
+          showError("Tu cuenta está deshabilitada.")
+        }
         showError(result.error);
       }
     } catch (error) {

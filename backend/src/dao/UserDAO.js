@@ -69,7 +69,7 @@ class UserDAO extends BaseDAO {
      */
     async emailExists(email) {
         try {
-            return await this.exists({ email: email.toLowerCase() });
+            return await this.exists({ email: email.toLowerCase(), isDeleted: false });
         } catch (error) {
             throw new Error(`Error al verificar email: ${error.message}`);
         }
@@ -124,7 +124,7 @@ class UserDAO extends BaseDAO {
     async getUserProfile(userId) {
         try {
             const user = await this.findById(userId);
-            if (!user) return null;
+            if (!user || user.isDeleted) return null;
 
             // Return only non-sensitive data
             return {
@@ -185,6 +185,20 @@ class UserDAO extends BaseDAO {
             });
         } catch (error) {
             throw new Error(`Error en búsqueda de usuarios: ${error.message}`);
+        }
+    }
+     /** 
+    * Boolean delete for the user
+    * @async
+    * @param {String}: userID
+    */
+     async softDeleteUser(userId) {
+        try {
+            const user = await this.findById(userId);
+            if (!user || user.isDeleted) return null;
+            return await this.updateById(userId, { isDeleted: true });
+        } catch (error) {
+            throw new Error(`Error al eliminar usuario: ${error.message}`);
         }
     }
 }
