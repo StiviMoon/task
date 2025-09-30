@@ -27,4 +27,7 @@ router.get("/profile", authenticateToken, authController.getUserProfile);
 // Update user profile
 router.put("/profile", authenticateToken, authController.updateUserProfile);
 
+// Delete ( soft ) user account
+router.delete("/profile", authenticateToken, authController.deleteAccount);
+
 module.exports = router;

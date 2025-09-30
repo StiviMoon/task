@@ -206,6 +206,15 @@
   border-bottom-color: transparent;
 }
 
+#close-sidebar-mobile:hover {
+  background-color: rgb(245, 131, 131);
+}
+
+#close-sidebar-mobile:active{
+  background-color: rgb(247, 48, 48);
+}
+
+
 @keyframes btn-spin {
   to { transform: rotate(360deg); }
 }
@@ -237,6 +246,12 @@
     height: 44px;
   }
 
+  #close-sidebar-mobile {
+    display: flex;
+    margin-left: auto;
+    transition: background 0.3 ease;
+  }
+  
   .fab {
     bottom: 1.5rem;
     right: 1.5rem;

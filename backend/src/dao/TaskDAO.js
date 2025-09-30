@@ -177,6 +177,20 @@ class TaskDAO extends BaseDAO {
         }
     }
 
+     /**
+     * Soft delete all tasks belonging to a user.
+     * @async
+     * @param {string} userId - Owner user's ID.
+     * @returns {Promise<Object>} - Update result containing matched and modified counts.
+     * @throws {Error} - If update fails.
+     */
+        async softDeleteTasksByUser(userId) {
+            try {
+                return await this.updateMany({ userId, isDeleted: false }, { isDeleted: true });
+            } catch (error) {
+                throw new Error(`Error al eliminar tareas del usuario: ${error.message}`);
+            }
+        }
 }
 
 module.exports = new TaskDAO();

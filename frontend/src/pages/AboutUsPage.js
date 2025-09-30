@@ -10,12 +10,23 @@
 export function renderAboutUs() {
   return `
 
+    <header class="main-header">
+      <button id="mobile-menu-btn-about" class="mobile-menu-btn" aria-label="Abrir menú">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <h1>Sobre nosotros</h1>     
+    </header>
 
     <div class="about-us-sections">
       <div class="about-us-logo">
         <img src="/logo.png" alt="Timely Logo" class="app-logo" onclick="window.open('https://github.com/StiviMoon/task', '_blank')">
         <p class="about-us-subtitle">Tu compañero perfecto para la gestión de tareas</p>
       </div>
+      
       <div class="about-us-section">
         <h3>¿Qué es Timely?</h3>
         <p>Timely es una aplicación web moderna diseñada para ayudarte a organizar y gestionar tus tareas de manera eficiente. Con una interfaz intuitiva y funcionalidades avanzadas, te permitimos mantener el control total sobre tus actividades diarias.</p>

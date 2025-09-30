@@ -22,6 +22,7 @@ function mount(view, logic) {
 /**
  * Shows a loading spinner while authentication is being verified.
  * Useful in protected routes before rendering the actual view.
+ * @function
  */
 const showLoading = () => {
   const appElement = document.getElementById("app");
@@ -43,14 +44,21 @@ const showLoading = () => {
 
 // ================== ROUTES ==================
 /**
- * "/" → Login page (solo accesible si NO estás autenticado)
- * "/signup" → Register page (solo accesible si NO estás autenticado)
- * "/forgot-password" → Forgot password page (solo accesible si NO estás autenticado)
- * "/reset-password" → Reset password page (accesible sin autenticación)
- * "/tasks" → Dashboard page (solo accesible si estás autenticado)
+ * Application routes handled by Page.js
+ *
+ * Routes:
+ * - `/` → Login page (only if guest)
+ * - `/signup` → Register page (only if guest)
+ * - `/forgot-password` → Forgot password page (only if guest)
+ * - `/reset-password` → Reset password page (public)
+ * - `/tasks` → Dashboard page (only if authenticated)
+ * - `*` → Fallback route (redirects based on authentication status)
  */
 
-// Ruta de login - solo accesible si NO estás autenticado
+/**
+ * Login route ("/").
+ * Accessible only if the user is not authenticated.
+ */
 page("/", () => {
   requireGuest(
     () => mount(renderLogin, addLoginLogic),
@@ -58,7 +66,10 @@ page("/", () => {
   );
 });
 
-// Login route
+/**
+ * Signup route ("/signup").
+ * Accessible only if the user is not authenticated.
+ */
 page("/signup", () => {
   requireGuest(
     () => mount(renderRegister, addRegisterLogic),
@@ -66,7 +77,10 @@ page("/signup", () => {
   );
 });
 
-// Forgot password route
+/**
+ * Forgot password route ("/forgot-password").
+ * Accessible only if the user is not authenticated.
+ */
 page("/forgot-password", () => {
   requireGuest(
     () => mount(renderForgotPassword, addForgotPasswordLogic),
@@ -74,12 +88,18 @@ page("/forgot-password", () => {
   );
 });
 
-// Reset password route (public)
+/**
+ * Reset password route ("/reset-password").
+ * Accessible publicly, without authentication.
+ */
 page("/reset-password", () => {
   mount(renderResetPassword, addResetPasswordLogic);
 });
 
-// Dashboard route (protected)
+/**
+ * Dashboard route ("/tasks").
+ * Accessible only if the user is authenticated.
+ */
 page("/tasks", () => {
   requireAuth(
     async () => {
@@ -90,7 +110,10 @@ page("/tasks", () => {
   );
 });
 
-// Fallback route (handles unknown paths)
+/**
+ * Fallback route ("*").
+ * Redirects to dashboard if authenticated, otherwise to login.
+ */
 page("*", () => {
   // Check if you are authenticated to decide where to redirect
   requireAuth(
@@ -102,6 +125,7 @@ page("*", () => {
 /**
  * Initializes the Page.js router.
  * This should be called once in the app entry point.
+ *  * @function
  */
 export function initRouter() {
   page.start();
