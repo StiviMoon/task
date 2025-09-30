@@ -122,6 +122,23 @@ class BaseDAO {
         }
     }
 
+      /**
+     * Update multiple documents matching the given criteria.
+     * @async
+     * @param {Object} criteria - Search criteria.
+     * @param {Object} data - Data to update.
+     * @param {Object} [options={ runValidators: true }] - Update options.
+     * @returns {Promise<Object>} - Mongoose update result.
+     * @throws {Error} - If update fails.
+     */
+      async updateMany(criteria, data, options = { runValidators: true }) {
+        try {
+            return await this.model.updateMany(criteria, data, options);
+        } catch (error) {
+            throw error;
+        }
+    }
+
     /**
      * Delete a document by its ID.
      * @async

@@ -361,24 +361,24 @@
   }
 
   .main-header h1 {
+    order: 1;
     font-size: var(--font-size-xl);
     flex: 1;
     min-width: 0;
     margin-left: var(--spacing-sm);
-    order: 2; /* Title in the middle */
+    
   }
 
   .main-header .header-actions {
+    order: 2;
     margin-left: auto;
     flex-shrink: 0;
-    order: 1; /* Actions on the left */
   }
 
-  /* Show mobile menu button on mobile and position it on the right */
-  .mobile-menu-btn {
+  .main-header .mobile-menu-btn{
     display: flex;
-    order: 3; /* Position at the end (right side) */
-    margin-left: auto;
+    order: 3;
+    margin-left: var(--spacing-sm);
   }
 
   .kanban-board {

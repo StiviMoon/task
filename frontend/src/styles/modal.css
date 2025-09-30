@@ -127,7 +127,7 @@
   display: flex;
   gap: var(--spacing-lg);
   margin-top: var(--spacing-2xl);
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .modal-actions.centered {
